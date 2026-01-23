@@ -1,0 +1,77 @@
+[
+  {
+    "task": "organize_fridge",
+    "objects": {
+      "fresh_milk.n.01_1": "milk_jug.n.01",
+      "water_bottle_glass.n.01_1": "water_bottle.n.01",
+      "lemon.n.01_1": "lemon.n.01",
+      "ramen_pack.n.01_1": "food_pack.n.01",
+      "hair_mud.n.01_1": "cosmetic_container.n.01"
+    },
+    "receptacles": {
+      "fridge_shelf": "fridge_shelf",
+      "fridge_drawer": "fridge_drawer",
+      "door_left_bin": "door_left_bin",
+      "door_right_bin": "door_right_bin"
+    },
+    "init": [
+      "(inside fresh_milk.n.01_1 fridge_shelf)",
+      "(inside water_bottle_glass.n.01_1 fridge_shelf)",
+      "(inside lemon.n.01_1 fridge_shelf)",
+      "(inside ramen_pack.n.01_1 door_left_bin)",
+      "(inside hair_mud.n.01_1 fridge_drawer)"
+    ],
+    "qa_history": [
+      {
+        "turn_id": 1,
+        "question": "Do you prefer to keep beverages like milk and water together or separate them from other food items?",
+        "answer": "inside fresh_milk.n.01_1 door_right_bin, inside water_bottle_glass.n.01_1 door_left_bin"
+      },
+      {
+        "turn_id": 2,
+        "question": "Would you like to keep perishable foods like milk and lemons on a shelf or in the drawer?",
+        "answer": "perishable_foods_on_shelf"
+      },
+      {
+        "turn_id": 3,
+        "question": "Do you want to keep similar items together, such as all beverages or all food items, or mix them up on the shelves?",
+        "answer": "keep_similar_items_together"
+      },
+      {
+        "turn_id": 4,
+        "question": "Would you prefer to store items like ramen packs in a bin or on a shelf for easy access when needed?",
+        "answer": "fridge_shelf"
+      },
+      {
+        "turn_id": 5,
+        "question": "Do you prioritize easy access to frequently used items such as milk and water, or do you prefer a more organized arrangement with less emphasis on convenience?",
+        "answer": "door_right_bin"
+      }
+    ],
+    "goal": [
+      "(inside fresh_milk.n.01_1 door_right_bin)",
+      "(inside water_bottle_glass.n.01_1 door_left_bin)",
+      "(inside lemon.n.01_1 fridge_drawer)",
+      "(inside ramen_pack.n.01_1 fridge_shelf)",
+      "(inside hair_mud.n.01_1 fridge_shelf)"
+    ],
+    "pred_goal": [
+      "(inside fresh_milk.n.01_1 door_right_bin)",
+      "(inside water_bottle_glass.n.01_1 door_left_bin)",
+      "(inside lemon.n.01_1 fridge_shelf)",
+      "(inside ramen_pack.n.01_1 fridge_shelf)",
+      "(inside hair_mud.n.01_1 fridge_drawer)"
+    ],
+    "preference_eval": {
+      "metrics": {
+        "satisfaction": 0.6,
+        "precision": 0.6
+      },
+      "counts": {
+        "pred_total": 5,
+        "gt_total": 5,
+        "matched_gt": 3
+      }
+    }
+  }
+]

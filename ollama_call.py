@@ -282,7 +282,7 @@ def save_data_to_json(json_data, base_path):
 
 if __name__ == "__main__":
     # 测试代码
-    model = "qwen2.5vl:32b"
+    model = "qwen3:32b"
     # model = "qwen3:32b"
     llmapi = VLMAPI(model)
     

@@ -1,10 +1,21 @@
 
+import json
+import os
+import sys
+
 import numpy as np
 from tqdm import tqdm
 import benchmark
 import utils
 from openai_cache import Completion
 import openai
+
+CURRENT_DIR = os.path.dirname(__file__)
+PARENT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, os.pardir))
+if PARENT_DIR not in sys.path:
+    sys.path.insert(0, PARENT_DIR)
+
+from task_matter import query_seen_placements
 
 
 def construct_summarization_prompt(objects, receptacles, placements):
@@ -71,7 +82,13 @@ pick_and_place("{first_object}",'''
     return placement_prompt_template.format(summary=summary, objects_str=objects_str, receptacles_str=receptacles_str, first_object=objects[0])
 
 
-def evaluate(scenarios, eval_split='unseen', model='gpt-4o', verbose=False):
+def evaluate(
+    scenarios,
+    eval_split='unseen',
+    model='gpt-4o',
+    verbose=False,
+    use_dialogue=True,
+):
     #功能：评估 LLM 总结整理规则和根据总结预测物体放置的能力。
     assert eval_split in {'unseen', 'seen'}
     completion = Completion()
@@ -80,9 +97,21 @@ def evaluate(scenarios, eval_split='unseen', model='gpt-4o', verbose=False):
         if verbose:
             print(f'Scenario {i + 1} of {len(scenarios)}\n')
 
+        # Seen placements via dialogue (task_matter) or ground-truth.
+        if use_dialogue:
+            seen_placements, qa_history = query_seen_placements(scenario)
+        else:
+            seen_placements = scenario.seen_placements
+            qa_history = []
+
+        if verbose:
+            print('Questions and answers:')
+            print(json.dumps(qa_history, ensure_ascii=True, indent=2))
+            print('\n' + 10 * '-' + '\n')
+
         # Summarization
         summarization_prompt = construct_summarization_prompt(
-            scenario.seen_objects, scenario.receptacles, scenario.seen_placements)
+            scenario.seen_objects, scenario.receptacles, seen_placements)
         summarization_completion = completion.create(summarization_prompt, model=model).choices[0].message.content
         if verbose:
             print(summarization_prompt, end='')

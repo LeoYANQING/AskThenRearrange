@@ -11,6 +11,12 @@ from typing import Dict, List, Optional, Tuple
 
 from ollama_call import VLMAPI
 
+STRICT_RULES = (
+    "Strict rules:\n"
+    "* Do not include any internal reasoning, thinking, or analysis.\n"
+    "* Only return the final answer.\n"
+)
+
 from question_generate import (
     generate_question_direct_question,
     generate_question_ParallelExploration,
@@ -24,6 +30,8 @@ def build_problem_for_remaining(scenario: Scenario, remaining_objects: List[str]
     seen_objects = ", ".join(scenario.seen_objects)
     remaining_str = ", ".join(remaining_objects)
     return (
+        STRICT_RULES
+        + "* Output format: question sentence or placement commands only.\n"
         f"Room: {scenario.room}\n"
         "Task: Organize the items in the room.\n"
         f"Receptacles: {receptacles}\n"
@@ -43,10 +51,11 @@ def build_answer_prompt(scenario: Scenario, question: str) -> str:
         [f"- {obj}: {recep}" for obj, recep in scenario.seen_placements]
     )
     return (
+        STRICT_RULES
         f"Seen placements:\n{seen_placements}\n"
         f"Question: {question}\n"
         "Answer naturally and concisely. If you mention locations, use receptacle names "
-        f"from this list: {receptacles}."
+        f"from this list: {receptacles}. Start your response immediately with the result."
     )
 
 
@@ -208,12 +217,11 @@ def _call_vlm(
     prompt: str,
     system: str,
     temperature: float,
-    max_tokens: int,
 ) -> str:
     return llm.vlm_request_with_format(
         system,
         prompt,
-        options={"temperature": temperature, "num_predict": max_tokens},
+        options={"temperature": temperature},
     )
 
 
@@ -247,13 +255,14 @@ def build_dialogue_summary_prompt(
     if not placement_lines:
         placement_lines = "None"
     return (
+        STRICT_RULES
+        + "* Output format: one summary sentence only.\n"
         "You are summarizing a robot's Q&A with a user about organizing objects.\n"
         "Summarize the user's preferences or placement rules in one concise sentence.\n"
         f"Room: {scenario.room}\n"
         f"Receptacles: {', '.join(scenario.receptacles)}\n"
         f"Q&A history:\n{history}\n"
         f"Known placements:\n{placement_lines}\n"
-        "Output only the summary sentence."
     )
 
 
@@ -287,10 +296,10 @@ def query_placements(
             _call_vlm(
                 question_model,
                 question_prompt,
-                "You are a helper robot. Output ONLY the question sentence or "
-                "'PLACEMENT: object -> receptacle'. Do NOT output any internal reasoning or analysis.",
+                STRICT_RULES
+                + "* Output format: question sentence or 'PLACEMENT: object -> receptacle'.\n"
+                "You are a helper robot. Start your response immediately with the result.",
                 temperature=0.2,
-                max_tokens=1024,
             )
         )
         
@@ -337,9 +346,9 @@ def query_placements(
             _call_vlm(
                 answer_model,
                 answer_prompt,
-                "You are the user answering a household organization question.",
+                "You are the user answering a household organization question. "
+                "Output only the answer. Do NOT include reasoning or analysis.",
                 temperature=0.0,
-                max_tokens=512,
             )
         )
         
@@ -370,9 +379,8 @@ def query_placements(
         _call_vlm(
             question_model,
             summary_prompt,
-            "Output one concise sentence. No analysis.",
+            "Output one concise sentence. Do NOT include reasoning or analysis.",
             temperature=0.0,
-            max_tokens=128,
         )
     )
 

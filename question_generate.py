@@ -16,15 +16,15 @@ def generate_question_user_preference(problem: str, history: str = "") -> str:
     * Question Form: Use Q14 (Judging) or Q1 (Confirmation).
 
     Output Format:
-    - If asking a question: Output the question sentence.
+    - If asking a question: Output ONLY the question sentence.
     - If placing objects: Output "PLACEMENT: <object_name> -> <receptacle_name>" (one per line).
+    - Do NOT output any internal thoughts, reasoning, or analysis. Start your response directly.
 
     Example:
     (If history is empty)
-    Robot: "Do you have a preferred way to group items in the fridge? (K11)"
+    Do you have a preferred way to group items in the fridge?
 
     (If history contains "I like fruits in the drawer")
-    Robot: 
     PLACEMENT: apple -> bottom drawer
     PLACEMENT: banana -> bottom drawer
 
@@ -45,13 +45,13 @@ def generate_question_ParallelExploration(problem: str, history: str = "") -> st
     {history}
 
     Instructions: 
-    * Dynamic Integration: Alternate between asking about user needs (K11) and specific task details (K4, K7, K8).
-    * Real-time Adaptation: Use questions to coordinate actions.
-    * Inference: If you can infer the placement of one or more objects from history, output placement commands.
-    
+    * Step-by-Step Execution: Focus on the immediate next step. Ask specific, operational questions first (e.g., K4 Quantities, K8 Procedure) to keep the task moving.
+    * Interleaved Preferences: While executing, occasionally ask about preferences (K11) to guide future steps, but do not start with abstract preference questions.
+    * Inference: If you know the next step from history, perform it (PLACEMENT).
+
     Output Format:
-    - If asking a question: Output the question sentence.
-    - If placing objects: Output "PLACEMENT: <object_name> -> <receptacle_name>" (one per line).
+    - please do not return analysis and reasoning. Output ONLY the question sentence. Do not include any internal thoughts, reasoning, or analysis.
+
 
     problem: {problem}
     """
@@ -75,8 +75,8 @@ def generate_question_direct_question(problem: str, history: str = "") -> str:
     * Inference: If you know where an object goes, place it.
     
     Output Format:
-    - If asking a question: Output the question sentence.
-    - If placing objects: Output "PLACEMENT: <object_name> -> <receptacle_name>" (one per line).
+    - Output ONLY the question sentence.
+    - Do NOT output any internal thoughts, reasoning, or analysis. Start your response directly.
 
     problem: {problem}
     """

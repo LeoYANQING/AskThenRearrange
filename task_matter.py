@@ -178,7 +178,7 @@ def query_placements(
         response = question_model.generate(
             question_prompt,
             system="You are a helper robot. Output ONLY the question sentence or 'PLACEMENT: object -> receptacle'. Do NOT output any internal reasoning or analysis.",
-            options={"temperature": 0.2, "num_predict": 512},
+            options={"temperature": 0.2, "num_predict": 1024},
         )
         response_text = extract_question(str(response))
         

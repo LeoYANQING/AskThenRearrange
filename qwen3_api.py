@@ -23,7 +23,7 @@ class Qwen3API:
         system_guard: Optional[str] = None,
     ) -> None:
         self.model = model
-        self.host = (host or os.environ.get("OLLAMA_HOST") or "http://localhost:11434").rstrip("/")
+        self.host = (host or os.environ.get("OLLAMA_HOST") or "http://110.42.252.68:8080").rstrip("/")
         self.timeout = timeout
         self.system_guard = system_guard or (
             "Respond with only the requested output. Do not include analysis or <think> tags."

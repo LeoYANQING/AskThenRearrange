@@ -1,0 +1,3375 @@
+[
+  {
+    "annotator_notes": "Place clean, dry, and non-leaking items on the coffee table for visibility. Items that are wet, dirty, or contain liquids must go in the lidded bin to prevent damage. Small, delicate, or battery-powered electronics should be stored in the side drawer to avoid accidents. Heavy or non-breakable items can be placed in the storage box. Frequently used plush items stay on the sofa, while less-used or larger plush items are stored in the storage box. Items with sharp edges or loose parts must never be placed on elevated surfaces. Battery-powered toys must be segregated from non-powered ones unless both are stored in the drawer.",
+    "receptacles": [
+      "coffee table",
+      "lidded bin",
+      "storage box",
+      "sofa",
+      "side drawer"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "fresh orange",
+      "wet towel",
+      "plush rabbit",
+      "glass vase",
+      "battery-powered remote",
+      "wooden puzzle",
+      "spilled water bottle",
+      "plush octopus",
+      "metal remote",
+      "dry cloth"
+    ],
+    "seen_placements": [
+      [
+        "fresh orange",
+        "coffee table"
+      ],
+      [
+        "dry cloth",
+        "coffee table"
+      ],
+      [
+        "wet towel",
+        "lidded bin"
+      ],
+      [
+        "spilled water bottle",
+        "lidded bin"
+      ],
+      [
+        "plush rabbit",
+        "sofa"
+      ],
+      [
+        "plush octopus",
+        "storage box"
+      ],
+      [
+        "battery-powered remote",
+        "side drawer"
+      ],
+      [
+        "glass vase",
+        "coffee table"
+      ],
+      [
+        "wooden puzzle",
+        "storage box"
+      ],
+      [
+        "metal remote",
+        "storage box"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "function",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "sunny-side-up egg",
+      "clean napkin",
+      "fuzzy slime",
+      "plush dragon",
+      "screwdriver set",
+      "leaky pen",
+      "rechargeable lamp",
+      "velvet pillow",
+      "plush bear",
+      "damp sponge"
+    ],
+    "unseen_placements": [
+      [
+        "clean napkin",
+        "coffee table"
+      ],
+      [
+        "velvet pillow",
+        "sofa"
+      ],
+      [
+        "sunny-side-up egg",
+        "lidded bin"
+      ],
+      [
+        "leaky pen",
+        "lidded bin"
+      ],
+      [
+        "fuzzy slime",
+        "lidded bin"
+      ],
+      [
+        "plush dragon",
+        "storage box"
+      ],
+      [
+        "screwdriver set",
+        "storage box"
+      ],
+      [
+        "rechargeable lamp",
+        "side drawer"
+      ],
+      [
+        "plush bear",
+        "sofa"
+      ],
+      [
+        "damp sponge",
+        "lidded bin"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Breakable items should be stored in the storage box to prevent damage. Frequently used items must be placed on the coffee table for easy access. Items powered by batteries should go in the side drawer to prevent accidental activation. Soft, frequently used toys can stay on the sofa. Items that don't fit these criteria should be sorted by material and usage frequency.",
+    "receptacles": [
+      "coffee table",
+      "storage box",
+      "side drawer",
+      "sofa",
+      "lidded bin"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "thick book",
+      "thin book",
+      "breakable mug",
+      "durable mug",
+      "battery-powered lamp",
+      "corded lamp",
+      "frequently used remote",
+      "rarely used remote",
+      "plush toy",
+      "wooden puzzle"
+    ],
+    "seen_placements": [
+      [
+        "thick book",
+        "coffee table"
+      ],
+      [
+        "thin book",
+        "storage box"
+      ],
+      [
+        "breakable mug",
+        "storage box"
+      ],
+      [
+        "durable mug",
+        "coffee table"
+      ],
+      [
+        "battery-powered lamp",
+        "side drawer"
+      ],
+      [
+        "corded lamp",
+        "coffee table"
+      ],
+      [
+        "frequently used remote",
+        "coffee table"
+      ],
+      [
+        "rarely used remote",
+        "storage box"
+      ],
+      [
+        "plush toy",
+        "sofa"
+      ],
+      [
+        "wooden puzzle",
+        "lidded bin"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "function"
+    ],
+    "unseen_objects": [
+      "medium book",
+      "delicate mug",
+      "wind-up music box",
+      "plastic puzzle",
+      "frequent-use blanket",
+      "infrequent-use blanket",
+      "electronic remote",
+      "wired headphones",
+      "velvet pillow",
+      "leather pillow"
+    ],
+    "unseen_placements": [
+      [
+        "medium book",
+        "coffee table"
+      ],
+      [
+        "delicate mug",
+        "storage box"
+      ],
+      [
+        "wind-up music box",
+        "sofa"
+      ],
+      [
+        "plastic puzzle",
+        "lidded bin"
+      ],
+      [
+        "frequent-use blanket",
+        "sofa"
+      ],
+      [
+        "infrequent-use blanket",
+        "storage box"
+      ],
+      [
+        "electronic remote",
+        "coffee table"
+      ],
+      [
+        "wired headphones",
+        "coffee table"
+      ],
+      [
+        "velvet pillow",
+        "sofa"
+      ],
+      [
+        "leather pillow",
+        "coffee table"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Place battery-powered items in the side drawer to prevent accidental activation. Store hard, durable toys in the storage box for compact organization. Keep fresh, whole produce visible on the coffee table for immediate use. Overripe or cut produce should go in the lidded bin to contain mess. Plush items that are frequently handled belong on the sofa. Books and flat items should be stacked on the shelf for easy access. Fragile or sharp objects must be secured in the storage box.",
+    "receptacles": [
+      "coffee table",
+      "storage box",
+      "side drawer",
+      "lidded bin",
+      "shelf"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "fresh banana",
+      "overripe banana",
+      "fresh apple",
+      "cut apple slices",
+      "small Lego brick",
+      "large Lego brick",
+      "battery-powered toy car",
+      "wind-up toy car",
+      "plush teddy bear",
+      "stuffed rabbit",
+      "hard plastic action figure",
+      "metal toy robot",
+      "paperback book",
+      "wireless remote"
+    ],
+    "seen_placements": [
+      [
+        "fresh banana",
+        "coffee table"
+      ],
+      [
+        "fresh apple",
+        "coffee table"
+      ],
+      [
+        "overripe banana",
+        "lidded bin"
+      ],
+      [
+        "cut apple slices",
+        "lidded bin"
+      ],
+      [
+        "small Lego brick",
+        "storage box"
+      ],
+      [
+        "large Lego brick",
+        "storage box"
+      ],
+      [
+        "hard plastic action figure",
+        "storage box"
+      ],
+      [
+        "metal toy robot",
+        "storage box"
+      ],
+      [
+        "plush teddy bear",
+        "sofa"
+      ],
+      [
+        "stuffed rabbit",
+        "sofa"
+      ],
+      [
+        "battery-powered toy car",
+        "side drawer"
+      ],
+      [
+        "wireless remote",
+        "side drawer"
+      ],
+      [
+        "paperback book",
+        "shelf"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "fresh orange",
+      "bruised orange",
+      "fresh peach",
+      "overripe peach",
+      "tiny puzzle piece",
+      "wooden toy block",
+      "battery-powered train",
+      "wind-up train",
+      "plush dog",
+      "plush dinosaur",
+      "electronic game controller",
+      "metal spinning top",
+      "cookbook",
+      "magazine"
+    ],
+    "unseen_placements": [
+      [
+        "fresh orange",
+        "coffee table"
+      ],
+      [
+        "fresh peach",
+        "coffee table"
+      ],
+      [
+        "bruised orange",
+        "lidded bin"
+      ],
+      [
+        "overripe peach",
+        "lidded bin"
+      ],
+      [
+        "tiny puzzle piece",
+        "storage box"
+      ],
+      [
+        "wooden toy block",
+        "storage box"
+      ],
+      [
+        "metal spinning top",
+        "storage box"
+      ],
+      [
+        "plush dog",
+        "sofa"
+      ],
+      [
+        "plush dinosaur",
+        "sofa"
+      ],
+      [
+        "battery-powered train",
+        "side drawer"
+      ],
+      [
+        "electronic game controller",
+        "side drawer"
+      ],
+      [
+        "wind-up train",
+        "storage box"
+      ],
+      [
+        "cookbook",
+        "shelf"
+      ],
+      [
+        "magazine",
+        "shelf"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Fragile items must be stored in secure, elevated locations (bookshelf, side table). Battery-powered devices require enclosed containment (side drawer) to prevent accidental activation. Books sorted by material type (leather-bound vs. paper) occupy dedicated shelf spaces. Delicate materials (glass, ceramic) require dust-resistant storage (storage bin with lid). Soft, bulky items (plush toys) should be placed in open floor spaces for comfort and accessibility. Items with loose parts or small components must be fully contained (storage bin) to prevent scattering. High-traffic area receptacles (coffee table) prioritize spill-resistant or non-perishable contents only.",
+    "receptacles": [
+      "coffee table",
+      "storage bin",
+      "bookshelf",
+      "side table",
+      "floor basket",
+      "side drawer"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "leather-bound book",
+      "paperback novel",
+      "battery-powered robot",
+      "wind-up train",
+      "glass figurine",
+      "plastic figurine",
+      "plush bear",
+      "stuffed octopus",
+      "board game box",
+      "lego set container",
+      "ceramic mug",
+      "plastic tumbler",
+      "wireless controller",
+      "mechanical puzzle"
+    ],
+    "seen_placements": [
+      [
+        "leather-bound book",
+        "bookshelf"
+      ],
+      [
+        "paperback novel",
+        "bookshelf"
+      ],
+      [
+        "glass figurine",
+        "side table"
+      ],
+      [
+        "plastic figurine",
+        "storage bin"
+      ],
+      [
+        "plush bear",
+        "floor basket"
+      ],
+      [
+        "stuffed octopus",
+        "floor basket"
+      ],
+      [
+        "board game box",
+        "coffee table"
+      ],
+      [
+        "lego set container",
+        "storage bin"
+      ],
+      [
+        "battery-powered robot",
+        "side drawer"
+      ],
+      [
+        "wind-up train",
+        "storage bin"
+      ],
+      [
+        "ceramic mug",
+        "side table"
+      ],
+      [
+        "plastic tumbler",
+        "coffee table"
+      ],
+      [
+        "wireless controller",
+        "side drawer"
+      ],
+      [
+        "mechanical puzzle",
+        "coffee table"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "hardcover cookbook",
+      "magazine",
+      "solar-powered lamp",
+      "manual wind-up lantern",
+      "porcelain vase",
+      "acrylic vase",
+      "plush cat",
+      "stuffed elephant",
+      "jigsaw puzzle box",
+      "building blocks container",
+      "stoneware bowl",
+      "plastic bowl",
+      "Bluetooth speaker",
+      "wooden puzzle"
+    ],
+    "unseen_placements": [
+      [
+        "hardcover cookbook",
+        "bookshelf"
+      ],
+      [
+        "magazine",
+        "bookshelf"
+      ],
+      [
+        "porcelain vase",
+        "side table"
+      ],
+      [
+        "acrylic vase",
+        "storage bin"
+      ],
+      [
+        "plush cat",
+        "floor basket"
+      ],
+      [
+        "stuffed elephant",
+        "floor basket"
+      ],
+      [
+        "jigsaw puzzle box",
+        "coffee table"
+      ],
+      [
+        "building blocks container",
+        "storage bin"
+      ],
+      [
+        "solar-powered lamp",
+        "side drawer"
+      ],
+      [
+        "manual wind-up lantern",
+        "storage bin"
+      ],
+      [
+        "stoneware bowl",
+        "side table"
+      ],
+      [
+        "plastic bowl",
+        "coffee table"
+      ],
+      [
+        "Bluetooth speaker",
+        "side drawer"
+      ],
+      [
+        "wooden puzzle",
+        "coffee table"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Sealed beverages are placed on the side table for easy access; open beverages are in the decorative basket to contain spills. Hardcover books go on the bookshelf for stability; paperbacks are on the TV stand for flexible stacking. Glass items are placed on the bookshelf to avoid damage; ceramics are on the ottoman for stability. Battery-powered devices are in the decorative basket to manage cords; non-battery items are on the side table. Fragile items requiring protection are stored in the ottoman; robust items are placed on the TV stand. Items with high visual appeal are prioritized for the bookshelf and side table to maintain aesthetic cohesion.",
+    "receptacles": [
+      "bookshelf",
+      "side table",
+      "TV stand",
+      "ottoman",
+      "decorative basket"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "sealed water bottle",
+      "open water bottle",
+      "hardcover novel",
+      "paperback novel",
+      "glass vase",
+      "ceramic vase",
+      "battery-powered lamp",
+      "non-battery lamp",
+      "decorative pillow",
+      "heavy throw blanket",
+      "wooden photo frame",
+      "plastic photo frame"
+    ],
+    "seen_placements": [
+      [
+        "sealed water bottle",
+        "side table"
+      ],
+      [
+        "open water bottle",
+        "decorative basket"
+      ],
+      [
+        "hardcover novel",
+        "bookshelf"
+      ],
+      [
+        "paperback novel",
+        "TV stand"
+      ],
+      [
+        "glass vase",
+        "bookshelf"
+      ],
+      [
+        "ceramic vase",
+        "ottoman"
+      ],
+      [
+        "battery-powered lamp",
+        "decorative basket"
+      ],
+      [
+        "non-battery lamp",
+        "side table"
+      ],
+      [
+        "decorative pillow",
+        "ottoman"
+      ],
+      [
+        "heavy throw blanket",
+        "ottoman"
+      ],
+      [
+        "wooden photo frame",
+        "TV stand"
+      ],
+      [
+        "plastic photo frame",
+        "side table"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "sealed juice box",
+      "open juice box",
+      "hardcover cookbook",
+      "paperback cookbook",
+      "ceramic bowl",
+      "glass bowl",
+      "battery-powered speaker",
+      "non-battery speaker",
+      "velvet cushion",
+      "chunky knit blanket",
+      "metal picture hanger",
+      "plastic picture hanger"
+    ],
+    "unseen_placements": [
+      [
+        "sealed juice box",
+        "side table"
+      ],
+      [
+        "open juice box",
+        "decorative basket"
+      ],
+      [
+        "hardcover cookbook",
+        "bookshelf"
+      ],
+      [
+        "paperback cookbook",
+        "TV stand"
+      ],
+      [
+        "ceramic bowl",
+        "ottoman"
+      ],
+      [
+        "glass bowl",
+        "bookshelf"
+      ],
+      [
+        "battery-powered speaker",
+        "decorative basket"
+      ],
+      [
+        "non-battery speaker",
+        "side table"
+      ],
+      [
+        "velvet cushion",
+        "ottoman"
+      ],
+      [
+        "chunky knit blanket",
+        "ottoman"
+      ],
+      [
+        "metal picture hanger",
+        "TV stand"
+      ],
+      [
+        "plastic picture hanger",
+        "side table"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Fresh produce and visually appealing items should be displayed on the coffee table. Overripe, damaged, or perishable items must be stored in the lidded bin to contain messes. Small, durable, or hazardous toys require the storage box for organization. Large, soft, or frequently used plush items can remain on the sofa. Battery-powered devices need secure containment in the side drawer to prevent activation. Items with ambiguous attributes should be sorted by dominant functional category and material type.",
+    "receptacles": [
+      "coffee table",
+      "lidded bin",
+      "storage box",
+      "sofa",
+      "side drawer"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "fresh banana",
+      "overripe banana",
+      "fresh apple",
+      "cut apple slices",
+      "small Lego brick",
+      "large Lego brick",
+      "toy car with batteries",
+      "toy car without batteries",
+      "plush teddy bear",
+      "stuffed rabbit",
+      "plastic action figure",
+      "metal toy robot"
+    ],
+    "seen_placements": [
+      [
+        "fresh banana",
+        "coffee table"
+      ],
+      [
+        "fresh apple",
+        "coffee table"
+      ],
+      [
+        "overripe banana",
+        "lidded bin"
+      ],
+      [
+        "cut apple slices",
+        "lidded bin"
+      ],
+      [
+        "small Lego brick",
+        "storage box"
+      ],
+      [
+        "large Lego brick",
+        "storage box"
+      ],
+      [
+        "plastic action figure",
+        "storage box"
+      ],
+      [
+        "metal toy robot",
+        "storage box"
+      ],
+      [
+        "plush teddy bear",
+        "sofa"
+      ],
+      [
+        "stuffed rabbit",
+        "sofa"
+      ],
+      [
+        "toy car with batteries",
+        "side drawer"
+      ],
+      [
+        "toy car without batteries",
+        "storage box"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "fresh orange",
+      "bruised orange",
+      "fresh peach",
+      "overripe peach",
+      "tiny puzzle piece",
+      "wooden toy block",
+      "battery-powered toy train",
+      "wind-up toy train",
+      "plush dog",
+      "plush dinosaur",
+      "electronic game controller",
+      "metal spinning top"
+    ],
+    "unseen_placements": [
+      [
+        "fresh orange",
+        "coffee table"
+      ],
+      [
+        "fresh peach",
+        "coffee table"
+      ],
+      [
+        "bruised orange",
+        "lidded bin"
+      ],
+      [
+        "overripe peach",
+        "lidded bin"
+      ],
+      [
+        "tiny puzzle piece",
+        "storage box"
+      ],
+      [
+        "wooden toy block",
+        "storage box"
+      ],
+      [
+        "metal spinning top",
+        "storage box"
+      ],
+      [
+        "plush dog",
+        "sofa"
+      ],
+      [
+        "plush dinosaur",
+        "sofa"
+      ],
+      [
+        "battery-powered toy train",
+        "side drawer"
+      ],
+      [
+        "electronic game controller",
+        "side drawer"
+      ],
+      [
+        "wind-up toy train",
+        "storage box"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Fragile items and delicate objects must be placed in the cabinet to prevent damage. Stuffed animals and soft toys should occupy the shelf for easy retrieval. Wet or liquid-containing items require the lidded bucket to avoid spills. Battery-powered electronics need secure storage in the side table to prevent accidental activation. Heavy or rigid objects are suited for the storage bin to maintain organization.",
+    "receptacles": [
+      "shelf",
+      "cabinet",
+      "lidded bucket",
+      "storage bin",
+      "side table"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "hardcover book",
+      "stuffed rabbit",
+      "plush zebra",
+      "remote control car",
+      "wet towel",
+      "glass vase",
+      "battery-powered drone",
+      "plastic building block",
+      "fresh oranges",
+      "spoiled bananas",
+      "wooden puzzle",
+      "metal keychain"
+    ],
+    "seen_placements": [
+      [
+        "hardcover book",
+        "cabinet"
+      ],
+      [
+        "stuffed rabbit",
+        "shelf"
+      ],
+      [
+        "plush zebra",
+        "shelf"
+      ],
+      [
+        "remote control car",
+        "side table"
+      ],
+      [
+        "wet towel",
+        "lidded bucket"
+      ],
+      [
+        "glass vase",
+        "cabinet"
+      ],
+      [
+        "battery-powered drone",
+        "side table"
+      ],
+      [
+        "plastic building block",
+        "storage bin"
+      ],
+      [
+        "fresh oranges",
+        "storage bin"
+      ],
+      [
+        "spoiled bananas",
+        "lidded bucket"
+      ],
+      [
+        "wooden puzzle",
+        "storage bin"
+      ],
+      [
+        "metal keychain",
+        "cabinet"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "category"
+    ],
+    "unseen_objects": [
+      "paperback magazine",
+      "plush bear",
+      "wind-up train",
+      "dry towel",
+      "ceramic mug",
+      "solar-powered lamp",
+      "fresh grapes",
+      "overripe mango",
+      "plastic toy boat",
+      "delicate figurine",
+      "cardboard box",
+      "velvet pillow"
+    ],
+    "unseen_placements": [
+      [
+        "paperback magazine",
+        "storage bin"
+      ],
+      [
+        "plush bear",
+        "shelf"
+      ],
+      [
+        "wind-up train",
+        "storage bin"
+      ],
+      [
+        "dry towel",
+        "shelf"
+      ],
+      [
+        "ceramic mug",
+        "cabinet"
+      ],
+      [
+        "solar-powered lamp",
+        "side table"
+      ],
+      [
+        "fresh grapes",
+        "storage bin"
+      ],
+      [
+        "overripe mango",
+        "lidded bucket"
+      ],
+      [
+        "plastic toy boat",
+        "storage bin"
+      ],
+      [
+        "delicate figurine",
+        "cabinet"
+      ],
+      [
+        "cardboard box",
+        "storage bin"
+      ],
+      [
+        "velvet pillow",
+        "shelf"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Durable, large-format books should be stored on the top bookshelf shelves to prevent damage. Compact, lightweight books can be placed in the storage ottoman. Hot beverages must be placed in heat-resistant containers on the side table, while cold drinks can be left on the coffee table for accessibility. Battery-powered electronics should be stored in the entertainment stand to prevent accidental activation. Fragile or decorative items require stable, elevated surfaces like the top bookshelf. Items that are both fragile and decorative must be prioritized for elevated placement over other attributes.",
+    "receptacles": [
+      "coffee table",
+      "side table",
+      "bookshelf",
+      "storage ottoman",
+      "entertainment stand"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "hardcover book",
+      "softcover book",
+      "hot tea",
+      "cold soda",
+      "remote control",
+      "manual fan",
+      "ceramic bowl",
+      "glass vase"
+    ],
+    "seen_placements": [
+      [
+        "hardcover book",
+        "bookshelf"
+      ],
+      [
+        "softcover book",
+        "storage ottoman"
+      ],
+      [
+        "hot tea",
+        "side table"
+      ],
+      [
+        "cold soda",
+        "coffee table"
+      ],
+      [
+        "remote control",
+        "entertainment stand"
+      ],
+      [
+        "manual fan",
+        "storage ottoman"
+      ],
+      [
+        "ceramic bowl",
+        "coffee table"
+      ],
+      [
+        "glass vase",
+        "bookshelf"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "textbook",
+      "notebook",
+      "hot coffee",
+      "iced water",
+      "wireless mouse",
+      "corded lamp",
+      "porcelain plate",
+      "delicate figurine"
+    ],
+    "unseen_placements": [
+      [
+        "textbook",
+        "bookshelf"
+      ],
+      [
+        "notebook",
+        "storage ottoman"
+      ],
+      [
+        "hot coffee",
+        "side table"
+      ],
+      [
+        "iced water",
+        "coffee table"
+      ],
+      [
+        "wireless mouse",
+        "entertainment stand"
+      ],
+      [
+        "corded lamp",
+        "storage ottoman"
+      ],
+      [
+        "porcelain plate",
+        "coffee table"
+      ],
+      [
+        "delicate figurine",
+        "bookshelf"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Fresh and intact consumables should be placed on the coffee table for accessibility. Overripe, damaged, or perishable consumables must be stored in the lidded bin to contain mess. Battery-powered devices require secure storage in the side drawer to prevent accidental operation. Non-powered toys and non-perishable items go in the storage box. Soft, frequently used items should remain on the sofa for comfort. Fragile or sharp objects must avoid open surfaces unless stabilized by weight or enclosure.",
+    "receptacles": [
+      "coffee table",
+      "lidded bin",
+      "storage box",
+      "sofa",
+      "side drawer"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "fresh banana",
+      "overripe banana",
+      "fresh apple",
+      "cut apple slices",
+      "battery-powered toy car",
+      "manual toy car",
+      "plush bear",
+      "ceramic cup",
+      "plastic cup",
+      "sharp kitchen knife",
+      "dull kitchen knife",
+      "wooden spoon"
+    ],
+    "seen_placements": [
+      [
+        "fresh banana",
+        "coffee table"
+      ],
+      [
+        "fresh apple",
+        "coffee table"
+      ],
+      [
+        "overripe banana",
+        "lidded bin"
+      ],
+      [
+        "cut apple slices",
+        "lidded bin"
+      ],
+      [
+        "battery-powered toy car",
+        "side drawer"
+      ],
+      [
+        "plastic cup",
+        "coffee table"
+      ],
+      [
+        "plush bear",
+        "sofa"
+      ],
+      [
+        "manual toy car",
+        "storage box"
+      ],
+      [
+        "wooden spoon",
+        "coffee table"
+      ],
+      [
+        "dull kitchen knife",
+        "storage box"
+      ],
+      [
+        "ceramic cup",
+        "storage box"
+      ],
+      [
+        "sharp kitchen knife",
+        "storage box"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "fresh orange",
+      "bruised orange",
+      "battery-powered remote control",
+      "manual remote control",
+      "stuffed owl",
+      "stuffed fox",
+      "glass mug",
+      "porcelain plate",
+      "cracked plate",
+      "plastic fork",
+      "metal fork",
+      "wet sponge"
+    ],
+    "unseen_placements": [
+      [
+        "fresh orange",
+        "coffee table"
+      ],
+      [
+        "bruised orange",
+        "lidded bin"
+      ],
+      [
+        "battery-powered remote control",
+        "side drawer"
+      ],
+      [
+        "wet sponge",
+        "lidded bin"
+      ],
+      [
+        "stuffed owl",
+        "sofa"
+      ],
+      [
+        "stuffed fox",
+        "sofa"
+      ],
+      [
+        "plastic fork",
+        "coffee table"
+      ],
+      [
+        "glass mug",
+        "storage box"
+      ],
+      [
+        "manual remote control",
+        "storage box"
+      ],
+      [
+        "porcelain plate",
+        "storage box"
+      ],
+      [
+        "cracked plate",
+        "lidded bin"
+      ],
+      [
+        "metal fork",
+        "coffee table"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Delicate or fragile items must be placed in the ottoman to prevent damage. Battery-powered electronics belong on the side table for centralized charging. Frequently used or lightweight items go on the coffee table for accessibility. Books and heavy objects are stored on the bookshelf for stability. Items that are open or messy should be in the storage bin. Oversized or bulky items should be placed in the cabinet to optimize space.",
+    "receptacles": [
+      "coffee table",
+      "storage bin",
+      "bookshelf",
+      "side table",
+      "ottoman",
+      "cabinet"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "hardback novel",
+      "paperback novel",
+      "leather-bound journal",
+      "mass-market paperback",
+      "battery-powered lamp",
+      "manual wind-up lamp",
+      "framed photo",
+      "unframed photo",
+      "glass ornament",
+      "plastic ornament",
+      "wooden cutting board",
+      "metal cutting board"
+    ],
+    "seen_placements": [
+      [
+        "hardback novel",
+        "bookshelf"
+      ],
+      [
+        "paperback novel",
+        "coffee table"
+      ],
+      [
+        "leather-bound journal",
+        "bookshelf"
+      ],
+      [
+        "mass-market paperback",
+        "coffee table"
+      ],
+      [
+        "battery-powered lamp",
+        "side table"
+      ],
+      [
+        "manual wind-up lamp",
+        "ottoman"
+      ],
+      [
+        "framed photo",
+        "bookshelf"
+      ],
+      [
+        "unframed photo",
+        "storage bin"
+      ],
+      [
+        "glass ornament",
+        "ottoman"
+      ],
+      [
+        "plastic ornament",
+        "coffee table"
+      ],
+      [
+        "wooden cutting board",
+        "storage bin"
+      ],
+      [
+        "metal cutting board",
+        "cabinet"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "category"
+    ],
+    "unseen_objects": [
+      "hardcover cookbook",
+      "paperback magazine",
+      "battery-operated speaker",
+      "manual wind-up clock",
+      "framed poster",
+      "unframed poster",
+      "crystal vase",
+      "ceramic vase",
+      "plastic cutting board",
+      "bamboo cutting board"
+    ],
+    "unseen_placements": [
+      [
+        "hardcover cookbook",
+        "bookshelf"
+      ],
+      [
+        "paperback magazine",
+        "coffee table"
+      ],
+      [
+        "battery-operated speaker",
+        "side table"
+      ],
+      [
+        "manual wind-up clock",
+        "ottoman"
+      ],
+      [
+        "framed poster",
+        "bookshelf"
+      ],
+      [
+        "unframed poster",
+        "storage bin"
+      ],
+      [
+        "crystal vase",
+        "ottoman"
+      ],
+      [
+        "ceramic vase",
+        "cabinet"
+      ],
+      [
+        "plastic cutting board",
+        "coffee table"
+      ],
+      [
+        "bamboo cutting board",
+        "storage bin"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Frequently used items must be placed on the side table for accessibility. Damaged or infrequently used objects should be stored in the decorative basket. Wet or unstable items require the rug to prevent spills. Battery-powered devices must be grouped with non-plugged-in electronics in the decorative basket. Fragile objects require stable, protected surfaces like the coffee table. Books differing in durability (hardcover vs. paperback) should be separated based on their likelihood to be moved or read frequently.",
+    "receptacles": [
+      "bookshelf",
+      "side table",
+      "decorative basket",
+      "coffee table",
+      "rug"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "hardcover book",
+      "paperback book",
+      "wet houseplant",
+      "dry houseplant",
+      "battery-powered lamp",
+      "plugged-in lamp",
+      "fragile glass coaster",
+      "non-fragile ceramic coaster",
+      "used remote control",
+      "new remote control"
+    ],
+    "seen_placements": [
+      [
+        "hardcover book",
+        "bookshelf"
+      ],
+      [
+        "paperback book",
+        "decorative basket"
+      ],
+      [
+        "wet houseplant",
+        "rug"
+      ],
+      [
+        "dry houseplant",
+        "side table"
+      ],
+      [
+        "battery-powered lamp",
+        "decorative basket"
+      ],
+      [
+        "plugged-in lamp",
+        "side table"
+      ],
+      [
+        "fragile glass coaster",
+        "coffee table"
+      ],
+      [
+        "non-fragile ceramic coaster",
+        "bookshelf"
+      ],
+      [
+        "used remote control",
+        "decorative basket"
+      ],
+      [
+        "new remote control",
+        "side table"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "damaged book",
+      "intact book",
+      "moist indoor plant",
+      "withered plant",
+      "dead battery remote",
+      "working battery remote",
+      "delicate figurine",
+      "sturdy mug",
+      "torn magazine",
+      "neat magazine"
+    ],
+    "unseen_placements": [
+      [
+        "damaged book",
+        "decorative basket"
+      ],
+      [
+        "intact book",
+        "bookshelf"
+      ],
+      [
+        "moist indoor plant",
+        "rug"
+      ],
+      [
+        "withered plant",
+        "decorative basket"
+      ],
+      [
+        "dead battery remote",
+        "decorative basket"
+      ],
+      [
+        "working battery remote",
+        "side table"
+      ],
+      [
+        "delicate figurine",
+        "coffee table"
+      ],
+      [
+        "sturdy mug",
+        "bookshelf"
+      ],
+      [
+        "torn magazine",
+        "decorative basket"
+      ],
+      [
+        "neat magazine",
+        "side table"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Place clean and functional items on visible surfaces like the coffee table and side table. Dirty or broken items must be stored in the lidded bin. Hardcover books should be shelved, while paperbacks go in the basket. Small loose items requiring containment (e.g., loose parts, fragile objects) should be in the drawer. Items that are both dirty and broken should prioritize the bin over the drawer.",
+    "receptacles": [
+      "coffee table",
+      "lidded bin",
+      "bookshelf",
+      "side table",
+      "storage drawer",
+      "woven basket"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "clean ceramic mug",
+      "dirty ceramic mug",
+      "hardcover novel",
+      "paperback novel",
+      "functional remote control",
+      "broken remote control",
+      "wooden puzzle pieces",
+      "fragile glass coaster",
+      "torn magazine",
+      "wet towel",
+      "battery-powered lamp",
+      "non-functional lamp"
+    ],
+    "seen_placements": [
+      [
+        "clean ceramic mug",
+        "side table"
+      ],
+      [
+        "dirty ceramic mug",
+        "lidded bin"
+      ],
+      [
+        "hardcover novel",
+        "bookshelf"
+      ],
+      [
+        "paperback novel",
+        "woven basket"
+      ],
+      [
+        "functional remote control",
+        "coffee table"
+      ],
+      [
+        "broken remote control",
+        "storage drawer"
+      ],
+      [
+        "wooden puzzle pieces",
+        "storage drawer"
+      ],
+      [
+        "fragile glass coaster",
+        "storage drawer"
+      ],
+      [
+        "torn magazine",
+        "lidded bin"
+      ],
+      [
+        "wet towel",
+        "lidded bin"
+      ],
+      [
+        "battery-powered lamp",
+        "coffee table"
+      ],
+      [
+        "non-functional lamp",
+        "storage drawer"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "clean plastic water bottle",
+      "dirty plastic water bottle",
+      "hardcover cookbook",
+      "paperback graphic novel",
+      "working bluetooth speaker",
+      "non-working bluetooth speaker",
+      "delicate porcelain figurine",
+      "shattered mirror fragment",
+      "stained fabric cushion",
+      "dry cloth napkin",
+      "solar-powered charger",
+      "defective solar charger"
+    ],
+    "unseen_placements": [
+      [
+        "clean plastic water bottle",
+        "side table"
+      ],
+      [
+        "dirty plastic water bottle",
+        "lidded bin"
+      ],
+      [
+        "hardcover cookbook",
+        "bookshelf"
+      ],
+      [
+        "paperback graphic novel",
+        "woven basket"
+      ],
+      [
+        "working bluetooth speaker",
+        "coffee table"
+      ],
+      [
+        "non-working bluetooth speaker",
+        "storage drawer"
+      ],
+      [
+        "delicate porcelain figurine",
+        "storage drawer"
+      ],
+      [
+        "shattered mirror fragment",
+        "lidded bin"
+      ],
+      [
+        "stained fabric cushion",
+        "lidded bin"
+      ],
+      [
+        "dry cloth napkin",
+        "side table"
+      ],
+      [
+        "solar-powered charger",
+        "coffee table"
+      ],
+      [
+        "defective solar charger",
+        "storage drawer"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Fresh, unopened snack packages should be placed on the coffee table for easy access. Stale or open snacks must be stored in the lidded bin to prevent spills and pests. Small, easily portable items like books and toys should be in the storage ottoman. Larger or heavier items belong in the bookshelf or side table. Battery-powered devices should be kept in the drawer to avoid accidental activation. Items without a clear category should be sorted by dominant attribute and function.",
+    "receptacles": [
+      "coffee table",
+      "lidded bin",
+      "storage ottoman",
+      "bookshelf",
+      "side table",
+      "drawer"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "fresh chips",
+      "stale chips",
+      "fresh cookies",
+      "stale cookies",
+      "open pretzel bag",
+      "unopened pretzel bag",
+      "thick hardcover book",
+      "thin paperback book",
+      "battery-powered remote car",
+      "wind-up car",
+      "small plush bear",
+      "large plush bear"
+    ],
+    "seen_placements": [
+      [
+        "fresh chips",
+        "coffee table"
+      ],
+      [
+        "fresh cookies",
+        "coffee table"
+      ],
+      [
+        "unopened pretzel bag",
+        "coffee table"
+      ],
+      [
+        "thick hardcover book",
+        "bookshelf"
+      ],
+      [
+        "large plush bear",
+        "side table"
+      ],
+      [
+        "stale chips",
+        "lidded bin"
+      ],
+      [
+        "stale cookies",
+        "lidded bin"
+      ],
+      [
+        "open pretzel bag",
+        "lidded bin"
+      ],
+      [
+        "thin paperback book",
+        "storage ottoman"
+      ],
+      [
+        "small plush bear",
+        "storage ottoman"
+      ],
+      [
+        "battery-powered remote car",
+        "drawer"
+      ],
+      [
+        "wind-up car",
+        "storage ottoman"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "fresh granola bar",
+      "stale granola bar",
+      "open bag of crackers",
+      "unopened bag of crackers",
+      "encyclopedia volume",
+      "novella",
+      "remote-controlled drone",
+      "manual toy train",
+      "medium-sized plush cat",
+      "oversized floor pillow"
+    ],
+    "unseen_placements": [
+      [
+        "fresh granola bar",
+        "coffee table"
+      ],
+      [
+        "unopened bag of crackers",
+        "coffee table"
+      ],
+      [
+        "novella",
+        "storage ottoman"
+      ],
+      [
+        "medium-sized plush cat",
+        "storage ottoman"
+      ],
+      [
+        "remote-controlled drone",
+        "drawer"
+      ],
+      [
+        "stale granola bar",
+        "lidded bin"
+      ],
+      [
+        "open bag of crackers",
+        "lidded bin"
+      ],
+      [
+        "encyclopedia volume",
+        "bookshelf"
+      ],
+      [
+        "oversized floor pillow",
+        "side table"
+      ],
+      [
+        "manual toy train",
+        "storage ottoman"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Fragile or delicate items must be placed in secure, enclosed spaces like the storage ottoman or bookcase. Frequently used items should occupy easily accessible, open surfaces such as the coffee table or side table. Battery-powered devices must be stored in the closed storage ottoman to prevent accidental activation. Large or heavy objects should be positioned on lower shelves for stability. Items with sharp edges or potential hazards should avoid soft surfaces. Decorative objects that require frequent rearrangement should remain on the shelf. Items with conflicting attributes (e.g., fragile + frequently used) follow attribute priority over function.",
+    "receptacles": [
+      "coffee table",
+      "shelf",
+      "storage ottoman",
+      "side table",
+      "bookcase"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "hardcover book",
+      "paperback book",
+      "delicate glass ornament",
+      "sturdy ceramic vase",
+      "battery-powered toy car",
+      "manual toy car",
+      "frequently read book",
+      "occasionally read book",
+      "large decorative bowl",
+      "small decorative bowl",
+      "wooden cutting board",
+      "plastic cutting board"
+    ],
+    "seen_placements": [
+      [
+        "hardcover book",
+        "bookcase"
+      ],
+      [
+        "paperback book",
+        "coffee table"
+      ],
+      [
+        "delicate glass ornament",
+        "storage ottoman"
+      ],
+      [
+        "sturdy ceramic vase",
+        "coffee table"
+      ],
+      [
+        "battery-powered toy car",
+        "storage ottoman"
+      ],
+      [
+        "manual toy car",
+        "side table"
+      ],
+      [
+        "frequently read book",
+        "coffee table"
+      ],
+      [
+        "occasionally read book",
+        "bookcase"
+      ],
+      [
+        "large decorative bowl",
+        "shelf"
+      ],
+      [
+        "small decorative bowl",
+        "shelf"
+      ],
+      [
+        "wooden cutting board",
+        "side table"
+      ],
+      [
+        "plastic cutting board",
+        "coffee table"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "function",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "thick art book",
+      "thin poetry book",
+      "fragile figurine",
+      "durable flowerpot",
+      "wired remote control",
+      "manual board game",
+      "heavy photo album",
+      "lightweight notebook",
+      "sharp kitchen shears",
+      "dull kitchen knife",
+      "velvet throw pillow",
+      "cotton throw pillow"
+    ],
+    "unseen_placements": [
+      [
+        "thick art book",
+        "bookcase"
+      ],
+      [
+        "thin poetry book",
+        "coffee table"
+      ],
+      [
+        "fragile figurine",
+        "storage ottoman"
+      ],
+      [
+        "durable flowerpot",
+        "shelf"
+      ],
+      [
+        "wired remote control",
+        "storage ottoman"
+      ],
+      [
+        "manual board game",
+        "side table"
+      ],
+      [
+        "heavy photo album",
+        "bookcase"
+      ],
+      [
+        "lightweight notebook",
+        "coffee table"
+      ],
+      [
+        "sharp kitchen shears",
+        "storage ottoman"
+      ],
+      [
+        "dull kitchen knife",
+        "side table"
+      ],
+      [
+        "velvet throw pillow",
+        "coffee table"
+      ],
+      [
+        "cotton throw pillow",
+        "shelf"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Place intact, dry food items on open surfaces for immediate access. Damaged or perishable items must be stored in sealed containers to prevent spoilage. Battery-powered devices should be secured in drawers to avoid accidental operation. Soft, frequently used textiles go on seating areas; soiled or damp items require laundry receptacles. Fragile or sharp objects must be contained in closed storage to prevent damage. Heavy items should be positioned in lower shelves for stability.",
+    "receptacles": [
+      "coffee table",
+      "side table",
+      "storage bin",
+      "sofa",
+      "shelf"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "fresh apple",
+      "bruised apple",
+      "cut banana",
+      "fresh banana",
+      "plush toy",
+      "battery-powered car",
+      "wooden puzzle",
+      "plastic puzzle",
+      "clean towel",
+      "dirty towel",
+      "spilled juice",
+      "fresh juice",
+      "wet book",
+      "dry book"
+    ],
+    "seen_placements": [
+      [
+        "fresh apple",
+        "coffee table"
+      ],
+      [
+        "fresh banana",
+        "side table"
+      ],
+      [
+        "plush toy",
+        "sofa"
+      ],
+      [
+        "wooden puzzle",
+        "shelf"
+      ],
+      [
+        "clean towel",
+        "sofa"
+      ],
+      [
+        "battery-powered car",
+        "storage bin"
+      ],
+      [
+        "bruised apple",
+        "storage bin"
+      ],
+      [
+        "cut banana",
+        "storage bin"
+      ],
+      [
+        "spilled juice",
+        "storage bin"
+      ],
+      [
+        "plastic puzzle",
+        "shelf"
+      ],
+      [
+        "dirty towel",
+        "storage bin"
+      ],
+      [
+        "wet book",
+        "storage bin"
+      ],
+      [
+        "dry book",
+        "shelf"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "function"
+    ],
+    "unseen_objects": [
+      "fresh orange",
+      "bruised orange",
+      "fresh grapes",
+      "crushed grapes",
+      "stuffed animal",
+      "manual wind-up car",
+      "metallic puzzle",
+      "plastic puzzle",
+      "clean handkerchief",
+      "soiled handkerchief",
+      "damp cloth",
+      "dry cloth",
+      "sharpened pencil",
+      "blunt pencil"
+    ],
+    "unseen_placements": [
+      [
+        "fresh orange",
+        "coffee table"
+      ],
+      [
+        "fresh grapes",
+        "side table"
+      ],
+      [
+        "stuffed animal",
+        "sofa"
+      ],
+      [
+        "manual wind-up car",
+        "shelf"
+      ],
+      [
+        "clean handkerchief",
+        "sofa"
+      ],
+      [
+        "metallic puzzle",
+        "shelf"
+      ],
+      [
+        "bruised orange",
+        "storage bin"
+      ],
+      [
+        "crushed grapes",
+        "storage bin"
+      ],
+      [
+        "soiled handkerchief",
+        "storage bin"
+      ],
+      [
+        "damp cloth",
+        "storage bin"
+      ],
+      [
+        "blunt pencil",
+        "storage bin"
+      ],
+      [
+        "plastic puzzle",
+        "shelf"
+      ],
+      [
+        "dry cloth",
+        "shelf"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Fragile or breakable items should be placed on the bookshelf for safety. Durable or non-breakable items can go on the ottoman for frequent access. Battery-powered electronics must be on the side table for portability. Corded electronics should be stored in the storage crate to avoid tripping hazards. Large or bulky items requiring stability should be in the corner. Compact items that don’t need frequent use can be on the end table. Items that combine multiple attributes should be sorted by their dominant functional constraint.",
+    "receptacles": [
+      "bookshelf",
+      "ottoman",
+      "storage crate",
+      "end table",
+      "side table",
+      "corner"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "hardcover book",
+      "paperback book",
+      "glass ornament",
+      "plastic ornament",
+      "battery-powered lamp",
+      "corded lamp",
+      "ceramic vase",
+      "wooden sculpture",
+      "bluetooth speaker",
+      "wired headphones",
+      "standing lamp",
+      "floor lamp",
+      "coffee mug",
+      "teacup",
+      "wireless keyboard",
+      "wired mouse"
+    ],
+    "seen_placements": [
+      [
+        "hardcover book",
+        "bookshelf"
+      ],
+      [
+        "paperback book",
+        "end table"
+      ],
+      [
+        "glass ornament",
+        "bookshelf"
+      ],
+      [
+        "plastic ornament",
+        "ottoman"
+      ],
+      [
+        "battery-powered lamp",
+        "side table"
+      ],
+      [
+        "corded lamp",
+        "storage crate"
+      ],
+      [
+        "ceramic vase",
+        "bookshelf"
+      ],
+      [
+        "wooden sculpture",
+        "ottoman"
+      ],
+      [
+        "bluetooth speaker",
+        "side table"
+      ],
+      [
+        "wired headphones",
+        "storage crate"
+      ],
+      [
+        "standing lamp",
+        "corner"
+      ],
+      [
+        "floor lamp",
+        "storage crate"
+      ],
+      [
+        "coffee mug",
+        "ottoman"
+      ],
+      [
+        "teacup",
+        "bookshelf"
+      ],
+      [
+        "wireless keyboard",
+        "side table"
+      ],
+      [
+        "wired mouse",
+        "storage crate"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "hardcover cookbook",
+      "paperback magazine",
+      "porcelain figurine",
+      "acrylic decoration",
+      "solar-powered fan",
+      "plug-in diffuser",
+      "clay pot",
+      "bamboo figurine",
+      "wireless charger",
+      "USB hub",
+      "floor mirror",
+      "wall-mounted shelf",
+      "travel mug",
+      "dinner plate",
+      "wireless mouse",
+      "wired keyboard"
+    ],
+    "unseen_placements": [
+      [
+        "hardcover cookbook",
+        "bookshelf"
+      ],
+      [
+        "paperback magazine",
+        "end table"
+      ],
+      [
+        "porcelain figurine",
+        "bookshelf"
+      ],
+      [
+        "acrylic decoration",
+        "ottoman"
+      ],
+      [
+        "solar-powered fan",
+        "side table"
+      ],
+      [
+        "plug-in diffuser",
+        "storage crate"
+      ],
+      [
+        "clay pot",
+        "bookshelf"
+      ],
+      [
+        "bamboo figurine",
+        "ottoman"
+      ],
+      [
+        "wireless charger",
+        "side table"
+      ],
+      [
+        "USB hub",
+        "storage crate"
+      ],
+      [
+        "floor mirror",
+        "corner"
+      ],
+      [
+        "wall-mounted shelf",
+        "storage crate"
+      ],
+      [
+        "travel mug",
+        "ottoman"
+      ],
+      [
+        "dinner plate",
+        "bookshelf"
+      ],
+      [
+        "wireless mouse",
+        "side table"
+      ],
+      [
+        "wired keyboard",
+        "storage crate"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Fragile items must be stored in enclosed cabinets to prevent breakage. Battery-powered devices should be placed in the side table to avoid interference with electronics. Frequently used items like books and decorative objects should occupy visible, accessible surfaces like the coffee table and bookshelf. Items that are seasonal or rarely used should be stored in the ottoman. Glass and ceramic materials require different handling; glass items should be in the storage cabinet, while ceramic items can be on open shelves. Items with loose parts or small components should be in the storage cabinet.",
+    "receptacles": [
+      "coffee table",
+      "bookshelf",
+      "side table",
+      "storage cabinet",
+      "ottoman"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "hardcover book",
+      "paperback book",
+      "battery-powered lamp",
+      "USB-powered lamp",
+      "ceramic mug",
+      "glass mug",
+      "ornamental plant",
+      "seasonal decoration",
+      "wooden puzzle",
+      "velvet pillow",
+      "silk throw",
+      "plastic remote",
+      "marble paperweight",
+      "metal key rack",
+      "woven basket"
+    ],
+    "seen_placements": [
+      [
+        "hardcover book",
+        "bookshelf"
+      ],
+      [
+        "paperback book",
+        "coffee table"
+      ],
+      [
+        "battery-powered lamp",
+        "side table"
+      ],
+      [
+        "USB-powered lamp",
+        "coffee table"
+      ],
+      [
+        "ceramic mug",
+        "coffee table"
+      ],
+      [
+        "glass mug",
+        "storage cabinet"
+      ],
+      [
+        "ornamental plant",
+        "coffee table"
+      ],
+      [
+        "seasonal decoration",
+        "ottoman"
+      ],
+      [
+        "wooden puzzle",
+        "storage cabinet"
+      ],
+      [
+        "velvet pillow",
+        "ottoman"
+      ],
+      [
+        "silk throw",
+        "ottoman"
+      ],
+      [
+        "plastic remote",
+        "coffee table"
+      ],
+      [
+        "marble paperweight",
+        "coffee table"
+      ],
+      [
+        "metal key rack",
+        "side table"
+      ],
+      [
+        "woven basket",
+        "ottoman"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "function",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "hardcover novel",
+      "paperback novel",
+      "solar-powered lamp",
+      "USB-powered lamp",
+      "ceramic bowl",
+      "glass vase",
+      "indoor fern",
+      "holiday ornament",
+      "wooden board game",
+      "velvet cushion",
+      "silk scarf",
+      "plastic charger",
+      "marble coaster",
+      "metal spice rack",
+      "woven mat"
+    ],
+    "unseen_placements": [
+      [
+        "hardcover novel",
+        "bookshelf"
+      ],
+      [
+        "paperback novel",
+        "coffee table"
+      ],
+      [
+        "solar-powered lamp",
+        "side table"
+      ],
+      [
+        "USB-powered lamp",
+        "coffee table"
+      ],
+      [
+        "ceramic bowl",
+        "coffee table"
+      ],
+      [
+        "glass vase",
+        "storage cabinet"
+      ],
+      [
+        "indoor fern",
+        "coffee table"
+      ],
+      [
+        "holiday ornament",
+        "ottoman"
+      ],
+      [
+        "wooden board game",
+        "storage cabinet"
+      ],
+      [
+        "velvet cushion",
+        "ottoman"
+      ],
+      [
+        "silk scarf",
+        "ottoman"
+      ],
+      [
+        "plastic charger",
+        "coffee table"
+      ],
+      [
+        "marble coaster",
+        "coffee table"
+      ],
+      [
+        "metal spice rack",
+        "side table"
+      ],
+      [
+        "woven mat",
+        "ottoman"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Fragile objects should be placed in secure, elevated locations to prevent accidental damage. Battery-powered devices must be stored in enclosed spaces to avoid tampering and conserve energy. Items requiring frequent use are placed in easily accessible, central locations. Heavy objects are prioritized for lower, sturdier storage to ensure stability.",
+    "receptacles": [
+      "coffee table",
+      "side table",
+      "bookshelf",
+      "storage basket",
+      "shelf"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "hardcover book",
+      "paperback book",
+      "ceramic vase",
+      "glass vase",
+      "battery-powered car",
+      "non-powered toy car",
+      "wireless remote",
+      "wired remote",
+      "floor lamp",
+      "desk lamp",
+      "wooden puzzle",
+      "plastic puzzle"
+    ],
+    "seen_placements": [
+      [
+        "hardcover book",
+        "bookshelf"
+      ],
+      [
+        "paperback book",
+        "coffee table"
+      ],
+      [
+        "ceramic vase",
+        "shelf"
+      ],
+      [
+        "glass vase",
+        "side table"
+      ],
+      [
+        "battery-powered car",
+        "storage basket"
+      ],
+      [
+        "non-powered toy car",
+        "coffee table"
+      ],
+      [
+        "wireless remote",
+        "coffee table"
+      ],
+      [
+        "wired remote",
+        "side table"
+      ],
+      [
+        "floor lamp",
+        "shelf"
+      ],
+      [
+        "desk lamp",
+        "bookshelf"
+      ],
+      [
+        "wooden puzzle",
+        "storage basket"
+      ],
+      [
+        "plastic puzzle",
+        "coffee table"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "function"
+    ],
+    "unseen_objects": [
+      "leather-bound journal",
+      "notebook",
+      "metal picture frame",
+      "wooden picture frame",
+      "solar-powered lamp",
+      "string-powered toy",
+      "velvet throw pillow",
+      "cotton throw pillow",
+      "delicate figurine",
+      "plush animal",
+      "electronic book reader",
+      "manual book"
+    ],
+    "unseen_placements": [
+      [
+        "leather-bound journal",
+        "bookshelf"
+      ],
+      [
+        "notebook",
+        "coffee table"
+      ],
+      [
+        "metal picture frame",
+        "shelf"
+      ],
+      [
+        "wooden picture frame",
+        "side table"
+      ],
+      [
+        "solar-powered lamp",
+        "storage basket"
+      ],
+      [
+        "string-powered toy",
+        "coffee table"
+      ],
+      [
+        "velvet throw pillow",
+        "coffee table"
+      ],
+      [
+        "cotton throw pillow",
+        "side table"
+      ],
+      [
+        "delicate figurine",
+        "shelf"
+      ],
+      [
+        "plush animal",
+        "storage basket"
+      ],
+      [
+        "electronic book reader",
+        "coffee table"
+      ],
+      [
+        "manual book",
+        "bookshelf"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Display perishable or high-maintenance items on the coffee table for easy monitoring. Store fragile or breakable items in the bookcase to prevent damage. Place battery-powered devices in the side table to manage power usage. Keep decorative items that attract dust in the storage shelf. Position items with loose parts or small components in the TV stand to avoid loss. Group items by both material and usage frequency to optimize accessibility.",
+    "receptacles": [
+      "coffee table",
+      "side table",
+      "storage shelf",
+      "bookcase",
+      "TV stand"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "fresh roses",
+      "dried roses",
+      "battery-powered remote",
+      "manual remote",
+      "glass vase",
+      "plastic vase",
+      "wooden book",
+      "ceramic bowl",
+      "silk plant",
+      "velvet pillow",
+      "frosted lamp",
+      "beaded curtain"
+    ],
+    "seen_placements": [
+      [
+        "fresh roses",
+        "coffee table"
+      ],
+      [
+        "dried roses",
+        "storage shelf"
+      ],
+      [
+        "battery-powered remote",
+        "side table"
+      ],
+      [
+        "manual remote",
+        "TV stand"
+      ],
+      [
+        "glass vase",
+        "bookcase"
+      ],
+      [
+        "plastic vase",
+        "coffee table"
+      ],
+      [
+        "wooden book",
+        "bookcase"
+      ],
+      [
+        "ceramic bowl",
+        "storage shelf"
+      ],
+      [
+        "silk plant",
+        "TV stand"
+      ],
+      [
+        "velvet pillow",
+        "coffee table"
+      ],
+      [
+        "frosted lamp",
+        "side table"
+      ],
+      [
+        "beaded curtain",
+        "bookcase"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "fresh lilies",
+      "dried lavender",
+      "wind-up clock",
+      "wireless speaker",
+      "crystal bowl",
+      "plastic bowl",
+      "leather journal",
+      "porcelain plate",
+      "artificial fern",
+      "cotton cushion",
+      "LED nightlight",
+      "velvet drapes"
+    ],
+    "unseen_placements": [
+      [
+        "fresh lilies",
+        "coffee table"
+      ],
+      [
+        "dried lavender",
+        "storage shelf"
+      ],
+      [
+        "wind-up clock",
+        "TV stand"
+      ],
+      [
+        "wireless speaker",
+        "side table"
+      ],
+      [
+        "crystal bowl",
+        "bookcase"
+      ],
+      [
+        "plastic bowl",
+        "coffee table"
+      ],
+      [
+        "leather journal",
+        "storage shelf"
+      ],
+      [
+        "porcelain plate",
+        "bookcase"
+      ],
+      [
+        "artificial fern",
+        "TV stand"
+      ],
+      [
+        "cotton cushion",
+        "coffee table"
+      ],
+      [
+        "LED nightlight",
+        "side table"
+      ],
+      [
+        "velvet drapes",
+        "storage shelf"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Clean reading materials should be displayed on open shelves for accessibility; used or damaged ones should be stored in enclosed spaces to preserve condition. Battery-powered devices should be placed in secure, easily accessible drawers to prevent accidental activation. Fragile or delicate items require stable, elevated surfaces to avoid damage; sturdier versions can be stored in lower, more accessible locations. Drinks with lids can be placed in multi-purpose storage, while open drinks should be on countertop-level surfaces for immediate use.",
+    "receptacles": [
+      "coffee table",
+      "side table",
+      "shelf",
+      "storage ottoman",
+      "bookcase"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "clean hardcover book",
+      "used hardcover book",
+      "clean paperback book",
+      "used paperback book",
+      "clean ceramic mug",
+      "used ceramic mug",
+      "battery-powered remote",
+      "non-battery remote",
+      "fragile glass mug",
+      "sturdy glass mug",
+      "plastic cup with lid",
+      "plastic cup without lid"
+    ],
+    "seen_placements": [
+      [
+        "clean hardcover book",
+        "shelf"
+      ],
+      [
+        "used hardcover book",
+        "bookcase"
+      ],
+      [
+        "clean paperback book",
+        "shelf"
+      ],
+      [
+        "used paperback book",
+        "storage ottoman"
+      ],
+      [
+        "clean ceramic mug",
+        "coffee table"
+      ],
+      [
+        "used ceramic mug",
+        "side table"
+      ],
+      [
+        "battery-powered remote",
+        "side table"
+      ],
+      [
+        "non-battery remote",
+        "shelf"
+      ],
+      [
+        "fragile glass mug",
+        "shelf"
+      ],
+      [
+        "sturdy glass mug",
+        "storage ottoman"
+      ],
+      [
+        "plastic cup with lid",
+        "storage ottoman"
+      ],
+      [
+        "plastic cup without lid",
+        "coffee table"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "multiple categories"
+    ],
+    "unseen_objects": [
+      "wet paperback novel",
+      "dry paperback novel",
+      "spilled coffee mug",
+      "empty coffee mug",
+      "battery-powered speaker",
+      "corded speaker",
+      "delicate porcelain plate",
+      "toughened glass plate",
+      "sealed water bottle",
+      "open water bottle",
+      "torn magazine",
+      "neat magazine"
+    ],
+    "unseen_placements": [
+      [
+        "wet paperback novel",
+        "storage ottoman"
+      ],
+      [
+        "dry paperback novel",
+        "shelf"
+      ],
+      [
+        "spilled coffee mug",
+        "side table"
+      ],
+      [
+        "empty coffee mug",
+        "coffee table"
+      ],
+      [
+        "battery-powered speaker",
+        "side table"
+      ],
+      [
+        "corded speaker",
+        "shelf"
+      ],
+      [
+        "delicate porcelain plate",
+        "shelf"
+      ],
+      [
+        "toughened glass plate",
+        "storage ottoman"
+      ],
+      [
+        "sealed water bottle",
+        "storage ottoman"
+      ],
+      [
+        "open water bottle",
+        "coffee table"
+      ],
+      [
+        "torn magazine",
+        "bookcase"
+      ],
+      [
+        "neat magazine",
+        "shelf"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Battery-powered items must be stored in the drawer to prevent accidental activation. Wet or damp items should go in the storage bin to avoid water damage. Fragile objects require the bookshelf's stable surface. Durable, non-breakable items can be placed on the coffee table. Frequently accessed items are prioritized for the TV stand. Items with damaged covers or pages should be sorted to the storage bin. Glass or ceramic materials must be placed where they are least likely to be knocked over.",
+    "receptacles": [
+      "coffee table",
+      "bookshelf",
+      "storage bin",
+      "TV stand",
+      "drawer",
+      "side table"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "battery-powered desk lamp",
+      "manual wind-up clock",
+      "wet microfiber cloth",
+      "dry microfiber cloth",
+      "ceramic vase",
+      "plastic storage container",
+      "damaged hardcover book",
+      "pristine hardcover book",
+      "glass photo frame",
+      "plastic photo frame",
+      "remote control",
+      "board game with missing pieces"
+    ],
+    "seen_placements": [
+      [
+        "battery-powered desk lamp",
+        "drawer"
+      ],
+      [
+        "manual wind-up clock",
+        "coffee table"
+      ],
+      [
+        "wet microfiber cloth",
+        "storage bin"
+      ],
+      [
+        "dry microfiber cloth",
+        "side table"
+      ],
+      [
+        "ceramic vase",
+        "bookshelf"
+      ],
+      [
+        "plastic storage container",
+        "coffee table"
+      ],
+      [
+        "damaged hardcover book",
+        "storage bin"
+      ],
+      [
+        "pristine hardcover book",
+        "bookshelf"
+      ],
+      [
+        "glass photo frame",
+        "bookshelf"
+      ],
+      [
+        "plastic photo frame",
+        "coffee table"
+      ],
+      [
+        "remote control",
+        "TV stand"
+      ],
+      [
+        "board game with missing pieces",
+        "storage bin"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "subcategory"
+    ],
+    "unseen_objects": [
+      "solar-powered nightlight",
+      "wet paper towel",
+      "dry paper towel",
+      "porcelain mug",
+      "styrofoam cup",
+      "coffee-stained novel",
+      "unmarked paperback",
+      "wooden puzzle",
+      "plastic puzzle",
+      "wireless charging pad",
+      "board game with complete pieces"
+    ],
+    "unseen_placements": [
+      [
+        "solar-powered nightlight",
+        "drawer"
+      ],
+      [
+        "wet paper towel",
+        "storage bin"
+      ],
+      [
+        "dry paper towel",
+        "side table"
+      ],
+      [
+        "porcelain mug",
+        "bookshelf"
+      ],
+      [
+        "styrofoam cup",
+        "coffee table"
+      ],
+      [
+        "coffee-stained novel",
+        "storage bin"
+      ],
+      [
+        "unmarked paperback",
+        "coffee table"
+      ],
+      [
+        "wooden puzzle",
+        "bookshelf"
+      ],
+      [
+        "plastic puzzle",
+        "coffee table"
+      ],
+      [
+        "wireless charging pad",
+        "drawer"
+      ],
+      [
+        "board game with complete pieces",
+        "TV stand"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Fragile items are stored in enclosed containers to prevent damage. Frequently used items are placed in easily accessible open surfaces. Items with sharp edges are kept on lower shelves for safety. Electronics are grouped in a central drawer for centralized management. Non-breakable decorative items can occupy upper shelves. Items requiring batteries are isolated to avoid accidental activation.",
+    "receptacles": [
+      "coffee table",
+      "side drawer",
+      "shelf",
+      "ottoman",
+      "wicker basket"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "ceramic mug",
+      "glass tumbler",
+      "hardcover book",
+      "paperback novel",
+      "wooden spoon",
+      "metal fork",
+      "vintage vase",
+      "modern sculpture",
+      "remote control",
+      "batter-powered lamp",
+      "knitted throw",
+      "plastic board game"
+    ],
+    "seen_placements": [
+      [
+        "ceramic mug",
+        "wicker basket"
+      ],
+      [
+        "glass tumbler",
+        "shelf"
+      ],
+      [
+        "hardcover book",
+        "coffee table"
+      ],
+      [
+        "paperback novel",
+        "ottoman"
+      ],
+      [
+        "wooden spoon",
+        "shelf"
+      ],
+      [
+        "metal fork",
+        "side drawer"
+      ],
+      [
+        "vintage vase",
+        "coffee table"
+      ],
+      [
+        "modern sculpture",
+        "ottoman"
+      ],
+      [
+        "remote control",
+        "coffee table"
+      ],
+      [
+        "batter-powered lamp",
+        "side drawer"
+      ],
+      [
+        "knitted throw",
+        "ottoman"
+      ],
+      [
+        "plastic board game",
+        "shelf"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "function"
+    ],
+    "unseen_objects": [
+      "porcelain plate",
+      "sturdy ceramic bowl",
+      "e-reader",
+      "physical magazine",
+      "bamboo cutting board",
+      "stainless steel knife",
+      "delicate figurine",
+      "industrial clock",
+      "wireless speaker",
+      "manual pencil sharpener",
+      "woven rug",
+      "cardboard puzzle"
+    ],
+    "unseen_placements": [
+      [
+        "porcelain plate",
+        "wicker basket"
+      ],
+      [
+        "sturdy ceramic bowl",
+        "shelf"
+      ],
+      [
+        "e-reader",
+        "coffee table"
+      ],
+      [
+        "physical magazine",
+        "ottoman"
+      ],
+      [
+        "bamboo cutting board",
+        "shelf"
+      ],
+      [
+        "stainless steel knife",
+        "side drawer"
+      ],
+      [
+        "delicate figurine",
+        "coffee table"
+      ],
+      [
+        "industrial clock",
+        "shelf"
+      ],
+      [
+        "wireless speaker",
+        "side drawer"
+      ],
+      [
+        "manual pencil sharpener",
+        "ottoman"
+      ],
+      [
+        "woven rug",
+        "ottoman"
+      ],
+      [
+        "cardboard puzzle",
+        "coffee table"
+      ]
+    ]
+  },
+  {
+    "annotator_notes": "Position objects based on material stability and usage frequency. Durable, frequently used items should be placed on the coffee table for accessibility. Fragile or rarely used items belong in the storage basket. Battery-powered devices must be stored in the side table to prevent accidental activation. Items with sharp edges or protrusions should be placed on the bookshelf to avoid damaging surfaces. Soft, pliable objects can stay on the end table to prevent slipping. Objects with hazardous liquids or powders must be secured in the lidded container to prevent spills.",
+    "receptacles": [
+      "coffee table",
+      "bookshelf",
+      "storage basket",
+      "end table",
+      "lidded container",
+      "side table"
+    ],
+    "room": "living room",
+    "seen_objects": [
+      "large hardcover book",
+      "small hardcover book",
+      "glass vase",
+      "ceramic vase",
+      "wireless remote",
+      "battery-powered speaker",
+      "plush pillow",
+      "wooden clock",
+      "plastic figurine",
+      "metal candle holder",
+      "velvet cushion",
+      "glass water carafe",
+      "ceramic mug",
+      "wooden bowl",
+      "stuffed animal",
+      "metal key rack",
+      "velvet throw",
+      "plastic storage bin",
+      "glass photo frame",
+      "ceramic plant pot"
+    ],
+    "seen_placements": [
+      [
+        "large hardcover book",
+        "coffee table"
+      ],
+      [
+        "small hardcover book",
+        "bookshelf"
+      ],
+      [
+        "glass vase",
+        "storage basket"
+      ],
+      [
+        "ceramic vase",
+        "end table"
+      ],
+      [
+        "wireless remote",
+        "coffee table"
+      ],
+      [
+        "battery-powered speaker",
+        "side table"
+      ],
+      [
+        "plush pillow",
+        "end table"
+      ],
+      [
+        "wooden clock",
+        "bookshelf"
+      ],
+      [
+        "plastic figurine",
+        "coffee table"
+      ],
+      [
+        "metal candle holder",
+        "storage basket"
+      ],
+      [
+        "velvet cushion",
+        "end table"
+      ],
+      [
+        "glass water carafe",
+        "lidded container"
+      ],
+      [
+        "ceramic mug",
+        "coffee table"
+      ],
+      [
+        "wooden bowl",
+        "bookshelf"
+      ],
+      [
+        "stuffed animal",
+        "coffee table"
+      ],
+      [
+        "metal key rack",
+        "side table"
+      ],
+      [
+        "velvet throw",
+        "end table"
+      ],
+      [
+        "plastic storage bin",
+        "storage basket"
+      ],
+      [
+        "glass photo frame",
+        "bookshelf"
+      ],
+      [
+        "ceramic plant pot",
+        "storage basket"
+      ]
+    ],
+    "tags": [
+      "attribute",
+      "category",
+      "function"
+    ],
+    "unseen_objects": [
+      "oversized art book",
+      "mini sketchbook",
+      "crystal vase",
+      "sturdy ceramic bowl",
+      "Bluetooth speaker",
+      "rechargeable lamp",
+      "fluffy bolster",
+      "marble paperweight",
+      "plastic puzzle",
+      "metal utensil holder",
+      "velvet pillow cover",
+      "glass spice jar",
+      "ceramic mug with lid",
+      "wooden cutting board",
+      "velvet-stuffed pillow",
+      "metal letter opener",
+      "plush decorative pad",
+      "plastic magazine rack",
+      "glass ornament",
+      "ceramic fruit dish"
+    ],
+    "unseen_placements": [
+      [
+        "oversized art book",
+        "coffee table"
+      ],
+      [
+        "mini sketchbook",
+        "bookshelf"
+      ],
+      [
+        "crystal vase",
+        "storage basket"
+      ],
+      [
+        "sturdy ceramic bowl",
+        "end table"
+      ],
+      [
+        "Bluetooth speaker",
+        "side table"
+      ],
+      [
+        "rechargeable lamp",
+        "side table"
+      ],
+      [
+        "fluffy bolster",
+        "end table"
+      ],
+      [
+        "marble paperweight",
+        "bookshelf"
+      ],
+      [
+        "plastic puzzle",
+        "coffee table"
+      ],
+      [
+        "metal utensil holder",
+        "storage basket"
+      ],
+      [
+        "velvet pillow cover",
+        "end table"
+      ],
+      [
+        "glass spice jar",
+        "lidded container"
+      ],
+      [
+        "ceramic mug with lid",
+        "coffee table"
+      ],
+      [
+        "wooden cutting board",
+        "bookshelf"
+      ],
+      [
+        "velvet-stuffed pillow",
+        "coffee table"
+      ],
+      [
+        "metal letter opener",
+        "side table"
+      ],
+      [
+        "plush decorative pad",
+        "end table"
+      ],
+      [
+        "plastic magazine rack",
+        "storage basket"
+      ],
+      [
+        "glass ornament",
+        "bookshelf"
+      ],
+      [
+        "ceramic fruit dish",
+        "storage basket"
+      ]
+    ]
+  }
+]

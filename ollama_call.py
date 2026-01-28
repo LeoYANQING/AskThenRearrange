@@ -1,3 +1,4 @@
+import argparse
 import requests
 import json
 import random
@@ -58,10 +59,9 @@ class VLMRequestError(Exception):
     pass  
 
 class VLMAPI:
-    def __init__(self, model):  # qwen2.5vl:32b, llava:7b, etc.
+    def __init__(self, model, port=8080):  # qwen2.5vl:32b, llava:7b, etc.
         self.model = model
-        self.api_url = "http://110.42.252.68:8080/api/generate"
-        
+        self.api_url = f"http://110.42.252.68:{port}/api/generate"
 
     def encode_image(self, image_path):
         """编码图像为base64格式"""
@@ -282,9 +282,12 @@ def save_data_to_json(json_data, base_path):
 
 if __name__ == "__main__":
     # 测试代码
-    model = "qwen3:32b"
-    # model = "qwen3:32b"
-    llmapi = VLMAPI(model)
+    parser = argparse.ArgumentParser(description="Ollama VLM test runner")
+    parser.add_argument("--model", default="qwen3:32b", help="Ollama model name")
+    parser.add_argument("--port", type=int, default=8080, help="Ollama API port")
+    args = parser.parse_args()
+
+    llmapi = VLMAPI(args.model, port=args.port)
     
     # 测试1: 纯文本请求
     print("=" * 50)

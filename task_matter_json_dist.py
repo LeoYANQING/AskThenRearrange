@@ -5,9 +5,13 @@ import argparse
 import json
 import os
 import re
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Type, TypeVar
+
+from pydantic import BaseModel, ValidationError
 
 from ollama_call import VLMAPI
 
@@ -16,6 +20,21 @@ STRICT_RULES = (
     "* Do not include any internal reasoning, thinking, or analysis.\n"
     "* Only return the final answer.\n"
 )
+
+
+class QuestionOutput(BaseModel):
+    question: str
+
+
+class AnswerOutput(BaseModel):
+    answer: str
+
+
+class SummaryOutput(BaseModel):
+    summary: str
+
+
+TModel = TypeVar("TModel", bound=BaseModel)
 
 from question_generate import (
     generate_question_direct_question,
@@ -31,16 +50,14 @@ def build_problem_for_remaining(scenario: Scenario, remaining_objects: List[str]
     remaining_str = ", ".join(remaining_objects)
     return (
         STRICT_RULES
-        + "* Output format: question sentence or placement commands only.\n"
+        + "* Output format: JSON that matches the provided schema.\n"
         f"Room: {scenario.room}\n"
         "Task: Organize the items in the room.\n"
         f"Receptacles: {receptacles}\n"
         f"Seen objects: {seen_objects}\n"
         f"Remaining objects to place: {remaining_str}\n"
-        "Review the remaining objects. You can either:\n"
-        "1. Ask a question to clarify user preferences or specific item locations (if you are unsure).\n"
-        "2. Directly place one or more objects if you can infer their location from history.\n"
-        "Choose the most efficient action."
+        "Ask one clear question to clarify user preferences or specific item locations.\n"
+        "Only return the question field in JSON."
     )
 
 
@@ -55,7 +72,7 @@ def build_answer_prompt(scenario: Scenario, question: str) -> str:
         f"Seen placements:\n{seen_placements}\n"
         f"Question: {question}\n"
         "Answer naturally and concisely. If you mention locations, use receptacle names "
-        f"from this list: {receptacles}. Start your response immediately with the result."
+        f"from this list: {receptacles}. Return only the answer content."
     )
 
 
@@ -85,6 +102,29 @@ def extract_answer(text: str) -> str:
         cleaned = re.sub(r"<think>.*?</think>", "", cleaned, flags=re.DOTALL).strip()
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
     return cleaned
+
+
+def _strip_code_fence(text: str) -> str:
+    cleaned = text.strip()
+    if cleaned.startswith("```"):
+        cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+    return cleaned.strip()
+
+
+def parse_structured_output(text: str, model: Type[TModel]) -> Optional[TModel]:
+    cleaned = text.strip()
+    if "<think>" in cleaned:
+        cleaned = re.sub(r"<think>.*?</think>", "", cleaned, flags=re.DOTALL).strip()
+    cleaned = _strip_code_fence(cleaned)
+    try:
+        data = json.loads(cleaned)
+    except json.JSONDecodeError:
+        return None
+    try:
+        return model.model_validate(data)
+    except ValidationError:
+        return None
 
 
 class QuestionPromptBuilder:
@@ -171,6 +211,33 @@ def resolve_log_path(
     return os.path.join(base_dir, filename)
 
 
+def resolve_strategy_log_path(
+    log_path: Optional[str],
+    strategy: str,
+    max_questions: Optional[int],
+    parallel: bool,
+    strategy_count: int,
+) -> str:
+    if log_path:
+        if not os.path.isabs(log_path):
+            log_path = os.path.join(os.path.dirname(__file__), log_path)
+        if parallel and strategy_count > 1 and "{strategy}" not in log_path:
+            safe_strategy = re.sub(r"[^a-zA-Z0-9_-]+", "_", strategy)
+            root, ext = os.path.splitext(log_path)
+            ext = ext or ".json"
+            log_path = f"{root}_{safe_strategy}{ext}"
+        return resolve_log_path(log_path, strategy, max_questions)
+    return resolve_log_path(None, strategy, max_questions)
+
+
+def resolve_strategy_workers(strategy_workers: Optional[int], strategy_count: int) -> int:
+    if strategy_count <= 0:
+        return 1
+    if not strategy_workers or strategy_workers <= 0:
+        return min(32, strategy_count)
+    return max(1, min(strategy_workers, strategy_count))
+
+
 def append_test_log(log_path: str, entry: Dict[str, object]) -> None:
     log_dir = os.path.dirname(log_path)
     if log_dir:
@@ -217,10 +284,12 @@ def _call_vlm(
     prompt: str,
     system: str,
     temperature: float,
+    format_schema: Optional[dict] = None,
 ) -> str:
     return llm.vlm_request_with_format(
         system,
         prompt,
+        format_schema=format_schema,
         options={"temperature": temperature},
     )
 
@@ -256,13 +325,14 @@ def build_dialogue_summary_prompt(
         placement_lines = "None"
     return (
         STRICT_RULES
-        + "* Output format: one summary sentence only.\n"
+        + "* Output format: JSON that matches the provided schema.\n"
         "You are summarizing a robot's Q&A with a user about organizing objects.\n"
         "Summarize the user's preferences or placement rules in one concise sentence.\n"
         f"Room: {scenario.room}\n"
         f"Receptacles: {', '.join(scenario.receptacles)}\n"
         f"Q&A history:\n{history}\n"
         f"Known placements:\n{placement_lines}\n"
+        "Return the summary in the JSON field only.\n"
     )
 
 
@@ -284,72 +354,47 @@ def query_placements(
     qa_history: List[dict] = []
     
     remaining_objects = list(objects)
-    max_questions = resolve_max_questions(objects, max_questions)
+    required_questions = resolve_max_questions(objects, max_questions)
     questions_asked = 0
 
-    while remaining_objects and questions_asked < max_questions:
+    while questions_asked < required_questions:
         problem = build_problem_for_remaining(scenario, remaining_objects)
         history_str = format_history(qa_history)
         question_prompt = question_builder.build(problem, history_str)
         
-        response_text = extract_question(
-            _call_vlm(
-                question_model,
-                question_prompt,
-                STRICT_RULES
-                + "* Output format: question sentence or 'PLACEMENT: object -> receptacle'.\n"
-                "You are a helper robot. Start your response immediately with the result.",
-                temperature=0.2,
-            )
+        response_raw = _call_vlm(
+            question_model,
+            question_prompt,
+            STRICT_RULES
+            + "* Output must be valid JSON matching the provided schema.\n"
+            "You are a helper robot. Ask one clear question about the remaining objects.",
+            temperature=0.2,
+            format_schema=QuestionOutput.model_json_schema(),
         )
-        
-        # Check for placements
-        new_placements = []
-        lines = response_text.split('\n')
-        is_placement = False
-        
-        for line in lines:
-            if "PLACEMENT:" in line:
-                is_placement = True
-                # Format: PLACEMENT: object -> receptacle
-                content = line.split("PLACEMENT:")[1].strip()
-                if "->" in content:
-                    obj_part, recep_part = content.split("->", 1)
-                    matched_obj = match_object(obj_part.strip(), remaining_objects)
-                    parsed_recep = extract_receptacle(recep_part, scenario.receptacles)
-                    
-                    if matched_obj:
-                        new_placements.append((matched_obj, parsed_recep))
-        
-        if is_placement and new_placements:
-            # Apply placements
-            for obj, recep in new_placements:
-                placements.append([obj, recep])
-                if obj in remaining_objects:
-                    remaining_objects.remove(obj)
-            # We don't ask user anything if we placed items
-            # But maybe we should loop again to see if we can place more or need to ask?
-            continue
-        elif is_placement and not new_placements:
-            # Model tried to place but failed to match objects/format
-            # Force a question next time or just break to avoid infinite loop?
-            # Let's try to ask a fallback question about the first remaining object
-            pass
 
-        # If we are here, it means we didn't successfully place anything (or model chose to ask)
-        # So we treat response as a question
+        structured_question = parse_structured_output(response_raw, QuestionOutput)
+        response_text = (
+            structured_question.question
+            if structured_question
+            else extract_question(response_raw)
+        )
+
+        # We always ask a question (no placement decision here).
         question_text = ensure_question(response_text)
         
         # Ask the user
         answer_prompt = build_answer_prompt(scenario, question_text)
-        answer_text = extract_answer(
-            _call_vlm(
-                answer_model,
-                answer_prompt,
-                "You are the user answering a household organization question. "
-                "Output only the answer. Do NOT include reasoning or analysis.",
-                temperature=0.0,
-            )
+        answer_raw = _call_vlm(
+            answer_model,
+            answer_prompt,
+            "You are the user answering a household organization question. "
+            "Output only JSON that matches the provided schema. Do NOT include reasoning or analysis.",
+            temperature=0.0,
+            format_schema=AnswerOutput.model_json_schema(),
+        )
+        structured_answer = parse_structured_output(answer_raw, AnswerOutput)
+        answer_text = (
+            structured_answer.answer if structured_answer else extract_answer(answer_raw)
         )
         
         matched_obj = match_object(question_text, remaining_objects)
@@ -370,18 +415,21 @@ def query_placements(
     # If we exited loop but still have objects (max turns reached), we might want to log that
     if remaining_objects:
         print(
-            f"Warning: Failed to place {remaining_objects} within question limit "
-            f"({questions_asked}/{max_questions})."
+            f"Warning: Failed to place {remaining_objects} after required questions "
+            f"({questions_asked}/{required_questions})."
         )
 
     summary_prompt = build_dialogue_summary_prompt(scenario, qa_history, placements)
-    summary_text = extract_answer(
-        _call_vlm(
-            question_model,
-            summary_prompt,
-            "Output one concise sentence. Do NOT include reasoning or analysis.",
-            temperature=0.0,
-        )
+    summary_raw = _call_vlm(
+        question_model,
+        summary_prompt,
+        "Output only JSON that matches the provided schema. Do NOT include reasoning or analysis.",
+        temperature=0.0,
+        format_schema=SummaryOutput.model_json_schema(),
+    )
+    structured_summary = parse_structured_output(summary_raw, SummaryOutput)
+    summary_text = (
+        structured_summary.summary if structured_summary else extract_answer(summary_raw)
     )
 
     return placements, qa_history, summary_text
@@ -484,33 +532,67 @@ def evaluate_accuracy_curve(
     answer_model: Optional[VLMAPI] = None,
     log_dir: Optional[str] = None,
     plot_path: Optional[str] = None,
+    parallel_strategies: bool = False,
+    strategy_workers: Optional[int] = None,
 ) -> Dict[str, List[float]]:
-    question_model = question_model or VLMAPI("qwen3:32b")
-    if answer_model is None:
-        answer_model = question_model
-
     results: Dict[str, List[float]] = {}
-    for strategy in strategies:
-        accuracies: List[float] = []
-        question_builder = QuestionPromptBuilder(strategy)
-        for max_questions in max_questions_list:
-            log_path = None
-            if log_dir:
-                log_path = os.path.join(
-                    log_dir, f"test_log_{strategy}_q{max_questions}.json"
+    if parallel_strategies and len(strategies) > 1:
+        max_workers = resolve_strategy_workers(strategy_workers, len(strategies))
+
+        def run_strategy(strategy: str) -> Tuple[str, List[float]]:
+            local_question_model = question_model or VLMAPI("qwen3:32b")
+            local_answer_model = answer_model if answer_model is not None else local_question_model
+            accuracies: List[float] = []
+            question_builder = QuestionPromptBuilder(strategy)
+            for max_questions in max_questions_list:
+                log_path = None
+                if log_dir:
+                    log_path = os.path.join(
+                        log_dir, f"test_log_{strategy}_q{max_questions}.json"
+                    )
+                accuracy = evaluate_seen_placements(
+                    scenarios,
+                    question_model=local_question_model,
+                    answer_model=local_answer_model,
+                    question_strategy=strategy,
+                    question_builder=question_builder,
+                    max_questions=max_questions,
+                    log_path=log_path,
+                    verbose=False,
                 )
-            accuracy = evaluate_seen_placements(
-                scenarios,
-                question_model=question_model,
-                answer_model=answer_model,
-                question_strategy=strategy,
-                question_builder=question_builder,
-                max_questions=max_questions,
-                log_path=log_path,
-                verbose=False,
-            )
-            accuracies.append(accuracy)
-        results[strategy] = accuracies
+                accuracies.append(accuracy)
+            return strategy, accuracies
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(run_strategy, s): s for s in strategies}
+            for future in as_completed(futures):
+                strategy, accuracies = future.result()
+                results[strategy] = accuracies
+    else:
+        question_model = question_model or VLMAPI("qwen3:32b")
+        if answer_model is None:
+            answer_model = question_model
+        for strategy in strategies:
+            accuracies = []
+            question_builder = QuestionPromptBuilder(strategy)
+            for max_questions in max_questions_list:
+                log_path = None
+                if log_dir:
+                    log_path = os.path.join(
+                        log_dir, f"test_log_{strategy}_q{max_questions}.json"
+                    )
+                accuracy = evaluate_seen_placements(
+                    scenarios,
+                    question_model=question_model,
+                    answer_model=answer_model,
+                    question_strategy=strategy,
+                    question_builder=question_builder,
+                    max_questions=max_questions,
+                    log_path=log_path,
+                    verbose=False,
+                )
+                accuracies.append(accuracy)
+            results[strategy] = accuracies
 
     if plot_path:
         plot_accuracy_curve(max_questions_list, results, plot_path)
@@ -551,7 +633,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--scenarios",
-        default=os.path.join("summarization", "scenarios_aug_tiny.json"),
+        default=os.path.join("summarization", "scenarios_aug.json"),
         help="Path to scenarios JSON.",
     )
     parser.add_argument(
@@ -569,7 +651,7 @@ def main() -> None:
         "--max_questions",
         type=int,
         default=0,
-        help="Max question turns per scenario (0 means auto).",
+        help="Required question turns per scenario (0 means auto).",
     )
     parser.add_argument(
         "--log_path",
@@ -591,6 +673,17 @@ def main() -> None:
         default=os.path.join("summarization", "test_logs"),
         help="Directory to save curve test logs.",
     )
+    parser.add_argument(
+        "--parallel_strategies",
+        action="store_true",
+        help="Run different strategies in parallel.",
+    )
+    parser.add_argument(
+        "--strategy_workers",
+        type=int,
+        default=0,
+        help="Max worker threads for parallel strategies (0 means auto).",
+    )
     args = parser.parse_args()
 
     scenarios_path = (
@@ -603,10 +696,11 @@ def main() -> None:
         raise RuntimeError("No scenarios loaded from JSON")
     if args.max_scenarios > 0:
         scenarios = scenarios[: args.max_scenarios]
-    question_model = VLMAPI("qwen3:32b")
-    answer_model = VLMAPI("qwen3:32b")
     strategies = [s.strip() for s in args.strategies.split(",") if s.strip()]
+    max_questions = args.max_questions if args.max_questions > 0 else None
+    overall_start = time.time()
     if args.curve_max_questions:
+        curve_start = time.time()
         max_questions_list = [
             int(v) for v in args.curve_max_questions.split(",") if v.strip()
         ]
@@ -621,30 +715,80 @@ def main() -> None:
             scenarios,
             strategies=strategies,
             max_questions_list=max_questions_list,
-            question_model=question_model,
-            answer_model=answer_model,
             log_dir=curve_log_dir,
             plot_path=(
                 args.curve_output
                 if os.path.isabs(args.curve_output)
                 else os.path.join(os.path.dirname(__file__), args.curve_output)
             ),
+            parallel_strategies=args.parallel_strategies,
+            strategy_workers=args.strategy_workers if args.strategy_workers > 0 else None,
         )
+        curve_elapsed = time.time() - curve_start
+        print(f"\nCurve evaluation time: {curve_elapsed:.2f}s")
+        total_elapsed = time.time() - overall_start
+        print(f"Total runtime: {total_elapsed:.2f}s")
         return
 
-    for strategy in strategies:
-        print(f"\n=== Strategy: {strategy} ===")
-        log_path = args.log_path or None
-        if log_path and not os.path.isabs(log_path):
-            log_path = os.path.join(os.path.dirname(__file__), log_path)
-        evaluate_seen_placements(
-            scenarios,
-            question_model=question_model,
-            answer_model=answer_model,
-            question_strategy=strategy,
-            max_questions=args.max_questions if args.max_questions > 0 else None,
-            log_path=log_path,
-        )
+    if args.parallel_strategies and len(strategies) > 1:
+        max_workers = resolve_strategy_workers(args.strategy_workers, len(strategies))
+        print(f"\nRunning strategies in parallel (workers={max_workers})")
+
+        def run_strategy(strategy: str) -> Tuple[str, float, str, float]:
+            strategy_start = time.time()
+            resolved_log_path = resolve_strategy_log_path(
+                args.log_path or None,
+                strategy,
+                max_questions,
+                parallel=True,
+                strategy_count=len(strategies),
+            )
+            accuracy = evaluate_seen_placements(
+                scenarios,
+                question_model=None,
+                answer_model=None,
+                question_strategy=strategy,
+                max_questions=max_questions,
+                log_path=resolved_log_path,
+                verbose=False,
+            )
+            elapsed = time.time() - strategy_start
+            return strategy, accuracy, resolved_log_path, elapsed
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(run_strategy, s): s for s in strategies}
+            for future in as_completed(futures):
+                strategy, accuracy, log_path, elapsed = future.result()
+                print(f"\n=== Strategy: {strategy} ===")
+                print(f"Overall accuracy: {accuracy:.2f}")
+                print(f"Log saved to: {log_path}")
+                print(f"Strategy time: {elapsed:.2f}s")
+    else:
+        question_model = VLMAPI("qwen3:32b")
+        answer_model = VLMAPI("qwen3:32b")
+        for strategy in strategies:
+            strategy_start = time.time()
+            print(f"\n=== Strategy: {strategy} ===")
+            log_path = resolve_strategy_log_path(
+                args.log_path or None,
+                strategy,
+                max_questions,
+                parallel=False,
+                strategy_count=len(strategies),
+            )
+            evaluate_seen_placements(
+                scenarios,
+                question_model=question_model,
+                answer_model=answer_model,
+                question_strategy=strategy,
+                max_questions=max_questions,
+                log_path=log_path,
+            )
+            elapsed = time.time() - strategy_start
+            print(f"Strategy time: {elapsed:.2f}s")
+
+    total_elapsed = time.time() - overall_start
+    print(f"\nTotal runtime: {total_elapsed:.2f}s")
 
 
 if __name__ == "__main__":

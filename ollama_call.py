@@ -62,6 +62,7 @@ class VLMAPI:
     def __init__(self, model, port=8080):  # qwen2.5vl:32b, llava:7b, etc.
         self.model = model
         self.api_url = f"http://110.42.252.68:{port}/api/generate"
+        # self.api_url = f"http://127.0.0.1:11434/api/generate"
 
     def encode_image(self, image_path):
         """编码图像为base64格式"""
@@ -88,7 +89,7 @@ class VLMAPI:
                     image_path1=None,
                     image_path2=None,
                     image_path3=None,
-                    max_tokens=1500,
+                    max_tokens=2500,
                     retry_limit=3):
         """
         发送VLM请求到Ollama API
@@ -140,7 +141,7 @@ class VLMAPI:
                 print(f"********* start call {self.model} *********")
                 
                 # 发送请求到Ollama API
-                response = requests.post(self.api_url, json=payload, timeout=60)
+                response = requests.post(self.api_url, json=payload, timeout=9999)
                 
                 if response.status_code == 200:
                     data = response.json()
@@ -235,7 +236,7 @@ class VLMAPI:
                 print(f"********* start VLM call {self.model} *********")
                 
                 # 发送请求到Ollama API
-                response = requests.post(self.api_url, json=payload, timeout=60)
+                response = requests.post(self.api_url, json=payload, timeout=9999)
                 
                 if response.status_code == 200:
                     data = response.json()

@@ -1,4 +1,6 @@
 
+#def generate_question_general(problem: str, history: str = "") -> str:
+
 def generate_question_user_preference(problem: str, history: str = "") -> str:
     """
     Generate a question for the user preference.

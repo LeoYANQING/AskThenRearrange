@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 import re
+import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict
@@ -14,40 +15,46 @@ from typing import Dict, List, Optional, Tuple, Type, TypeVar
 from pydantic import BaseModel, ValidationError
 
 from ollama_call import VLMAPI
+from benchmark.organizer import Organizer, parse_fact
 
+from eval_question import (
+    ModelRunner,
+    clean_summary,
+    construct_summarization_prompt,
+    evaluate_questions,
+    plot_accuracy_curve,
+)
 STRICT_RULES = (
     "Strict rules:\n"
     "* Do not include any internal reasoning, thinking, or analysis.\n"
     "* Only return the final answer.\n"
 )
 
-
 class QuestionOutput(BaseModel):
     question: str
-
 
 class AnswerOutput(BaseModel):
     answer: str
 
-
-class SummaryOutput(BaseModel):
-    summary: str
-
-
 TModel = TypeVar("TModel", bound=BaseModel)
+
+PROJECT_ROOT = os.path.dirname(__file__)
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 from question_generate import (
     generate_question_direct_question,
     generate_question_ParallelExploration,
+    generate_question_general,
     generate_question_user_preference,
 )
-from summarization.benchmark import Scenario, check_placements
+from summarization import benchmark
+from summarization.benchmark import Scenario
 
 
-def build_problem_for_remaining(scenario: Scenario, remaining_objects: List[str]) -> str:
+def build_problem_for_seen(scenario: Scenario) -> str:
     receptacles = ", ".join(scenario.receptacles)
     seen_objects = ", ".join(scenario.seen_objects)
-    remaining_str = ", ".join(remaining_objects)
     return (
         STRICT_RULES
         + "* Output format: JSON that matches the provided schema.\n"
@@ -55,7 +62,6 @@ def build_problem_for_remaining(scenario: Scenario, remaining_objects: List[str]
         "Task: Organize the items in the room.\n"
         f"Receptacles: {receptacles}\n"
         f"Seen objects: {seen_objects}\n"
-        f"Remaining objects to place: {remaining_str}\n"
         "Ask one clear question to clarify user preferences or specific item locations.\n"
         "Only return the question field in JSON."
     )
@@ -129,6 +135,7 @@ def parse_structured_output(text: str, model: Type[TModel]) -> Optional[TModel]:
 
 class QuestionPromptBuilder:
     _ALIASES = {
+        "general": "general",
         "user_preference": "user_preference",
         "preference": "user_preference",
         "k11": "user_preference",
@@ -138,6 +145,7 @@ class QuestionPromptBuilder:
         "direct_question": "direct",
     }
     _STRATEGIES = {
+        "general": generate_question_general,
         "user_preference": generate_question_user_preference,
         "parallel": generate_question_ParallelExploration,
         "direct": generate_question_direct_question,
@@ -316,24 +324,73 @@ def match_object(name: str, candidates: List[str]) -> Optional[str]:
     return None
 
 
-def build_dialogue_summary_prompt(
-    scenario: Scenario, qa_history: List[dict], placements: List[List[str]]
-) -> str:
-    history = format_history(qa_history)
-    placement_lines = "\n".join([f"- {obj}: {recep}" for obj, recep in placements])
-    if not placement_lines:
-        placement_lines = "None"
-    return (
-        STRICT_RULES
-        + "* Output format: JSON that matches the provided schema.\n"
-        "You are summarizing a robot's Q&A with a user about organizing objects.\n"
-        "Summarize the user's preferences or placement rules in one concise sentence.\n"
-        f"Room: {scenario.room}\n"
-        f"Receptacles: {', '.join(scenario.receptacles)}\n"
-        f"Q&A history:\n{history}\n"
-        f"Known placements:\n{placement_lines}\n"
-        "Return the summary in the JSON field only.\n"
-    )
+def placements_to_objects(placements: List[List[str]]) -> List[Dict[str, str]]:
+    return [{"object": obj, "placement": recep} for obj, recep in placements]
+
+
+def _normalize_id(name: str) -> str:
+    normalized = re.sub(r"[^a-zA-Z0-9_]+", "_", name.strip().lower())
+    return normalized.strip("_") or "item"
+
+
+def build_id_maps(names: List[str]) -> Tuple[Dict[str, str], Dict[str, str]]:
+    name_to_id: Dict[str, str] = {}
+    id_to_name: Dict[str, str] = {}
+    for name in names:
+        base = _normalize_id(name)
+        candidate = base
+        counter = 2
+        while candidate in id_to_name and id_to_name[candidate] != name:
+            candidate = f"{base}_{counter}"
+            counter += 1
+        name_to_id[name] = candidate
+        id_to_name[candidate] = name
+    return name_to_id, id_to_name
+
+
+def build_organizer_sample(
+    scenario: Scenario,
+    qa_history: List[dict],
+) -> Tuple[Dict[str, object], Dict[str, str], Dict[str, str]]:
+    obj_name_to_id, obj_id_to_name = build_id_maps(scenario.seen_objects)
+    rec_name_to_id, rec_id_to_name = build_id_maps(scenario.receptacles)
+    objects = {obj_id: obj_id for obj_id in obj_id_to_name.keys()}
+    receptacles = {rec_id: rec_id for rec_id in rec_id_to_name.keys()}
+    init: List[str] = []
+    history = [
+        {
+            "turn_id": idx + 1,
+            "question": item.get("question", ""),
+            "answer": item.get("answer", ""),
+        }
+        for idx, item in enumerate(qa_history)
+    ]
+    sample = {
+        "task": f"Room: {scenario.room}. Organize the items in the room.",
+        "objects": objects,
+        "receptacles": receptacles,
+        "init": init,
+        "qa_history": history,
+    }
+    return sample, obj_id_to_name, rec_id_to_name
+
+
+def pred_goal_to_placements(
+    pred_goal: List[str],
+    obj_id_to_name: Dict[str, str],
+    rec_id_to_name: Dict[str, str],
+) -> List[List[str]]:
+    placements: List[List[str]] = []
+    for fact in pred_goal:
+        pred, obj, receptacle = parse_fact(fact)
+        if pred and obj and receptacle:
+            placements.append(
+                [
+                    obj_id_to_name.get(obj, obj),
+                    rec_id_to_name.get(receptacle, receptacle),
+                ]
+            )
+    return placements
 
 
 def query_placements(
@@ -344,21 +401,19 @@ def query_placements(
     question_strategy: str = "direct",
     question_builder: Optional[QuestionPromptBuilder] = None,
     max_questions: Optional[int] = None,
-) -> Tuple[List[List[str]], List[dict], str]:
+) -> List[dict]:
     question_model = question_model or VLMAPI("qwen3:32b")
     answer_model = answer_model or VLMAPI("qwen3:32b")
     question_builder = question_builder or QuestionPromptBuilder(question_strategy)
     question_builder.set_strategy(question_strategy)
 
-    placements: List[List[str]] = []
     qa_history: List[dict] = []
-    
-    remaining_objects = list(objects)
+
     required_questions = resolve_max_questions(objects, max_questions)
     questions_asked = 0
 
     while questions_asked < required_questions:
-        problem = build_problem_for_remaining(scenario, remaining_objects)
+        problem = build_problem_for_seen(scenario)
         history_str = format_history(qa_history)
         question_prompt = question_builder.build(problem, history_str)
         
@@ -397,12 +452,6 @@ def query_placements(
             structured_answer.answer if structured_answer else extract_answer(answer_raw)
         )
         
-        matched_obj = match_object(question_text, remaining_objects)
-        receptacle = extract_receptacle(answer_text, scenario.receptacles)
-        if matched_obj and receptacle:
-            placements.append([matched_obj, receptacle])
-            remaining_objects.remove(matched_obj)
-
         qa_history.append(
             {
                 "question": question_text,
@@ -411,220 +460,96 @@ def query_placements(
             }
         )
         questions_asked += 1
-        
-    # If we exited loop but still have objects (max turns reached), we might want to log that
-    if remaining_objects:
-        print(
-            f"Warning: Failed to place {remaining_objects} after required questions "
-            f"({questions_asked}/{required_questions})."
-        )
 
-    summary_prompt = build_dialogue_summary_prompt(scenario, qa_history, placements)
-    summary_raw = _call_vlm(
-        question_model,
-        summary_prompt,
-        "Output only JSON that matches the provided schema. Do NOT include reasoning or analysis.",
-        temperature=0.0,
-        format_schema=SummaryOutput.model_json_schema(),
-    )
-    structured_summary = parse_structured_output(summary_raw, SummaryOutput)
-    summary_text = (
-        structured_summary.summary if structured_summary else extract_answer(summary_raw)
-    )
-
-    return placements, qa_history, summary_text
+    return qa_history
 
 
-def query_seen_placements(
-    scenario: Scenario,
-    question_model: Optional[VLMAPI] = None,
-    answer_model: Optional[VLMAPI] = None,
-    question_strategy: str = "direct",
-    question_builder: Optional[QuestionPromptBuilder] = None,
-    max_questions: Optional[int] = None,
-) -> Tuple[List[List[str]], List[dict], str]:
-    return query_placements(
-        scenario,
-        scenario.seen_objects,
-        question_model=question_model,
-        answer_model=answer_model,
-        question_strategy=question_strategy,
-        question_builder=question_builder,
-        max_questions=max_questions,
-    )
-
-
-def evaluate_seen_placements(
+def run_strategy_scenarios(
     scenarios: List[Scenario],
+    strategy: str,
+    max_questions: Optional[int],
+    log_path: str,
+    eval_model: str,
     question_model: Optional[VLMAPI] = None,
     answer_model: Optional[VLMAPI] = None,
-    scenario_limit: Optional[int] = None,
-    question_strategy: str = "direct",
-    question_builder: Optional[QuestionPromptBuilder] = None,
-    max_questions: Optional[int] = None,
-    log_path: Optional[str] = None,
     verbose: bool = True,
-) -> float:
+) -> Tuple[List[List[dict]], List[float]]:
     question_model = question_model or VLMAPI("qwen3:32b")
-    if answer_model is None:
-        answer_model = question_model
-    question_builder = question_builder or QuestionPromptBuilder(question_strategy)
-    question_builder.set_strategy(question_strategy)
-    resolved_log_path = resolve_log_path(log_path, question_strategy, max_questions)
+    answer_model = answer_model or question_model
+    question_builder = QuestionPromptBuilder(strategy)
+    eval_runner = ModelRunner(eval_model)
+    organizer = Organizer(question_model.model)
 
-    total_correct = 0
-    total_items = 0
-
-    for index, scenario in enumerate(scenarios[: scenario_limit or len(scenarios)]):
-        placements, qa_history, summary_text = query_seen_placements(
+    output_chunks: List[str] = []
+    qa_histories: List[List[dict]] = []
+    accuracies: List[float] = []
+    for index, scenario in enumerate(scenarios):
+        qa_history = query_placements(
             scenario,
+            scenario.seen_objects,
             question_model=question_model,
             answer_model=answer_model,
-            question_strategy=question_strategy,
+            question_strategy=strategy,
             question_builder=question_builder,
             max_questions=max_questions,
         )
-        corrects, accuracy = check_placements(placements, scenario.seen_placements)
-        total_correct += sum(corrects)
-        total_items += len(corrects)
+        qa_histories.append(qa_history)
 
-        log_entry = asdict(scenario)
-        placed_objects = {obj for obj, _ in placements}
-        remaining_objects = [obj for obj in scenario.seen_objects if obj not in placed_objects]
+        summary_prompt = construct_summarization_prompt(
+            scenario.seen_objects,
+            scenario.receptacles,
+            qa_history=qa_history,
+        )
+        summary_completion = eval_runner.generate(summary_prompt)
+        summary = clean_summary(summary_completion)
+        organizer_sample, obj_id_to_name, rec_id_to_name = build_organizer_sample(
+            scenario, qa_history
+        )
+        pred_goal = organizer.predict_goal(organizer_sample)
+        predicted_placements = pred_goal_to_placements(
+            pred_goal, obj_id_to_name, rec_id_to_name
+        )
+        _corrects, accuracy = benchmark.check_placements(
+            predicted_placements, scenario.seen_placements
+        )
+        accuracies.append(accuracy)
+        predicted_placement_objects = placements_to_objects(predicted_placements)
+
+        log_entry = {"scenario_index": index + 1, **asdict(scenario)}
         log_entry.update(
             {
-                "scenario_index": index + 1,
-                "strategy": question_strategy,
-                "max_questions": resolve_max_questions(scenario.seen_objects, max_questions),
+                "strategy": strategy,
+                "max_questions": resolve_max_questions(
+                    scenario.seen_objects, max_questions
+                ),
                 "questions_asked": len(qa_history),
                 "qa_history": qa_history,
-                "predicted_placements": placements,
-                "corrects": corrects,
+                "summary": summary,
+                "predicted_placements": predicted_placement_objects,
                 "accuracy": accuracy,
-                "summary": summary_text,
-                "remaining_objects": remaining_objects,
             }
         )
-        append_test_log(resolved_log_path, log_entry)
+        append_test_log(log_path, log_entry)
 
         if verbose:
-            print(f"\nScenario {index + 1}: {scenario.room}")
-            print("Q&A history:")
-            print(json.dumps(qa_history, ensure_ascii=True, indent=2))
-            print("\nDialogue summary:")
-            print(summary_text)
-            print("\nPredicted placements:")
-            print(json.dumps(placements, ensure_ascii=True, indent=2))
-            print(f"\nScenario accuracy: {accuracy:.2f}")
+            output_chunks.append(f"\nScenario {index + 1} (raw):")
+            output_chunks.append(
+                json.dumps(asdict(scenario), ensure_ascii=True, indent=2)
+            )
+            output_chunks.append("\nQ&A history:")
+            output_chunks.append(json.dumps(qa_history, ensure_ascii=True, indent=2))
+            output_chunks.append("\nSummary:")
+            output_chunks.append(summary)
+            output_chunks.append("\nPredicted placements:")
+            output_chunks.append(
+                json.dumps(predicted_placement_objects, ensure_ascii=True, indent=2)
+            )
+            output_chunks.append(f"\nScenario accuracy: {accuracy:.2f}")
 
-    overall_accuracy = total_correct / total_items if total_items else 0.0
-    if verbose:
-        print(f"\nOverall accuracy: {overall_accuracy:.2f}")
-        print(f"Log saved to: {resolved_log_path}")
-    return overall_accuracy
+    if verbose and output_chunks:
+        print("\n".join(output_chunks))
 
-
-def evaluate_accuracy_curve(
-    scenarios: List[Scenario],
-    strategies: List[str],
-    max_questions_list: List[int],
-    question_model: Optional[VLMAPI] = None,
-    answer_model: Optional[VLMAPI] = None,
-    log_dir: Optional[str] = None,
-    plot_path: Optional[str] = None,
-    parallel_strategies: bool = False,
-    strategy_workers: Optional[int] = None,
-) -> Dict[str, List[float]]:
-    results: Dict[str, List[float]] = {}
-    if parallel_strategies and len(strategies) > 1:
-        max_workers = resolve_strategy_workers(strategy_workers, len(strategies))
-
-        def run_strategy(strategy: str) -> Tuple[str, List[float]]:
-            local_question_model = question_model or VLMAPI("qwen3:32b")
-            local_answer_model = answer_model if answer_model is not None else local_question_model
-            accuracies: List[float] = []
-            question_builder = QuestionPromptBuilder(strategy)
-            for max_questions in max_questions_list:
-                log_path = None
-                if log_dir:
-                    log_path = os.path.join(
-                        log_dir, f"test_log_{strategy}_q{max_questions}.json"
-                    )
-                accuracy = evaluate_seen_placements(
-                    scenarios,
-                    question_model=local_question_model,
-                    answer_model=local_answer_model,
-                    question_strategy=strategy,
-                    question_builder=question_builder,
-                    max_questions=max_questions,
-                    log_path=log_path,
-                    verbose=False,
-                )
-                accuracies.append(accuracy)
-            return strategy, accuracies
-
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {executor.submit(run_strategy, s): s for s in strategies}
-            for future in as_completed(futures):
-                strategy, accuracies = future.result()
-                results[strategy] = accuracies
-    else:
-        question_model = question_model or VLMAPI("qwen3:32b")
-        if answer_model is None:
-            answer_model = question_model
-        for strategy in strategies:
-            accuracies = []
-            question_builder = QuestionPromptBuilder(strategy)
-            for max_questions in max_questions_list:
-                log_path = None
-                if log_dir:
-                    log_path = os.path.join(
-                        log_dir, f"test_log_{strategy}_q{max_questions}.json"
-                    )
-                accuracy = evaluate_seen_placements(
-                    scenarios,
-                    question_model=question_model,
-                    answer_model=answer_model,
-                    question_strategy=strategy,
-                    question_builder=question_builder,
-                    max_questions=max_questions,
-                    log_path=log_path,
-                    verbose=False,
-                )
-                accuracies.append(accuracy)
-            results[strategy] = accuracies
-
-    if plot_path:
-        plot_accuracy_curve(max_questions_list, results, plot_path)
-        print(f"Accuracy curve saved to: {plot_path}")
-
-    return results
-
-
-def plot_accuracy_curve(
-    max_questions_list: List[int],
-    results: Dict[str, List[float]],
-    output_path: str,
-) -> None:
-    try:
-        import matplotlib.pyplot as plt
-    except ImportError as exc:
-        raise RuntimeError("matplotlib is required to plot accuracy curves.") from exc
-
-    plt.figure(figsize=(8, 5))
-    for strategy, accuracies in results.items():
-        plt.plot(max_questions_list, accuracies, marker="o", label=strategy)
-    plt.xlabel("Max Question Turns")
-    plt.ylabel("Accuracy")
-    plt.title("Accuracy vs Max Question Turns")
-    plt.grid(True, alpha=0.3)
-    plt.legend()
-    output_dir = os.path.dirname(output_path)
-    if output_dir:
-        os.makedirs(output_dir, exist_ok=True)
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=150)
-    plt.close()
+    return qa_histories, accuracies
 
 
 def main() -> None:
@@ -644,8 +569,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--strategies",
-        default="direct,user_preference,parallel",
-        help="Comma-separated: direct,user_preference,parallel",
+        default="direct,user_preference,parallel,general",
+        help="Comma-separated: direct,user_preference,parallel,general",
     )
     parser.add_argument(
         "--max_questions",
@@ -654,24 +579,14 @@ def main() -> None:
         help="Required question turns per scenario (0 means auto).",
     )
     parser.add_argument(
+        "--max_questions_list",
+        default="1,3,5,8,10",
+        help="Comma-separated max question counts to run.",
+    )
+    parser.add_argument(
         "--log_path",
         default="",
         help="Optional JSON log path (supports {strategy} and {max_questions}).",
-    )
-    parser.add_argument(
-        "--curve_max_questions",
-        default="",
-        help="Comma-separated max question counts to plot accuracy curve.",
-    )
-    parser.add_argument(
-        "--curve_output",
-        default=os.path.join("summarization", "acc_curve.png"),
-        help="Path to save accuracy curve plot.",
-    )
-    parser.add_argument(
-        "--curve_log_dir",
-        default=os.path.join("summarization", "test_logs"),
-        help="Directory to save curve test logs.",
     )
     parser.add_argument(
         "--parallel_strategies",
@@ -683,6 +598,16 @@ def main() -> None:
         type=int,
         default=0,
         help="Max worker threads for parallel strategies (0 means auto).",
+    )
+    parser.add_argument(
+        "--eval_model",
+        default="qwen3",
+        help="Model name for summarization/placement evaluation.",
+    )
+    parser.add_argument(
+        "--plot_path",
+        default=os.path.join("summarization", "acc_curve.png"),
+        help="Output path for accuracy curve plot.",
     )
     args = parser.parse_args()
 
@@ -697,98 +622,93 @@ def main() -> None:
     if args.max_scenarios > 0:
         scenarios = scenarios[: args.max_scenarios]
     strategies = [s.strip() for s in args.strategies.split(",") if s.strip()]
-    max_questions = args.max_questions if args.max_questions > 0 else None
-    overall_start = time.time()
-    if args.curve_max_questions:
-        curve_start = time.time()
-        max_questions_list = [
-            int(v) for v in args.curve_max_questions.split(",") if v.strip()
-        ]
-        print(
-            f"Running accuracy curve for strategies={strategies} "
-            f"max_questions={max_questions_list}"
-        )
-        curve_log_dir = args.curve_log_dir
-        if curve_log_dir and not os.path.isabs(curve_log_dir):
-            curve_log_dir = os.path.join(os.path.dirname(__file__), curve_log_dir)
-        evaluate_accuracy_curve(
-            scenarios,
-            strategies=strategies,
-            max_questions_list=max_questions_list,
-            log_dir=curve_log_dir,
-            plot_path=(
-                args.curve_output
-                if os.path.isabs(args.curve_output)
-                else os.path.join(os.path.dirname(__file__), args.curve_output)
-            ),
-            parallel_strategies=args.parallel_strategies,
-            strategy_workers=args.strategy_workers if args.strategy_workers > 0 else None,
-        )
-        curve_elapsed = time.time() - curve_start
-        print(f"\nCurve evaluation time: {curve_elapsed:.2f}s")
-        total_elapsed = time.time() - overall_start
-        print(f"Total runtime: {total_elapsed:.2f}s")
-        return
-
-    if args.parallel_strategies and len(strategies) > 1:
-        max_workers = resolve_strategy_workers(args.strategy_workers, len(strategies))
-        print(f"\nRunning strategies in parallel (workers={max_workers})")
-
-        def run_strategy(strategy: str) -> Tuple[str, float, str, float]:
-            strategy_start = time.time()
-            resolved_log_path = resolve_strategy_log_path(
-                args.log_path or None,
-                strategy,
-                max_questions,
-                parallel=True,
-                strategy_count=len(strategies),
-            )
-            accuracy = evaluate_seen_placements(
-                scenarios,
-                question_model=None,
-                answer_model=None,
-                question_strategy=strategy,
-                max_questions=max_questions,
-                log_path=resolved_log_path,
-                verbose=False,
-            )
-            elapsed = time.time() - strategy_start
-            return strategy, accuracy, resolved_log_path, elapsed
-
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {executor.submit(run_strategy, s): s for s in strategies}
-            for future in as_completed(futures):
-                strategy, accuracy, log_path, elapsed = future.result()
-                print(f"\n=== Strategy: {strategy} ===")
-                print(f"Overall accuracy: {accuracy:.2f}")
-                print(f"Log saved to: {log_path}")
-                print(f"Strategy time: {elapsed:.2f}s")
+    if args.max_questions > 0:
+        max_questions_list = [args.max_questions]
     else:
-        question_model = VLMAPI("qwen3:32b")
-        answer_model = VLMAPI("qwen3:32b")
-        for strategy in strategies:
-            strategy_start = time.time()
-            print(f"\n=== Strategy: {strategy} ===")
-            log_path = resolve_strategy_log_path(
-                args.log_path or None,
-                strategy,
-                max_questions,
-                parallel=False,
-                strategy_count=len(strategies),
-            )
-            evaluate_seen_placements(
-                scenarios,
-                question_model=question_model,
-                answer_model=answer_model,
-                question_strategy=strategy,
-                max_questions=max_questions,
-                log_path=log_path,
-            )
-            elapsed = time.time() - strategy_start
-            print(f"Strategy time: {elapsed:.2f}s")
+        max_questions_list = [
+            int(v) for v in args.max_questions_list.split(",") if v.strip()
+        ]
+    overall_start = time.time()
+    results_by_strategy = {strategy: [] for strategy in strategies}
+    for max_questions in max_questions_list:
+        print(f"\n=== Max questions: {max_questions} ===")
+        if args.parallel_strategies and len(strategies) > 1:
+            max_workers = resolve_strategy_workers(args.strategy_workers, len(strategies))
+            print(f"Running strategies in parallel (workers={max_workers})")
+
+            def run_strategy(
+                strategy: str,
+            ) -> Tuple[str, str, float, List[List[dict]], List[float]]:
+                strategy_start = time.time()
+                resolved_log_path = resolve_strategy_log_path(
+                    args.log_path or None,
+                    strategy,
+                    max_questions,
+                    parallel=True,
+                    strategy_count=len(strategies),
+                )
+                qa_histories, accuracies = run_strategy_scenarios(
+                    scenarios,
+                    strategy,
+                    max_questions,
+                    resolved_log_path,
+                    args.eval_model,
+                    question_model=None,
+                    answer_model=None,
+                    verbose=True,
+                )
+                elapsed = time.time() - strategy_start
+                return strategy, resolved_log_path, elapsed, qa_histories, accuracies
+
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                futures = {executor.submit(run_strategy, s): s for s in strategies}
+                for future in as_completed(futures):
+                    strategy, log_path, elapsed, _qa_histories, accuracies = (
+                        future.result()
+                    )
+                    avg_accuracy = (
+                        sum(accuracies) / len(accuracies) if accuracies else 0.0
+                    )
+                    results_by_strategy[strategy].append(avg_accuracy)
+                    print(f"\n=== Strategy: {strategy} ===")
+                    print(f"Log saved to: {log_path}")
+                    print(f"Strategy time: {elapsed:.2f}s")
+                    print(f"Seen accuracy: {avg_accuracy:.2f}")
+        else:
+            question_model = VLMAPI("qwen3:32b")
+            answer_model = VLMAPI("qwen3:32b")
+            for strategy in strategies:
+                strategy_start = time.time()
+                print(f"\n=== Strategy: {strategy} ===")
+                log_path = resolve_strategy_log_path(
+                    args.log_path or None,
+                    strategy,
+                    max_questions,
+                    parallel=False,
+                    strategy_count=len(strategies),
+                )
+                qa_histories, accuracies = run_strategy_scenarios(
+                    scenarios,
+                    strategy,
+                    max_questions,
+                    log_path,
+                    args.eval_model,
+                    question_model=question_model,
+                    answer_model=answer_model,
+                    verbose=True,
+                )
+                avg_accuracy = (
+                    sum(accuracies) / len(accuracies) if accuracies else 0.0
+                )
+                results_by_strategy[strategy].append(avg_accuracy)
+                elapsed = time.time() - strategy_start
+                print(f"Strategy time: {elapsed:.2f}s")
+                print(f"Seen accuracy: {avg_accuracy:.2f}")
 
     total_elapsed = time.time() - overall_start
     print(f"\nTotal runtime: {total_elapsed:.2f}s")
+    plot_accuracy_curve(max_questions_list, results_by_strategy, args.plot_path)
+    print(f"Saved accuracy curve to {args.plot_path}")
 
 
 if __name__ == "__main__":

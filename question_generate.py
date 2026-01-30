@@ -1,6 +1,21 @@
 
-#def generate_question_general(problem: str, history: str = "") -> str:
+def generate_question_general(problem: str, history: str = "") -> str:
+    """
+    Generate a question for the general.
+    """
+    general_prompt_template = f"""
+    You are an AI agent controlling a home service robot. Your goal is to use the General strategy to finish the task{problem}.
 
+    context:
+    History of Q&A:
+    {history}
+
+    Instructions:
+    * You should ask a question to the user to get the information to finish the task.
+    """
+
+    return general_prompt_template.format(problem=problem, history=history)
+    
 def generate_question_user_preference(problem: str, history: str = "") -> str:
     """
     Generate a question for the user preference.

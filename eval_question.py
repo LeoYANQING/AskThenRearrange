@@ -11,10 +11,46 @@ from qwen2_5_7B_api import Qwen2_5_7BAPI
 from qwen3_api import Qwen3API
 from task_matter import query_seen_placements
 from summarization import benchmark, utils
-from summarization.openai_cache import Completion
 
 
-def construct_summarization_prompt(objects, receptacles, placements) -> str:
+def format_history(qa_history: List[Dict[str, str]]) -> str:
+    if not qa_history:
+        return "None"
+    lines = []
+    for item in qa_history:
+        question = item.get("question", "").strip()
+        answer = item.get("answer", "").strip()
+        if question:
+            lines.append(f"Q: {question}")
+        if answer:
+            lines.append(f"A: {answer}")
+    return "\n".join(lines) if lines else "None"
+
+
+def construct_summarization_prompt(
+    objects,
+    receptacles,
+    placements=None,
+    qa_history: Optional[List[Dict[str, str]]] = None,
+):
+    #功能：生成用于让 LLM 总结整理规则的 prompt。
+    if qa_history is not None:
+        history = format_history(qa_history)
+        placement_lines = "None"
+        if placements:
+            placement_lines = "\n".join(
+                [f"- {obj}: {recep}" for obj, recep in placements]
+            )
+        return (
+            "You are summarizing a robot's Q&A with a user about organizing objects.\n"
+            "Summarize the user's preferences or placement rules in one concise sentence.\n"
+            f"Objects: {', '.join(objects)}\n"
+            f"Receptacles: {', '.join(receptacles)}\n"
+            f"Q&A history:\n{history}\n"
+            f"Known placements:\n{placement_lines}\n"
+            "Output only the summary sentence."
+        )
+
     summarization_prompt_template = '''objects = ["dried figs", "protein bar", "cornmeal", "Macadamia nuts", "vinegar", "herbal tea", "peanut oil", "chocolate bar", "bread crumbs", "Folgers instant coffee"]
 receptacles = ["top rack", "middle rack", "table", "shelf", "plastic box"]
 pick_and_place("dried figs", "plastic box")
@@ -55,12 +91,11 @@ receptacles = {receptacles_str}
 # Summary:'''
     objects_str = '[' + ', '.join(map(lambda x: f'"{x}"', objects)) + ']'
     receptacles_str = '[' + ', '.join(map(lambda x: f'"{x}"', receptacles)) + ']'
-    placements_str = '\n'.join(map(lambda x: f'pick_and_place("{x[0]}", "{x[1]}")', placements))
-    return summarization_prompt_template.format(
-        objects_str=objects_str,
-        receptacles_str=receptacles_str,
-        placements_str=placements_str,
+    placements_list = placements or []
+    placements_str = '\n'.join(
+        map(lambda x: f'pick_and_place("{x[0]}", "{x[1]}")', placements_list)
     )
+    return summarization_prompt_template.format(objects_str=objects_str, receptacles_str=receptacles_str, placements_str=placements_str)
 
 
 def construct_placement_prompt(summary, objects, receptacles) -> str:
@@ -130,6 +165,8 @@ class ModelRunner:
             self.client = Qwen2_5_7BAPI(model=model)
             self.backend = "qwen2.5"
         else:
+            from summarization.openai_cache import Completion
+
             self.client = Completion()
             self.backend = "openai"
         self.model_name = normalized
@@ -205,6 +242,7 @@ def evaluate_questions(
     model_name: str = "gpt-4o",
     verbose: bool = False,
     use_dialogue: bool = True,
+    qa_histories: Optional[List[List[Dict[str, str]]]] = None,
 ) -> Tuple[List[float], List[Dict[str, Any]]]:
     # 功能：评估 LLM 总结整理规则和根据总结预测物体放置的能力。
     assert eval_split in {"unseen", "seen"}
@@ -216,14 +254,28 @@ def evaluate_questions(
         if verbose:
             print(f"Scenario {i + 1} of {len(scenarios)}\n")
 
-        seen_result = query_seen_placements(scenario)
-        if isinstance(seen_result, tuple) and len(seen_result) == 2:
-            seen_placements, qa_history = seen_result
+        qa_history: List[Dict[str, str]] = []
+        seen_placements: List[List[str]] = []
+        if qa_histories is not None:
+            if i < len(qa_histories):
+                qa_history = qa_histories[i] or []
         else:
-            seen_placements, qa_history = seen_result, []
+            seen_result = query_seen_placements(scenario)
+            if isinstance(seen_result, tuple):
+                if len(seen_result) == 2:
+                    seen_placements, qa_history = seen_result
+                elif len(seen_result) >= 3:
+                    seen_placements, qa_history, _summary = seen_result
+                else:
+                    seen_placements = list(seen_result)
+            else:
+                seen_placements = seen_result
 
         summarization_prompt = construct_summarization_prompt(
-            scenario.seen_objects, scenario.receptacles, seen_placements
+            scenario.seen_objects,
+            scenario.receptacles,
+            seen_placements,
+            qa_history=qa_history if qa_histories is not None else None,
         )
         summarization_completion = runner.generate(summarization_prompt)
         if verbose:
@@ -283,6 +335,32 @@ def evaluate_questions(
             print(f"\nAccuracy: {accuracy:.2f}")
             print("\n" + 80 * "-" + "\n")
     return accuracies, details
+
+def plot_accuracy_curve(
+    max_questions_list: List[int],
+    results: Dict[str, List[float]],
+    output_path: str,
+) -> None:
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError as exc:
+        raise RuntimeError("matplotlib is required to plot accuracy curves.") from exc
+
+    plt.figure(figsize=(8, 5))
+    for strategy, accuracies in results.items():
+        plt.plot(max_questions_list, accuracies, marker="o", label=strategy)
+    plt.xlabel("Max Question Turns")
+    plt.ylabel("Accuracy")
+    plt.title("Accuracy vs Max Question Turns")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    output_dir = os.path.dirname(output_path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150)
+    plt.close()
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(

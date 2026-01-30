@@ -96,8 +96,7 @@ def format_qa_history(qa_history: List[Dict[str, Any]]) -> str:
 def build_prompt(sample: Dict[str, Any]) -> Dict[str, str]:
     objects = format_objects(sample.get("objects", {}))
     receptacles = format_receptacles(sample.get("receptacles", {}))
-    init = format_facts(sample.get("init", []))
-    history = format_qa_history(sample.get("qa_history", []))
+    summary = sample.get("summary", "")
 
     systext = (
         "You are a household organizing assistant.\n"
@@ -105,17 +104,24 @@ def build_prompt(sample: Dict[str, Any]) -> Dict[str, str]:
         "Return strict JSON with exactly one key: \"pred_goal\".\n"
         "Each item must be a fact like (inside obj receptacle) or (ontop obj receptacle).\n"
         "Use only the object/receptacle ids given. One placement per object.\n"
-        "If unsure, keep the object in its current init location.\n"
+        "You MUST predict a final placement for EVERY object listed in Objects.\n"
         "No extra text, no markdown.\n"
     )
     usertext = (
-        "Context:\n"
-        f"Task: {sample.get('task', 'unknown')}\n\n"
-        f"Objects:\n{objects}\n\n"
-        f"Receptacles:\n{receptacles}\n\n"
-        f"Init facts:\n{init}\n\n"
-        f"QA history:\n{history}\n\n"
-        "Predict the final placement for every object."
+        "Here is an example of how to think:\n\n"
+        "# Summary: Put clothes in the laundry basket and toys in the storage box.\n"
+        "objects = [\"socks\", \"toy_car\"]\n"
+        "receptacles = [\"laundry_basket\", \"storage_box\"]\n"
+        "# Logic:\n"
+        "# pick_and_place(\"socks\", \"laundry_basket\")\n"
+        "# pick_and_place(\"toy_car\", \"storage_box\")\n"
+        "Output: {\"pred_goal\": [\"(inside socks laundry_basket)\", \"(inside toy_car storage_box)\"]}\n\n"
+        "Now, solve the following task:\n\n"
+        f"# Summary: {summary}\n"
+        f"objects = {list(sample.get('objects', {}).keys())}\n"
+        f"receptacles = {list(sample.get('receptacles', {}).keys())}\n"
+        "Predict the placement for every object in the list above.\n"
+        "Output:"
     )
     return {"systext": systext, "usertext": usertext}
 
@@ -195,8 +201,11 @@ class Organizer:
             format_schema=self.schema,
             options=self.options if options is None else options,
         )
+        print(f"\n[DEBUG] Organizer Raw Output:\n{text}\n[DEBUG] End Organizer Output\n")
         pred_goal = self.parse_pred_goal(text)
-        return normalize_pred_goal(pred_goal, sample)
+        result = normalize_pred_goal(pred_goal, sample)
+        print(f"\n[DEBUG] Normalized Goal:\n{result}\n[DEBUG] End Normalized Goal\n")
+        return result
 
 
 def predict_goal_for_sample(

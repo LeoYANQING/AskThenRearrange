@@ -7,9 +7,7 @@ import os
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-from qwen2_5_7B_api import Qwen2_5_7BAPI
-from qwen3_api import Qwen3API
-from task_matter import query_seen_placements
+from ollama_call import VLMAPI
 from summarization import benchmark, utils
 
 
@@ -33,69 +31,52 @@ def construct_summarization_prompt(
     placements=None,
     qa_history: Optional[List[Dict[str, str]]] = None,
 ):
-    #功能：生成用于让 LLM 总结整理规则的 prompt。
-    if qa_history is not None:
-        history = format_history(qa_history)
-        placement_lines = "None"
-        if placements:
-            placement_lines = "\n".join(
-                [f"- {obj}: {recep}" for obj, recep in placements]
-            )
-        return (
-            "You are summarizing a robot's Q&A with a user about organizing objects.\n"
-            "Summarize the user's preferences or placement rules in one concise sentence.\n"
-            f"Objects: {', '.join(objects)}\n"
-            f"Receptacles: {', '.join(receptacles)}\n"
-            f"Q&A history:\n{history}\n"
-            f"Known placements:\n{placement_lines}\n"
-            "Output only the summary sentence."
-        )
+    summarization_prompt_template = '''You are summarizing a robot's Q&A with a user about organizing objects.
+Summarize the user's preferences or placement rules in one concise sentence.
+Objects: dried figs, protein bar, cornmeal, Macadamia nuts, vinegar, herbal tea, peanut oil, chocolate bar, bread crumbs, Folgers instant coffee
+Receptacles: top rack, middle rack, table, shelf, plastic box
+Q&A history:
+Q: Where should I put the dried figs and Macadamia nuts?
+A: Put dried fruits and nuts in the plastic box.
+Q: Where do liquid ingredients go?
+A: Liquids like vinegar and peanut oil should go on the middle rack.
+Summary: Put dry ingredients on the top rack, liquid ingredients in the middle rack, tea and coffee on the table, packaged snacks on the shelf, and dried fruits and nuts in the plastic box.
 
-    summarization_prompt_template = '''objects = ["dried figs", "protein bar", "cornmeal", "Macadamia nuts", "vinegar", "herbal tea", "peanut oil", "chocolate bar", "bread crumbs", "Folgers instant coffee"]
-receptacles = ["top rack", "middle rack", "table", "shelf", "plastic box"]
-pick_and_place("dried figs", "plastic box")
-pick_and_place("protein bar", "shelf")
-pick_and_place("cornmeal", "top rack")
-pick_and_place("Macadamia nuts", "plastic box")
-pick_and_place("vinegar", "middle rack")
-pick_and_place("herbal tea", "table")
-pick_and_place("peanut oil", "middle rack")
-pick_and_place("chocolate bar", "shelf")
-pick_and_place("bread crumbs", "top rack")
-pick_and_place("Folgers instant coffee", "table")
-# Summary: Put dry ingredients on the top rack, liquid ingredients in the middle rack, tea and coffee on the table, packaged snacks on the shelf, and dried fruits and nuts in the plastic box.
+You are summarizing a robot's Q&A with a user about organizing objects.
+Summarize the user's preferences or placement rules in one concise sentence.
+Objects: yoga pants, wool sweater, black jeans, Nike shorts
+Receptacles: hamper, bed
+Q&A history:
+Q: How do you want to organize clothes?
+A: Put athletic clothes in the hamper and other clothes on the bed.
+Summary: Put athletic clothes in the hamper and other clothes on the bed.
 
-objects = ["yoga pants", "wool sweater", "black jeans", "Nike shorts"]
-receptacles = ["hamper", "bed"]
-pick_and_place("yoga pants", "hamper")
-pick_and_place("wool sweater", "bed")
-pick_and_place("black jeans", "bed")
-pick_and_place("Nike shorts", "hamper")
-# Summary: Put athletic clothes in the hamper and other clothes on the bed.
+You are summarizing a robot's Q&A with a user about organizing objects.
+Summarize the user's preferences or placement rules in one concise sentence.
+Objects: Nike sweatpants, sweater, cargo shorts, iPhone, dictionary, tablet, Under Armour t-shirt, physics homework
+Receptacles: backpack, closet, desk, nightstand
+Q&A history:
+Q: Where do workout clothes go?
+A: Put workout clothes in the backpack.
+Q: Where should electronics and books go?
+A: Electronics go on the nightstand and books on the desk.
+Summary: Put workout clothes in the backpack, other clothes in the closet, books and homeworks on the desk, and electronics on the nightstand.
 
-objects = ["Nike sweatpants", "sweater", "cargo shorts", "iPhone", "dictionary", "tablet", "Under Armour t-shirt", "physics homework"]
-receptacles = ["backpack", "closet", "desk", "nightstand"]
-pick_and_place("Nike sweatpants", "backpack")
-pick_and_place("sweater", "closet")
-pick_and_place("cargo shorts", "closet")
-pick_and_place("iPhone", "nightstand")
-pick_and_place("dictionary", "desk")
-pick_and_place("tablet", "nightstand")
-pick_and_place("Under Armour t-shirt", "backpack")
-pick_and_place("physics homework", "desk")
-# Summary: Put workout clothes in the backpack, other clothes in the closet, books and homeworks on the desk, and electronics on the nightstand.
-
-objects = {objects_str}
-receptacles = {receptacles_str}
-{placements_str}
-# Summary:'''
-    objects_str = '[' + ', '.join(map(lambda x: f'"{x}"', objects)) + ']'
-    receptacles_str = '[' + ', '.join(map(lambda x: f'"{x}"', receptacles)) + ']'
-    placements_list = placements or []
-    placements_str = '\n'.join(
-        map(lambda x: f'pick_and_place("{x[0]}", "{x[1]}")', placements_list)
+You are summarizing a robot's Q&A with a user about organizing objects.
+Summarize the user's preferences or placement rules in one concise sentence.
+Objects: {objects_str}
+Receptacles: {receptacles_str}
+Q&A history:
+{qa_history_str}
+Summary:'''
+    objects_str = ", ".join(objects)
+    receptacles_str = ", ".join(receptacles)
+    qa_history_str = format_history(qa_history) if qa_history is not None else "None"
+    return summarization_prompt_template.format(
+        objects_str=objects_str,
+        receptacles_str=receptacles_str,
+        qa_history_str=qa_history_str,
     )
-    return summarization_prompt_template.format(objects_str=objects_str, receptacles_str=receptacles_str, placements_str=placements_str)
 
 
 def construct_placement_prompt(summary, objects, receptacles) -> str:
@@ -155,34 +136,16 @@ def normalize_name(text: str) -> str:
 class ModelRunner:
     def __init__(self, model_name: str) -> None:
         normalized = model_name.strip()
-        lower_name = normalized.lower()
-        if lower_name.startswith("qwen3"):
-            model = normalized if ":" in normalized else "qwen3:32b"
-            self.client = Qwen3API(model=model)
-            self.backend = "qwen3"
-        elif lower_name.startswith("qwen2.5") or lower_name.startswith("qwen2_5"):
-            model = normalized if ":" in normalized else "qwen2.5:7b"
-            self.client = Qwen2_5_7BAPI(model=model)
-            self.backend = "qwen2.5"
-        else:
-            from summarization.openai_cache import Completion
-
-            self.client = Completion()
-            self.backend = "openai"
-        self.model_name = normalized
+        self.model_name = normalized if normalized else "qwen3:32b"
+        self.client = VLMAPI(self.model_name)
 
     def generate(self, prompt: str) -> str:
-        if self.backend in {"qwen3", "qwen2.5"}:
-            response = self.client.generate(
-                prompt,
-                options={"temperature": 0.0, "num_predict": 256},
-            )
-            return str(response).strip()
-        response = self.client.create(prompt, model=self.model_name)
-        if isinstance(response, str):
-            return response.strip()
-        if hasattr(response, "choices") and response.choices:
-            return str(response.choices[0].message.content).strip()
+        response = self.client.vlm_request_with_format(
+            "You are a helpful assistant. Do not output any <think> content. "
+            "Only output the final answer.",
+            prompt,
+            options={"temperature": 0.0},
+        )
         return str(response).strip()
 
 
@@ -259,17 +222,6 @@ def evaluate_questions(
         if qa_histories is not None:
             if i < len(qa_histories):
                 qa_history = qa_histories[i] or []
-        else:
-            seen_result = query_seen_placements(scenario)
-            if isinstance(seen_result, tuple):
-                if len(seen_result) == 2:
-                    seen_placements, qa_history = seen_result
-                elif len(seen_result) >= 3:
-                    seen_placements, qa_history, _summary = seen_result
-                else:
-                    seen_placements = list(seen_result)
-            else:
-                seen_placements = seen_result
 
         summarization_prompt = construct_summarization_prompt(
             scenario.seen_objects,

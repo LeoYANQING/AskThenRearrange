@@ -351,6 +351,7 @@ def build_id_maps(names: List[str]) -> Tuple[Dict[str, str], Dict[str, str]]:
 def build_organizer_sample(
     scenario: Scenario,
     qa_history: List[dict],
+    summary: str,
 ) -> Tuple[Dict[str, object], Dict[str, str], Dict[str, str]]:
     obj_name_to_id, obj_id_to_name = build_id_maps(scenario.seen_objects)
     rec_name_to_id, rec_id_to_name = build_id_maps(scenario.receptacles)
@@ -370,6 +371,7 @@ def build_organizer_sample(
         "objects": objects,
         "receptacles": receptacles,
         "init": init,
+        "summary": summary,
         "qa_history": history,
     }
     return sample, obj_id_to_name, rec_id_to_name
@@ -503,7 +505,7 @@ def run_strategy_scenarios(
         summary_completion = eval_runner.generate(summary_prompt)
         summary = clean_summary(summary_completion)
         organizer_sample, obj_id_to_name, rec_id_to_name = build_organizer_sample(
-            scenario, qa_history
+            scenario, qa_history, summary
         )
         pred_goal = organizer.predict_goal(organizer_sample)
         predicted_placements = pred_goal_to_placements(
@@ -601,7 +603,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--eval_model",
-        default="qwen3",
+        default="qwen3:32b",
         help="Model name for summarization/placement evaluation.",
     )
     parser.add_argument(

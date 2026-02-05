@@ -1,0 +1,219 @@
+{
+  "annotator_notes": [
+    "I prefer frequently used cooking items to be immediately accessible, even if they stay on the countertop.",
+    "Fragile items such as glassware should always be stored in upper cabinets to avoid accidental breakage.",
+    "Heavy cookware must be placed in lower cabinets for safety and ease of lifting.",
+    "Cleaning supplies should never be stored together with food or tableware.",
+    "Items used for the same activity, such as coffee making, should be grouped together so I can grab everything at once.",
+    "Food preparation tools for raw ingredients should be separated from those used for ready-to-eat food."
+  ],
+  "receptacles": [
+    "countertop",
+    "upper_cabinet",
+    "lower_cabinet",
+    "drawer",
+    "pantry_shelf",
+    "under_sink_cabinet"
+  ],
+  "room": "kitchen",
+  "seen_objects": [
+    "salt shaker",
+    "pepper grinder",
+    "olive oil bottle",
+    "glass cup",
+    "ceramic mug",
+    "cast iron pan",
+    "cutting board (meat)",
+    "chef knife",
+    "dish soap",
+    "sponge",
+    "coffee beans bag",
+    "coffee filter paper"
+  ],
+  "seen_placements": [
+    [
+      "salt shaker",
+      "countertop"
+    ],
+    [
+      "pepper grinder",
+      "countertop"
+    ],
+    [
+      "olive oil bottle",
+      "countertop"
+    ],
+    [
+      "glass cup",
+      "upper_cabinet"
+    ],
+    [
+      "ceramic mug",
+      "upper_cabinet"
+    ],
+    [
+      "cast iron pan",
+      "lower_cabinet"
+    ],
+    [
+      "cutting board (meat)",
+      "drawer"
+    ],
+    [
+      "chef knife",
+      "drawer"
+    ],
+    [
+      "dish soap",
+      "under_sink_cabinet"
+    ],
+    [
+      "sponge",
+      "under_sink_cabinet"
+    ],
+    [
+      "coffee beans bag",
+      "pantry_shelf"
+    ],
+    [
+      "coffee filter paper",
+      "pantry_shelf"
+    ]
+  ],
+  "tags": [
+    "Category",
+    "Attribute",
+    "Function",
+    "Subcategory",
+    "Multiple categories"
+  ],
+  "unseen_objects": [
+    "soy sauce bottle",
+    "vinegar bottle",
+    "wine glass",
+    "mixing bowl (glass)",
+    "nonstick frying pan",
+    "pot lid",
+    "paper towel roll",
+    "bleach cleaner",
+    "fruit bowl",
+    "bread loaf",
+    "cutting board (fruit)",
+    "paring knife",
+    "tea bags box"
+  ],
+  "unseen_placements": [
+    [
+      "soy sauce bottle",
+      "countertop"
+    ],
+    [
+      "vinegar bottle",
+      "countertop"
+    ],
+    [
+      "wine glass",
+      "upper_cabinet"
+    ],
+    [
+      "mixing bowl (glass)",
+      "upper_cabinet"
+    ],
+    [
+      "nonstick frying pan",
+      "lower_cabinet"
+    ],
+    [
+      "pot lid",
+      "lower_cabinet"
+    ],
+    [
+      "paper towel roll",
+      "countertop"
+    ],
+    [
+      "bleach cleaner",
+      "under_sink_cabinet"
+    ],
+    [
+      "fruit bowl",
+      "countertop"
+    ],
+    [
+      "bread loaf",
+      "pantry_shelf"
+    ],
+    [
+      "cutting board (fruit)",
+      "drawer"
+    ],
+    [
+      "paring knife",
+      "drawer"
+    ],
+    [
+      "tea bags box",
+      "pantry_shelf"
+    ]
+  ],
+  "strategy": "preference-first",
+  "budget_total": 5,
+  "budget_used": 5,
+  "qa_history": [
+    {
+      "question": "Do you prefer to organize kitchen items by category (e.g., spices, cleaning supplies) or by function (e.g., cooking, baking)?",
+      "answer": "I prefer to organize kitchen items by function, grouping items used for the same activity together. For example, spices (salt, pepper, olive oil) are on the countertop for cooking, coffee items are grouped on the pantry shelf, and cleaning supplies are stored separately in the under_sink_cabinet.",
+      "q_type": "preference"
+    },
+    {
+      "question": "\"When organizing by function, do you further separate items within the same group based on attributes like frequency of use or size?\"",
+      "answer": "No, I do not further separate items within the same group based on frequency of use or size. Items are grouped by function (e.g., coffee-making items together) and placed in accessible locations per preferences, but no additional separation by attributes like frequency or size is applied within those groups.",
+      "q_type": "preference"
+    },
+    {
+      "question": "\"When placing functional groups into receptacles, do you prioritize the receptacle's typical use (e.g., countertops for frequent access, cabinets for storage) over other factors?\"",
+      "answer": "Yes, prioritizing typical use aligns with my preferences: countertops for frequent access, upper cabinets for fragile items, lower cabinets for heavy cookware, and separate storage for cleaning supplies and food items.",
+      "q_type": "preference"
+    },
+    {
+      "question": "\"When items can belong to multiple functional groups (e.g., a cast iron pan used for both cooking and baking), how do you determine which group to assign them to?\"",
+      "answer": "Heavy cookware is placed in lower_cabinet regardless of other uses. If an item serves multiple functions, prioritize grouping by primary activity unless safety or accessibility rules (like heavy items in lower_cabinet) conflict.",
+      "q_type": "preference"
+    },
+    {
+      "question": "If an item's primary function suggests one receptacle (e.g., countertop for frequent use) but its size or weight makes another receptacle (e.g., lower cabinet) more practical, how do you resolve this conflict?",
+      "answer": "Place heavy items in lower_cabinet, and frequently used items on countertop, prioritizing weight for heavy items.",
+      "q_type": "preference"
+    }
+  ],
+  "predicted_placements_seen": {
+    "salt shaker": "countertop",
+    "pepper grinder": "countertop",
+    "olive oil bottle": "countertop",
+    "glass cup": "pantry_shelf",
+    "ceramic mug": "pantry_shelf",
+    "cast iron pan": "lower_cabinet",
+    "cutting board (meat)": "countertop",
+    "chef knife": "countertop",
+    "dish soap": "under_sink_cabinet",
+    "sponge": "under_sink_cabinet",
+    "coffee beans bag": "pantry_shelf",
+    "coffee filter paper": "pantry_shelf"
+  },
+  "predicted_placements_unseen": {
+    "soy sauce bottle": "countertop",
+    "vinegar bottle": "countertop",
+    "wine glass": "upper_cabinet",
+    "mixing bowl (glass)": "upper_cabinet",
+    "nonstick frying pan": "upper_cabinet",
+    "pot lid": "countertop",
+    "paper towel roll": "under_sink_cabinet",
+    "bleach cleaner": "under_sink_cabinet",
+    "fruit bowl": "pantry_shelf",
+    "bread loaf": "pantry_shelf",
+    "cutting board (fruit)": "countertop",
+    "paring knife": "countertop",
+    "tea bags box": "pantry_shelf"
+  },
+  "preference": "1. **Organize by function**: Group items by activity (e.g., cooking, baking, cleaning) rather than category.  \n2. **No sub-sorting within groups**: Items in a functional group are not separated by frequency of use or size.  \n3. **Prioritize receptacle purpose**:  \n   - Countertop: Frequent access (e.g., cooking spices).  \n   - Upper cabinet: Fragile items.  \n   - Lower cabinet: Heavy cookware.  \n   - Under-sink cabinet: Cleaning supplies.  \n   - Pantry shelf: Food-related items (e.g., coffee).  \n4. **Resolve functional conflicts by weight/safety**: Heavy items (e.g., cast iron pans) go to lower cabinets regardless of function.  \n5. **Override function with practicality**: Place heavy/frequently used items in lower cabinet or countertop, prioritizing weight and accessibility over primary function."
+}

@@ -1,0 +1,227 @@
+{
+  "annotator_notes": [
+    "I prefer frequently used cooking items to be immediately accessible, even if they stay on the countertop.",
+    "Fragile items such as glassware should always be stored in upper cabinets to avoid accidental breakage.",
+    "Heavy cookware must be placed in lower cabinets for safety and ease of lifting.",
+    "Cleaning supplies should never be stored together with food or tableware.",
+    "Items used for the same activity, such as coffee making, should be grouped together so I can grab everything at once.",
+    "Food preparation tools for raw ingredients should be separated from those used for ready-to-eat food."
+  ],
+  "receptacles": [
+    "countertop",
+    "upper_cabinet",
+    "lower_cabinet",
+    "drawer",
+    "pantry_shelf",
+    "under_sink_cabinet"
+  ],
+  "room": "kitchen",
+  "seen_objects": [
+    "salt shaker",
+    "pepper grinder",
+    "olive oil bottle",
+    "glass cup",
+    "ceramic mug",
+    "cast iron pan",
+    "cutting board (meat)",
+    "chef knife",
+    "dish soap",
+    "sponge",
+    "coffee beans bag",
+    "coffee filter paper"
+  ],
+  "seen_placements": [
+    [
+      "salt shaker",
+      "countertop"
+    ],
+    [
+      "pepper grinder",
+      "countertop"
+    ],
+    [
+      "olive oil bottle",
+      "countertop"
+    ],
+    [
+      "glass cup",
+      "upper_cabinet"
+    ],
+    [
+      "ceramic mug",
+      "upper_cabinet"
+    ],
+    [
+      "cast iron pan",
+      "lower_cabinet"
+    ],
+    [
+      "cutting board (meat)",
+      "drawer"
+    ],
+    [
+      "chef knife",
+      "drawer"
+    ],
+    [
+      "dish soap",
+      "under_sink_cabinet"
+    ],
+    [
+      "sponge",
+      "under_sink_cabinet"
+    ],
+    [
+      "coffee beans bag",
+      "pantry_shelf"
+    ],
+    [
+      "coffee filter paper",
+      "pantry_shelf"
+    ]
+  ],
+  "tags": [
+    "Category",
+    "Attribute",
+    "Function",
+    "Subcategory",
+    "Multiple categories"
+  ],
+  "unseen_objects": [
+    "soy sauce bottle",
+    "vinegar bottle",
+    "wine glass",
+    "mixing bowl (glass)",
+    "nonstick frying pan",
+    "pot lid",
+    "paper towel roll",
+    "bleach cleaner",
+    "fruit bowl",
+    "bread loaf",
+    "cutting board (fruit)",
+    "paring knife",
+    "tea bags box"
+  ],
+  "unseen_placements": [
+    [
+      "soy sauce bottle",
+      "countertop"
+    ],
+    [
+      "vinegar bottle",
+      "countertop"
+    ],
+    [
+      "wine glass",
+      "upper_cabinet"
+    ],
+    [
+      "mixing bowl (glass)",
+      "upper_cabinet"
+    ],
+    [
+      "nonstick frying pan",
+      "lower_cabinet"
+    ],
+    [
+      "pot lid",
+      "lower_cabinet"
+    ],
+    [
+      "paper towel roll",
+      "countertop"
+    ],
+    [
+      "bleach cleaner",
+      "under_sink_cabinet"
+    ],
+    [
+      "fruit bowl",
+      "countertop"
+    ],
+    [
+      "bread loaf",
+      "pantry_shelf"
+    ],
+    [
+      "cutting board (fruit)",
+      "drawer"
+    ],
+    [
+      "paring knife",
+      "drawer"
+    ],
+    [
+      "tea bags box",
+      "pantry_shelf"
+    ]
+  ],
+  "strategy": "preference-first",
+  "budget_total": 5,
+  "budget_used": 5,
+  "qa_history": [
+    {
+      "question": "Would you like to group items by category (e.g., spices, cookware, cleaning supplies) or by their frequency of use when organizing the kitchen?",
+      "answer": "Group by frequency of use, placing frequently accessed items like spices and coffee tools on the countertop and pantry shelf respectively, while ensuring categories like cleaning supplies are separated from food.",
+      "q_type": "preference"
+    },
+    {
+      "question": "Should cleaning supplies like dish soap and sponge be grouped together in a specific cabinet, such as the under-sink cabinet, to maintain separation from food items?",
+      "answer": "Yes, dish soap and sponge should remain grouped in the under_sink_cabinet to maintain separation from food items.",
+      "q_type": "preference"
+    },
+    {
+      "question": "Should coffee-related items like the coffee beans bag and coffee filter paper be grouped together on the pantry shelf for frequent access, separate from other categories?",
+      "answer": "Yes, coffee-related items like the coffee beans bag and coffee filter paper should be grouped together on the pantry shelf, as they are already grouped there and this aligns with the preference for same-activity items to be grouped for easy access.",
+      "q_type": "preference"
+    },
+    {
+      "question": "Should cookware like the cast iron pan and cutting board (meat) be grouped together in a specific cabinet, such as the lower cabinet, for easy access during cooking, while keeping them separate from food storage items?",
+      "answer": "The cast iron pan is in the lower_cabinet as required. The cutting board (meat) is in the drawer, which is appropriate for raw food prep tools. They should not be grouped together in the lower_cabinet, as they serve different purposes and the cutting board must remain separate from ready-to-eat items.",
+      "q_type": "preference"
+    },
+    {
+      "question": "Should frequently used items like the olive oil bottle be grouped with spices (salt shaker, pepper grinder) on the countertop, or placed in the pantry shelf for organized storage?",
+      "answer": "The olive oil bottle should remain on the countertop with the salt shaker and pepper grinder, as they are frequently used and grouped for easy access during cooking.",
+      "q_type": "preference"
+    }
+  ],
+  "predicted_placements_seen": {
+    "salt shaker": "countertop",
+    "pepper grinder": "countertop",
+    "olive oil bottle": "countertop",
+    "glass cup": "upper_cabinet",
+    "ceramic mug": "upper_cabinet",
+    "cast iron pan": "lower_cabinet",
+    "cutting board (meat)": "drawer",
+    "chef knife": "drawer",
+    "dish soap": "under_sink_cabinet",
+    "sponge": "under_sink_cabinet",
+    "coffee beans bag": "pantry_shelf",
+    "coffee filter paper": "pantry_shelf"
+  },
+  "predicted_placements_unseen": {
+    "soy sauce bottle": "countertop",
+    "vinegar bottle": "countertop",
+    "wine glass": "upper_cabinet",
+    "mixing bowl (glass)": "upper_cabinet",
+    "nonstick frying pan": "lower_cabinet",
+    "pot lid": "lower_cabinet",
+    "paper towel roll": "under_sink_cabinet",
+    "bleach cleaner": "under_sink_cabinet",
+    "fruit bowl": "countertop",
+    "bread loaf": "pantry_shelf",
+    "cutting board (fruit)": "drawer",
+    "paring knife": "drawer",
+    "tea bags box": "pantry_shelf"
+  },
+  "preference": "Group by frequency of use, placing frequently accessed items like spices and coffee tools on the countertop and pantry shelf respectively, while ensuring categories like cleaning supplies are separated from food.\nYes, dish soap and sponge should remain grouped in the under_sink_cabinet to maintain separation from food items.\nYes, coffee-related items like the coffee beans bag and coffee filter paper should be grouped together on the pantry shelf, as they are already grouped there and this aligns with the preference for same-activity items to be grouped for easy access.\nThe cast iron pan is in the lower_cabinet as required. The cutting board (meat) is in the drawer, which is appropriate for raw food prep tools. They should not be grouped together in the lower_cabinet, as they serve different purposes and the cutting board must remain separate from ready-to-eat items.\nThe olive oil bottle should remain on the countertop with the salt shaker and pepper grinder, as they are frequently used and grouped for easy access during cooking.",
+  "eval": {
+    "seen_satisfaction": 1.0,
+    "unseen_satisfaction": 0.9230769230769231,
+    "seen_correct": 12,
+    "seen_total": 12,
+    "unseen_correct": 12,
+    "unseen_total": 13
+  }
+}

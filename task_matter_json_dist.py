@@ -404,8 +404,8 @@ def query_placements(
     question_builder: Optional[QuestionPromptBuilder] = None,
     max_questions: Optional[int] = None,
 ) -> List[dict]:
-    question_model = question_model or VLMAPI("qwen3:32b")
-    answer_model = answer_model or VLMAPI("qwen3:32b")
+    question_model = question_model or VLMAPI("qwen3.5")
+    answer_model = answer_model or VLMAPI("qwen3.5")
     question_builder = question_builder or QuestionPromptBuilder(question_strategy)
     question_builder.set_strategy(question_strategy)
 
@@ -476,7 +476,7 @@ def run_strategy_scenarios(
     answer_model: Optional[VLMAPI] = None,
     verbose: bool = True,
 ) -> Tuple[List[List[dict]], List[float]]:
-    question_model = question_model or VLMAPI("qwen3:32b")
+    question_model = question_model or VLMAPI("qwen3.5")
     answer_model = answer_model or question_model
     question_builder = QuestionPromptBuilder(strategy)
     eval_runner = ModelRunner(eval_model)
@@ -603,7 +603,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--eval_model",
-        default="qwen3:32b",
+        default="qwen3.5",
         help="Model name for summarization/placement evaluation.",
     )
     parser.add_argument(
@@ -677,8 +677,8 @@ def main() -> None:
                     print(f"Strategy time: {elapsed:.2f}s")
                     print(f"Seen accuracy: {avg_accuracy:.2f}")
         else:
-            question_model = VLMAPI("qwen3:32b")
-            answer_model = VLMAPI("qwen3:32b")
+            question_model = VLMAPI("qwen3.5")
+            answer_model = VLMAPI("qwen3.5")
             for strategy in strategies:
                 strategy_start = time.time()
                 print(f"\n=== Strategy: {strategy} ===")

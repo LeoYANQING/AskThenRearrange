@@ -285,7 +285,7 @@ def parse_json_strict(text: str) -> dict:
 
 def augment_one_sample_with_vlm(
     sample: dict,
-    model_name: str = "qwen3:32b",
+    model_name: str = "qwen3.5",
     max_rounds: int = 5,
     max_tokens: int = 5000
 ) -> dict:
@@ -317,7 +317,7 @@ output_json = "scenarios_aug.json"
 from tqdm import tqdm
 
 for i, sample_in in enumerate(tqdm(samples)):
-    aug_sample = augment_one_sample_with_vlm(sample_in, model_name="qwen3:32b", max_rounds=5)
+    aug_sample = augment_one_sample_with_vlm(sample_in, model_name="qwen3.5", max_rounds=5)
 
     print(f"VALID augmented sample generated! index={i}")
     print(json.dumps(aug_sample, ensure_ascii=False, indent=2))

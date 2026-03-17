@@ -284,7 +284,7 @@ def save_data_to_json(json_data, base_path):
 if __name__ == "__main__":
     # 测试代码
     parser = argparse.ArgumentParser(description="Ollama VLM test runner")
-    parser.add_argument("--model", default="qwen3:32b", help="Ollama model name")
+    parser.add_argument("--model", default="qwen3.5", help="Ollama model name")
     parser.add_argument("--port", type=int, default=8080, help="Ollama API port")
     args = parser.parse_args()
 

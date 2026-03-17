@@ -256,8 +256,8 @@ def query_placements(
     question_builder: Optional[QuestionPromptBuilder] = None,
     max_questions: Optional[int] = None,
 ) -> Tuple[List[List[str]], List[dict], str]:
-    question_model = question_model or VLMAPI("qwen3:32b")
-    answer_model = answer_model or VLMAPI("qwen3:32b")
+    question_model = question_model or VLMAPI("qwen3.5")
+    answer_model = answer_model or VLMAPI("qwen3.5")
     question_builder = question_builder or QuestionPromptBuilder(question_strategy)
     question_builder.set_strategy(question_strategy)
 
@@ -416,8 +416,8 @@ def main() -> None:
         raise RuntimeError("No scenarios loaded from JSON")
     if args.max_scenarios > 0:
         scenarios = scenarios[: args.max_scenarios]
-    question_model = VLMAPI("qwen3:32b")
-    answer_model = VLMAPI("qwen3:32b")
+    question_model = VLMAPI("qwen3.5")
+    answer_model = VLMAPI("qwen3.5")
     strategies = [s.strip() for s in args.strategies.split(",") if s.strip()]
     if args.curve_max_questions:
         max_questions_list = [

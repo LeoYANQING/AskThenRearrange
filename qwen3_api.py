@@ -17,7 +17,7 @@ class Qwen3API:
 
     def __init__(
         self,
-        model: str = "qwen3:32b",
+        model: str = "qwen3.5",
         host: Optional[str] = None,
         timeout: int = 120,
         system_guard: Optional[str] = None,

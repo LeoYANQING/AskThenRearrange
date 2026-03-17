@@ -40,15 +40,16 @@ from eval import evaluate_episode, plot_strategy_tradeoff
 QUESTION_MODEL = "qwen3.5"
 # Oracle answerer model (user simulator)
 ANSWER_MODEL = "qwen3.5"
+OLLAMA_BASE_URL = "http://127.0.0.1:11434"
 
 question_llm = ChatOllama(
     model=QUESTION_MODEL,  # 哪怕是VL模型，也可以只传纯文字
-    base_url="http://110.42.252.68:8080",
+    base_url=OLLAMA_BASE_URL,
     temperature=0
 )
 answer_llm = ChatOllama(
     model=ANSWER_MODEL,
-    base_url="http://110.42.252.68:8080",
+    base_url=OLLAMA_BASE_URL,
     temperature=0
 )
 
@@ -77,8 +78,8 @@ class AgentState(TypedDict):
     receptacles: List[str]
     seen_objects: List[str]
     unseen_objects: List[str]
-    gt_seen_placements: Dict[str, str]
-    gt_unseen_placements: Dict[str, str]
+    seen_placements: Dict[str, str]
+    unseen_placements: Dict[str, str]
     annotator_notes: List[str]  # oracle preference source
 
     # --- interaction log ---
@@ -113,14 +114,14 @@ class Scenario:
 
 
 def build_answer_prompt(scenario: Scenario, question: str) -> str:
-    notes = "\n".join(f"- {x}" for x in scenario.annotator_notes)
+    annotator_notes = "\n".join(f"- {x}" for x in scenario.annotator_notes)
     seen_placements = "\n".join(f"- {k} -> {v}" for k, v in scenario.seen_placements.items())
     receptacles = ", ".join(scenario.receptacles)
 
     return (
         "You are the user in a household organization task.\n"
         "Below are your personal organization preferences (follow them strictly):\n"
-        f"{notes}\n\n"
+        f"{annotator_notes}\n\n"
         "Below are the ground-truth placements for objects that are currently present (seen objects):\n"
         f"{seen_placements}\n\n"
         f"Valid receptacles: [{receptacles}]\n\n"
@@ -199,50 +200,48 @@ def init_node(state: AgentState) -> dict:
     }
 
 
-def _fallback_q_type(state: AgentState, *, strategy: Strategy) -> QType:
-    used = state["budget_used"]
-    total = state["budget_total"]
-    remaining = total - used
-
-    qa_history = state["qa_history"]
-    num_summary = sum(1 for x in qa_history if x["q_type"] == "summary")
-
-    if strategy == "preference-first":
-        if remaining <= 1 and num_summary == 0 and qa_history:
-            return "summary"
-        return "preference"
-
-    if strategy == "direct":
-        if remaining <= 1 and num_summary == 0 and qa_history:
-            return "summary"
-        return "action"
-
-    # parallel
-    reserve_for_summary = 1
-    if num_summary >= 1:
-        return "action"
-    if remaining <= reserve_for_summary:
-        return "summary"
-    return "action"
+def _gate_decision_schema(allowed: List[QType]) -> dict:
+    return {
+        "type": "object",
+        "properties": {
+            "q_type": {
+                "type": "string",
+                "enum": allowed,
+                "description": "Next question type.",
+            }
+        },
+        "required": ["q_type"],
+        "additionalProperties": False,
+    }
 
 
-def _parse_q_type(text: str, allowed: List[QType]) -> Optional[QType]:
-    if not text:
-        return None
-    low = text.strip().lower()
-    if low in allowed:
-        return low  # type: ignore[return-value]
-    tokens = low.split()
-    if tokens and tokens[0] in allowed:
-        return tokens[0]  # type: ignore[return-value]
-    if low.startswith("answer:"):
-        tail = low.replace("answer:", "", 1).strip()
-        if tail in allowed:
-            return tail  # type: ignore[return-value]
-        tail_tokens = tail.split()
-        if tail_tokens and tail_tokens[0] in allowed:
-            return tail_tokens[0]  # type: ignore[return-value]
-    return None
+def _planner_output_schema(
+    *,
+    seen_objects: List[str],
+    unseen_objects: List[str],
+    receptacles: List[str],
+) -> dict:
+    seen_props = {obj: {"type": "string", "enum": receptacles} for obj in seen_objects}
+    unseen_props = {obj: {"type": "string", "enum": receptacles} for obj in unseen_objects}
+    return {
+        "type": "object",
+        "properties": {
+            "predicted_placements_seen": {
+                "type": "object",
+                "properties": seen_props,
+                "required": seen_objects,
+                "additionalProperties": False,
+            },
+            "predicted_placements_unseen": {
+                "type": "object",
+                "properties": unseen_props,
+                "required": unseen_objects,
+                "additionalProperties": False,
+            },
+        },
+        "required": ["predicted_placements_seen", "predicted_placements_unseen"],
+        "additionalProperties": False,
+    }
 
 
 def _gate_prompt(state: AgentState, *, strategy: Strategy, allowed: List[QType]) -> str:
@@ -257,7 +256,7 @@ def _gate_prompt(state: AgentState, *, strategy: Strategy, allowed: List[QType])
 
     return f"""
 You are choosing the next question type for a household organization agent.
-You must output only ONE word from: {allowed}.
+Return a JSON object that matches the schema and choose q_type from: {allowed}.
 
 Strategy: {strategy}
 Budget: total={total}, used={used}, remaining={remaining}
@@ -270,7 +269,7 @@ Strategy guidance:
 - parallel: mix preference and action; ask summary once when there is enough evidence and budget is nearly done.
 - direct: prioritize action questions; use summary only if budget is nearly done and there is some evidence.
 
-Return ONLY one word from the allowed list.
+Return ONLY the JSON object with key "q_type".
 """.strip()
 
 
@@ -287,24 +286,25 @@ def _decide_q_type_with_llm(state: AgentState, *, strategy: Strategy) -> QType:
         allowed.append("summary")
 
     prompt = _gate_prompt(state, strategy=strategy, allowed=allowed)
-    msg = question_llm.invoke([{"role": "user", "content": prompt}])
-    text = msg.content if hasattr(msg, "content") else str(msg)
-    choice = _parse_q_type(text, allowed)
-    if choice is None:
-        return _fallback_q_type(state, strategy=strategy)
-    return choice
+    structured_gate_llm = question_llm.with_structured_output(
+        _gate_decision_schema(allowed),
+        method="json_schema",
+    )
+    decision = structured_gate_llm.invoke([{"role": "user", "content": prompt}])
+    if not isinstance(decision, dict):
+        raise ValueError(f"Gate model returned non-dict decision: {decision!r}")
+
+    q_type = decision.get("q_type")
+    if not isinstance(q_type, str):
+        raise ValueError(f"Gate model decision missing string q_type: {decision!r}")
+    if q_type not in allowed:
+        raise ValueError(f"Gate model returned invalid q_type={q_type!r}, allowed={allowed}")
+    return q_type  # type: ignore[return-value]
 
 
-def gate_node_preference_first(state: AgentState) -> dict:
-    return {"current_q_type": _decide_q_type_with_llm(state, strategy="preference-first")}
-
-
-def gate_node_parallel(state: AgentState) -> dict:
-    return {"current_q_type": _decide_q_type_with_llm(state, strategy="parallel")}
-
-
-def gate_node_direct(state: AgentState) -> dict:
-    return {"current_q_type": _decide_q_type_with_llm(state, strategy="direct")}
+def gate_node(state: AgentState) -> dict:
+    strategy = state["strategy"]
+    return {"current_q_type": _decide_q_type_with_llm(state, strategy=strategy)}
 
 
 def _question_prompt_base(state: AgentState, *, q_type: QType) -> str:
@@ -328,8 +328,39 @@ Conversation so far (qa_history):
 {state["qa_history"]}
 
 Known preference summary (may be empty):
-{state["preference"]}
-""".strip()
+    {state["preference"]}
+    """.strip()
+
+
+def _normalize_question_text(raw: Any) -> str:
+    text = raw.content if hasattr(raw, "content") else str(raw)
+    if isinstance(text, list):
+        parts: List[str] = []
+        for item in text:
+            if isinstance(item, dict) and "text" in item and isinstance(item["text"], str):
+                parts.append(item["text"])
+            elif isinstance(item, str):
+                parts.append(item)
+            else:
+                parts.append(str(item))
+        text = "\n".join(parts)
+    text = str(text).strip()
+    if not text:
+        return ""
+    for line in text.splitlines():
+        line = line.strip()
+        if line:
+            return line.strip("\"' ")
+    return ""
+
+
+def _fallback_question(state: AgentState, *, q_type: QType) -> str:
+    if q_type == "action":
+        obj = state["seen_objects"][0] if state["seen_objects"] else "object"
+        return f"Where should I place the {obj}?"
+    if q_type == "preference":
+        return "What are your main organizing preferences for this room?"
+    return "Based on our conversation, is this summary of your preferences correct?"
 
 
 def question_gen_action_node(state: AgentState) -> dict:
@@ -343,9 +374,10 @@ def question_gen_action_node(state: AgentState) -> dict:
         "Return only the question text. Do not include any explanation."
     )
     msg = question_llm.invoke([{"role": "user", "content": prompt}])
-    q_text = msg.content if hasattr(msg, "content") else str(msg)
-    q_text = q_text.strip()
-    q_text = q_text.splitlines()[0].strip()
+    q_text = _normalize_question_text(msg)
+    if not q_text:
+        q_text = _fallback_question(state, q_type="action")
+        print("[WARN] Empty action question from model; using fallback question.")
     return {"current_question": q_text}
 
 
@@ -360,9 +392,10 @@ def question_gen_preference_node(state: AgentState) -> dict:
         "most impactful preference question. Return only the question text. Do not include any explanation."
     )
     msg = question_llm.invoke([{"role": "user", "content": prompt}])
-    q_text = msg.content if hasattr(msg, "content") else str(msg)
-    q_text = q_text.strip()
-    q_text = q_text.splitlines()[0].strip()
+    q_text = _normalize_question_text(msg)
+    if not q_text:
+        q_text = _fallback_question(state, q_type="preference")
+        print("[WARN] Empty preference question from model; using fallback question.")
     return {"current_question": q_text}
 
 
@@ -377,9 +410,10 @@ def question_gen_summary_node(state: AgentState) -> dict:
         "given the remaining budget. Return only the question text. Do not include any explanation."
     )
     msg = question_llm.invoke([{"role": "user", "content": prompt}])
-    q_text = msg.content if hasattr(msg, "content") else str(msg)
-    q_text = q_text.strip()
-    q_text = q_text.splitlines()[0].strip()
+    q_text = _normalize_question_text(msg)
+    if not q_text:
+        q_text = _fallback_question(state, q_type="summary")
+        print("[WARN] Empty summary question from model; using fallback question.")
     return {"current_question": q_text}
 
 
@@ -395,8 +429,8 @@ def oracle_node(state: AgentState) -> dict:
             "receptacles": state["receptacles"],
             "seen_objects": state["seen_objects"],
             "unseen_objects": state.get("unseen_objects", []),
-            "seen_placements": state["gt_seen_placements"],
-            "unseen_placements": state.get("gt_unseen_placements", {}),
+            "seen_placements": state["seen_placements"],
+            "unseen_placements": state.get("unseen_placements", {}),
             "annotator_notes": state["annotator_notes"],
         }
     )
@@ -437,19 +471,10 @@ def route_question_node(state: AgentState) -> str:
     return "qgen_action"
 
 
-def route_strategy_node(state: AgentState) -> str:
-    strategy = state["strategy"]
-    if strategy == "preference-first":
-        return "gate_preference_first"
-    if strategy == "direct":
-        return "gate_direct"
-    return "gate_parallel"
-
-
 def route_after_update(state: AgentState) -> str:
-    if not should_continue(state):
-        return "summarize_pref"
-    return route_strategy_node(state)
+    if should_continue(state):
+        return "gate"
+    return "summarize_pref"
 
 
 def summarize_pref_node(state: AgentState) -> dict:
@@ -537,16 +562,25 @@ def planner_node(state: AgentState) -> dict:
         - Receptacle values must match exactly one of the allowed receptacles.
         """.strip()
 
-    msg = question_llm.invoke(
-        [
-            {"role": "system", "content": system},
-            {"role": "user", "content": user},
-        ]
+    structured_planner_llm = question_llm.with_structured_output(
+        _planner_output_schema(
+            seen_objects=seen_objects,
+            unseen_objects=unseen_objects,
+            receptacles=receptacles,
+        ),
+        method="json_schema",
     )
-    text = msg.content if hasattr(msg, "content") else str(msg)
-    text = text.strip()
+    try:
+        parsed = structured_planner_llm.invoke(
+            [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ]
+        )
+    except Exception as e:
+        print(f"[WARN] planner structured output failed, using fallback placements: {e}")
+        parsed = {}
 
-    parsed = json.loads(text)
     parsed_seen = parsed.get("predicted_placements_seen", {}) if isinstance(parsed, dict) else {}
     parsed_unseen = parsed.get("predicted_placements_unseen", {}) if isinstance(parsed, dict) else {}
 
@@ -576,9 +610,7 @@ def build_mvp_graph():
     g = StateGraph(AgentState)
 
     g.add_node("init", init_node)
-    g.add_node("gate_preference_first", gate_node_preference_first)
-    g.add_node("gate_parallel", gate_node_parallel)
-    g.add_node("gate_direct", gate_node_direct)
+    g.add_node("gate", gate_node)
     g.add_node("qgen_action", question_gen_action_node)
     g.add_node("qgen_preference", question_gen_preference_node)
     g.add_node("qgen_summary", question_gen_summary_node)
@@ -588,35 +620,9 @@ def build_mvp_graph():
     g.add_node("plan", planner_node)
 
     g.set_entry_point("init")
+    g.add_edge("init", "gate")
     g.add_conditional_edges(
-        "init",
-        route_strategy_node,
-        {
-            "gate_preference_first": "gate_preference_first",
-            "gate_parallel": "gate_parallel",
-            "gate_direct": "gate_direct",
-        },
-    )
-    g.add_conditional_edges(
-        "gate_preference_first",
-        route_question_node,
-        {
-            "qgen_action": "qgen_action",
-            "qgen_preference": "qgen_preference",
-            "qgen_summary": "qgen_summary",
-        },
-    )
-    g.add_conditional_edges(
-        "gate_parallel",
-        route_question_node,
-        {
-            "qgen_action": "qgen_action",
-            "qgen_preference": "qgen_preference",
-            "qgen_summary": "qgen_summary",
-        },
-    )
-    g.add_conditional_edges(
-        "gate_direct",
+        "gate",
         route_question_node,
         {
             "qgen_action": "qgen_action",
@@ -633,9 +639,7 @@ def build_mvp_graph():
         "update",
         route_after_update,
         {
-            "gate_preference_first": "gate_preference_first",
-            "gate_parallel": "gate_parallel",
-            "gate_direct": "gate_direct",
+            "gate": "gate",
             "summarize_pref": "summarize_pref",
         },
     )
@@ -686,25 +690,8 @@ def normalize_placements(placements) -> Dict[str, str]:
 
 
 def make_initial_state(sample: dict, *, strategy: Strategy, budget_total: int) -> AgentState:
-    # Support either "seen_placements" or "seen_placements"/"seen_placements" naming variants
-    seen_pl = sample.get("seen_placements", sample.get("seen_placement", sample.get("seenPlacement")))
-    unseen_pl = sample.get("unseen_placements", sample.get("unseen_placement", sample.get("unseenPlacement")))
-
-    # Some datasets use "seen_placements" field name; earlier we used "seen_placements".
-    # Also user earlier wrote "seen_placements". We'll accept both.
-    if seen_pl is None and "seen_placements" not in sample and "seen_placements" not in sample:
-        # try "seen_placements" fallback in case of typo
-        seen_pl = sample.get("seen_placements", None)
-
-    gt_seen = normalize_placements(sample.get("seen_placements", sample.get("seen_placements", sample.get("seen_placements"))))
-    # If your dataset uses "seen_placements" key exactly, above line already works.
-    # Otherwise map from common alternatives:
-    if not gt_seen and "seen_placements" not in sample:
-        gt_seen = normalize_placements(seen_pl)
-
-    gt_unseen = normalize_placements(sample.get("unseen_placements", {}))
-    if not gt_unseen and unseen_pl is not None:
-        gt_unseen = normalize_placements(unseen_pl)
+    seen_placements = normalize_placements(sample["seen_placements"])
+    unseen_placements = normalize_placements(sample.get("unseen_placements"))
 
     state: AgentState = {
         "strategy": strategy,
@@ -714,8 +701,8 @@ def make_initial_state(sample: dict, *, strategy: Strategy, budget_total: int) -
         "receptacles": list(sample["receptacles"]),
         "seen_objects": list(sample["seen_objects"]),
         "unseen_objects": list(sample.get("unseen_objects", [])),
-        "gt_seen_placements": gt_seen,
-        "gt_unseen_placements": gt_unseen,
+        "seen_placements": seen_placements,
+        "unseen_placements": unseen_placements,
         "annotator_notes": list(sample.get("annotator_notes", [])),
         "qa_history": [],
         "asked_questions": [],
@@ -771,8 +758,8 @@ def run_one_episode(
         unseen_objects=final_state.get("unseen_objects", []),
         predicted_seen=final_state["predicted_placements_seen"],
         predicted_unseen=final_state["predicted_placements_unseen"],
-        gt_seen=final_state["gt_seen_placements"],
-        gt_unseen=final_state.get("gt_unseen_placements", {}),
+        gt_seen=final_state["seen_placements"],
+        gt_unseen=final_state.get("unseen_placements", {}),
     )
     print("Seen acc:", metrics["seen_satisfaction"])
     print("Unseen acc:", metrics["unseen_satisfaction"])
@@ -820,8 +807,8 @@ def main():
     )
     parser.add_argument(
         "--indices",
-        default="0",
-        help="Comma-separated scenario indices to test.",
+        default=0,
+        help="Comma-separated scenario indices to test. Use ALL or omit to evaluate all scenarios.",
     )
     parser.add_argument(
         "--plot-output",
@@ -834,12 +821,18 @@ def main():
     dataset_path = args.dataset
     strategies = [s.strip() for s in args.strategies.split(",") if s.strip()]
     budgets = [int(x.strip()) for x in args.budgets.split(",") if x.strip()]
-    indices = [int(x.strip()) for x in args.indices.split(",") if x.strip()]
 
     scenarios = load_scenarios(dataset_path)
+    indices_arg = "" if args.indices is None else str(args.indices).strip()
+    if not indices_arg or indices_arg.upper() == "ALL":
+        indices = list(range(len(scenarios)))
+    else:
+        indices = [int(x.strip()) for x in indices_arg.split(",") if x.strip()]
+
     graph = build_mvp_graph()
     with open("agent_graph.png", "wb") as f:
         f.write(graph.get_graph(xray=True).draw_mermaid_png())
+        print("Saved graph visualization -> agent_graph.png")
 
 
     tasks: List[tuple[int, Strategy, int]] = []

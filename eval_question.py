@@ -136,7 +136,7 @@ def normalize_name(text: str) -> str:
 class ModelRunner:
     def __init__(self, model_name: str) -> None:
         normalized = model_name.strip()
-        self.model_name = normalized if normalized else "qwen3:32b"
+        self.model_name = normalized if normalized else "qwen3.5"
         self.client = VLMAPI(self.model_name)
 
     def generate(self, prompt: str) -> str:

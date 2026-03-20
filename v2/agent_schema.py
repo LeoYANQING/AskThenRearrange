@@ -12,7 +12,7 @@ except ModuleNotFoundError:
 
 Strategy = Literal["direct", "preference_first", "parallel_exploration"]
 QuestionPattern = Literal["action_oriented", "preference_eliciting", "preference_summary"]
-PreferenceSource = Literal["elicited", "induced"]
+PreferenceSource = Literal["elicited", "induced", "confirmed"]
 IntentSource = Literal["scene_gap", "action", "induced_hypothesis"]
 
 
@@ -26,7 +26,6 @@ class QAItem(TypedDict, total=False):
 
 
 class PreferenceCandidate(TypedDict, total=False):
-    preference_id: str
     hypothesis: str
     source: PreferenceSource
     covered_objects: List[str]
@@ -35,21 +34,11 @@ class PreferenceCandidate(TypedDict, total=False):
 
 
 class ConfirmedPreference(TypedDict, total=False):
-    preference_id: str
     hypothesis: str
     source: PreferenceSource
     covered_objects: List[str]
     target_receptacle: Optional[str]
     exceptions: List[str]
-
-
-class OpenPreferenceDimensionsState(BaseModel):
-    dimensions: List[str] = Field(
-        description=(
-            "A list of high-level preference dimensions worth directly asking "
-            "about in the current visible scene."
-        )
-    )
 
 
 class PreferenceElicitingIntent(BaseModel):
@@ -96,6 +85,7 @@ class PreferenceSummaryIntentBatch(BaseModel):
 
 
 PreferenceIntent = PreferenceElicitingIntent | PreferenceSummaryIntent
+Preference = PreferenceCandidate | ConfirmedPreference
 
 
 class AgentState(TypedDict):
@@ -109,18 +99,17 @@ class AgentState(TypedDict):
     receptacles: List[str]
     seen_objects: List[str]
     unseen_objects: List[str]
-    gt_seen_placements: PlacementMap
-    gt_unseen_placements: PlacementMap
-    annotator_notes: List[str]
 
     # evidence collected through interaction
     qa_history: List[QAItem]
-    asked_questions: List[str]
 
     # Confirmed seen object -> receptacle actions collected so far.
     confirmed_actions: PlacementMap
 
-    # Preference dimensions not yet acquired, but worth asking directly.
+    # Object -> receptacles explicitly ruled out by prior answers.
+    excluded_receptacles: dict[str, List[str]]
+
+    # Preference dimensions still worth asking directly.
     open_preference_dimensions: List[str]
 
     # Induced but not yet confirmed preference rules.
@@ -128,6 +117,9 @@ class AgentState(TypedDict):
 
     # Preference rules that have already been explicitly confirmed.
     confirmed_preferences: List[ConfirmedPreference]
+
+    # Summary hypotheses that have been explicitly rejected.
+    rejected_hypotheses: List[str]
 
     # Seen objects whose placement is still unresolved.
     unresolved_objects: List[str]
@@ -148,12 +140,12 @@ __all__ = [
     "ConfirmedPreference",
     "Episode",
     "IntentSource",
-    "OpenPreferenceDimensionsState",
     "PlacementMap",
+    "Preference",
+    "PreferenceCandidate",
     "PreferenceElicitingIntent",
     "PreferenceElicitingIntentBatch",
     "PreferenceIntent",
-    "PreferenceCandidate",
     "PreferenceSource",
     "PreferenceSummaryIntent",
     "PreferenceSummaryIntentBatch",

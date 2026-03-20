@@ -19,6 +19,7 @@ try:
     )
     from v2.data import get_episode
     from v2.state_init import build_initial_state
+    from v2.state_update import StateUpdate, update_open_preference_dimensions
 except ModuleNotFoundError:
     from agent_schema import (
         ActionIntent,
@@ -30,6 +31,7 @@ except ModuleNotFoundError:
     )
     from data import get_episode
     from state_init import build_initial_state
+    from state_update import StateUpdate, update_open_preference_dimensions
 
 
 QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
@@ -80,8 +82,6 @@ class PreferenceElicitingProposer:
     - room
     - receptacles
     - seen_objects
-    - existing open_preference_dimensions
-
     Output:
     - a small list of PreferenceElicitingIntent
     - each intent already includes a natural question
@@ -128,13 +128,11 @@ You may use:
 - room
 - receptacles
 - seen_objects
-- current open_preference_dimensions
+- open_preference_dimensions
 - already confirmed preferences
 
 You must not use:
 - unseen_objects
-- annotator_notes
-- ground-truth placements
 - hidden information
 """.strip()
 
@@ -148,13 +146,16 @@ Receptacles:
 Seen objects:
 {state["seen_objects"]}
 
-Current open_preference_dimensions:
+Open preference dimensions:
 {state["open_preference_dimensions"]}
 
 Confirmed preferences:
 {state["confirmed_preferences"]}
 
 Return a small list of Preference-eliciting intents.
+
+Use the current open_preference_dimensions as the primary source of candidate dimensions.
+If that list is non-empty, prefer proposing only from that list unless a listed dimension is clearly no longer useful.
 
 Each intent must:
 - source = "scene_gap"
@@ -185,6 +186,7 @@ def _normalize_preference_eliciting_intents(
     max_intents: int,
 ) -> List[PreferenceElicitingIntent]:
     allowed_objects = set(state["seen_objects"])
+    open_dimensions = {item.strip().lower() for item in state["open_preference_dimensions"] if item.strip()}
     normalized: List[PreferenceElicitingIntent] = []
     seen_signatures = set()
 
@@ -192,6 +194,8 @@ def _normalize_preference_eliciting_intents(
         dimension = item.dimension.strip()
         question = item.question.strip()
         if not dimension or not question:
+            continue
+        if open_dimensions and dimension.lower() not in open_dimensions:
             continue
 
         covered_objects = [
@@ -579,6 +583,10 @@ def main() -> None:
         episode=episode,
         strategy=args.strategy,  # type: ignore[arg-type]
         budget_total=args.budget,
+    )
+    state = update_open_preference_dimensions(
+        state=state,
+        updater=StateUpdate(model=args.model, base_url=args.base_url, temperature=0.0),
     )
 
     print("=== Current State ===")

@@ -11,17 +11,17 @@ try:
     from v2.data import DEFAULT_DATA_PATH, Episode, get_episode
     from v2.evaluation import FinalPlacementPlanner, evaluate_episode_state, plot_accuracy_curve
     from v2.oracle import NaturalUserOracle
-    from v2.proposers import PreferenceElicitingProposer
+    from v2.proposers import PreferenceSummaryProposer, propose_preference_summary_intents
     from v2.state_init import build_initial_state
-    from v2.state_update import StateUpdate, update_open_preference_hypotheses, update_state_with_answer
+    from v2.state_update import StateUpdate, update_state_with_answer
 except ModuleNotFoundError:
     from agent_schema import AgentState
     from data import DEFAULT_DATA_PATH, Episode, get_episode
     from evaluation import FinalPlacementPlanner, evaluate_episode_state, plot_accuracy_curve
     from oracle import NaturalUserOracle
-    from proposers import PreferenceElicitingProposer
+    from proposers import PreferenceSummaryProposer, propose_preference_summary_intents
     from state_init import build_initial_state
-    from state_update import StateUpdate, update_open_preference_hypotheses, update_state_with_answer
+    from state_update import StateUpdate, update_state_with_answer
 
 
 QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
@@ -58,11 +58,23 @@ def _parse_budget_list(value: str) -> List[int]:
     return budgets
 
 
-def run_preference_eliciting_loop(
+def _seed_summary_state(state: AgentState) -> AgentState:
+    seen = state["seen_objects"]
+    receptacles = state["receptacles"]
+    if len(seen) >= 2 and receptacles:
+        state["confirmed_actions"][seen[0]] = receptacles[0]
+        state["confirmed_actions"][seen[1]] = receptacles[0]
+    if len(seen) >= 4 and len(receptacles) >= 2:
+        state["confirmed_actions"][seen[2]] = receptacles[1]
+        state["confirmed_actions"][seen[3]] = receptacles[1]
+    return state
+
+
+def run_preference_summary_loop(
     *,
     episode: Episode,
     state: AgentState,
-    proposer: PreferenceElicitingProposer,
+    proposer: PreferenceSummaryProposer,
     oracle: NaturalUserOracle,
     updater: StateUpdate,
 ) -> AgentState:
@@ -70,16 +82,16 @@ def run_preference_eliciting_loop(
     while state["budget_used"] < state["budget_total"]:
         step_idx += 1
 
-        print(f"[step {step_idx}] proposing preference-eliciting intents...")
-        intents = proposer.propose(state=state, max_intents=3)
+        intents = propose_preference_summary_intents(
+            state=state,
+            proposer=proposer,
+            max_intents=3,
+        )
         if not intents:
-            print(f"[step {step_idx}] no preference-eliciting intent available")
+            print(f"[step {step_idx}] no preference-summary intent available")
             break
 
         intent = intents[0]
-        print(f"[step {step_idx}] selected hypothesis: {intent.hypothesis}")
-        print(f"[step {step_idx}] querying oracle...")
-
         oracle_response = oracle.answer(
             question=intent.question,
             room=state["room"],
@@ -90,7 +102,6 @@ def run_preference_eliciting_loop(
             qa_history=state["qa_history"],
         )
 
-        print(f"[step {step_idx}] updating state from answer...")
         state = update_state_with_answer(
             state=state,
             question_pattern=intent.question_pattern,
@@ -100,7 +111,6 @@ def run_preference_eliciting_loop(
             covered_objects=list(intent.covered_objects),
             updater=updater,
         )
-        print(f"[step {step_idx}] state update finished")
 
         print(f"=== Step {step_idx} ===")
         print(
@@ -119,7 +129,7 @@ def run_preference_eliciting_loop(
     return state
 
 
-def run_preference_eliciting_episode(
+def run_preference_summary_episode(
     *,
     episode: Episode,
     budget: int,
@@ -135,7 +145,8 @@ def run_preference_eliciting_episode(
         strategy="parallel_exploration",
         budget_total=budget,
     )
-    proposer = PreferenceElicitingProposer(
+    state = _seed_summary_state(state)
+    proposer = PreferenceSummaryProposer(
         model=proposer_model,
         base_url=base_url,
         temperature=0.0,
@@ -155,14 +166,12 @@ def run_preference_eliciting_episode(
         base_url=base_url,
         temperature=0.0,
     )
-    state = update_open_preference_hypotheses(state=state, updater=updater)
-
     if verbose:
         print("=== Initial State ===")
         print(json.dumps(_state_snapshot(state), indent=2, ensure_ascii=False))
         print()
 
-    final_state = run_preference_eliciting_loop(
+    final_state = run_preference_summary_loop(
         episode=episode,
         state=state,
         proposer=proposer,
@@ -179,7 +188,7 @@ def run_preference_eliciting_episode(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Smoke test for PreferenceElicitingProposer + Oracle + StateUpdate."
+        description="Smoke test for PreferenceSummaryProposer + Oracle + StateUpdate."
     )
     parser.add_argument("--data", type=str, default=str(DEFAULT_DATA_PATH))
     parser.add_argument("--index", type=int, default=0)
@@ -198,7 +207,7 @@ def main() -> None:
     if args.plot_curve:
         curve_points: List[Dict[str, Any]] = []
         for budget in budgets:
-            _, evaluation = run_preference_eliciting_episode(
+            _, evaluation = run_preference_summary_episode(
                 episode=episode,
                 budget=budget,
                 proposer_model=args.proposer_model,
@@ -216,17 +225,17 @@ def main() -> None:
                 }
             )
 
-        output_path = args.curve_output or "v2/plots/preference_eliciting_loop_accuracy_curve.png"
+        output_path = args.curve_output or "v2/plots/preference_summary_loop_accuracy_curve.png"
         saved_path = plot_accuracy_curve(
             curve_points,
             output_path=output_path,
-            title=f"Preference-Eliciting Loop Accuracy vs Budget ({episode.episode_id})",
+            title=f"Preference-Summary Loop Accuracy vs Budget ({episode.episode_id})",
         )
         print(json.dumps({"curve_points": curve_points, "saved_plot": saved_path}, indent=2, ensure_ascii=False))
         return
 
     for budget in budgets:
-        final_state, evaluation = run_preference_eliciting_episode(
+        final_state, evaluation = run_preference_summary_episode(
             episode=episode,
             budget=budget,
             proposer_model=args.proposer_model,

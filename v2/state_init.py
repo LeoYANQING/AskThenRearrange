@@ -45,18 +45,13 @@ def build_initial_state(
         "excluded_receptacles": {},
 
         # preference belief state
-        "open_preference_dimensions": [],
+        "open_preference_hypotheses": [],
         "preference_candidates": [],
         "confirmed_preferences": [],
         "rejected_hypotheses": [],
 
         # object solving state
         "unresolved_objects": list(episode.seen_objects),
-
-        # transient fields
-        "current_pattern": None,
-        "current_question": None,
-        "current_answer": None,
 
         # outputs
         "predicted_placements_seen": {},
@@ -73,7 +68,7 @@ def _print_state_summary(state: AgentState) -> None:
     print("num_seen_objects:", len(state["seen_objects"]))
     print("num_unresolved_objects:", len(state["unresolved_objects"]))
     print("num_unseen_objects:", len(state["unseen_objects"]))
-    print("open_preference_dimensions:", state["open_preference_dimensions"])
+    print("open_preference_hypotheses:", state["open_preference_hypotheses"])
     print("confirmed_actions:", state["confirmed_actions"])
     print("preference_candidates:", state["preference_candidates"])
     print("confirmed_preferences:", state["confirmed_preferences"])

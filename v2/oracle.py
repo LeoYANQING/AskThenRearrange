@@ -21,7 +21,7 @@ except ModuleNotFoundError:
     from data import DEFAULT_DATA_PATH, PlacementMap, get_episode
 
 
-QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
+QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:14b")
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
 
 
@@ -70,11 +70,19 @@ You may use ONLY the following human-visible information:
 - gt_seen_placements
 - qa_history
 
+Behavior rules:
+- answer like a natural user, briefly and concretely
+- prefer one or two sentences
+- when the user has a clear placement preference, say it directly using exact receptacle names from the provided receptacles
+- if the answer gives multiple placements, mention them explicitly in the answer text
+- if the answer rejects a receptacle, you may mention that receptacle in the answer text
+- set referenced_receptacle only when the answer positively points to one primary receptacle
+- do not set referenced_receptacle for a receptacle that is mentioned only as a negative example or rejection
+- if there is no single positive receptacle reference, set referenced_receptacle to null
+
 Do not use any agent-internal metadata.
 Do not mention hidden reasoning.
-Answer naturally and briefly.
-If the answer clearly names one receptacle, set referenced_receptacle to that exact receptacle.
-Otherwise set referenced_receptacle to null.
+Return only structured output that matches the schema.
 """.strip()
 
         user_prompt = f"""

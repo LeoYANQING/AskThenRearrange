@@ -1,10 +1,6 @@
 from __future__ import annotations
 
-import argparse
-import copy
-import json
 import os
-from pathlib import Path
 from typing import Any, Iterable, List, Literal, Optional
 
 from langchain_ollama import ChatOllama
@@ -13,24 +9,17 @@ from pydantic import BaseModel, Field
 try:
     from v2.agent_schema import (
         AgentState,
-        ConfirmedPreference,
-        IntentSource,
+        PreferenceRecord,
         QAItem,
         QuestionPattern,
     )
-    from v2.data import DEFAULT_DATA_PATH, get_episode
-    from v2.state_init import build_initial_state
 except ModuleNotFoundError:
     from agent_schema import (
         AgentState,
-        ConfirmedPreference,
-        IntentSource,
+        PreferenceRecord,
         QAItem,
         QuestionPattern,
     )
-    from data import DEFAULT_DATA_PATH, get_episode
-    from state_init import build_initial_state
-
 
 QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
@@ -50,7 +39,7 @@ class ObjectPlacementModel(BaseModel):
 
 
 class ActionAnswerInterpretation(BaseModel):
-    update_type: Literal["direct_place", "exclude_receptacle", "general_rule", "no_update"]
+    update_type: Literal["direct_place", "exclude_receptacle", "general_rule"]
     confirmed_action_receptacle: Optional[str] = Field(default=None)
     confirmed_actions: List[ObjectPlacementModel] = Field(default_factory=list)
     excluded_receptacles: List[str] = Field(default_factory=list)
@@ -58,7 +47,16 @@ class ActionAnswerInterpretation(BaseModel):
 
 
 class PreferenceElicitingInterpretation(BaseModel):
-    update_type: Literal["confirmed_rule", "no_preference", "rule_with_exception", "no_update"]
+    update_type: Literal["confirmed_rule", "no_preference", "rule_with_exception"]
+    confirmed_preference: Optional[PreferenceRecordModel] = None
+    exception_actions: List[ObjectPlacementModel] = Field(default_factory=list)
+    rejected_hypotheses: List[str] = Field(default_factory=list)
+
+
+class PreferenceSummaryInterpretation(BaseModel):
+    update_types: List[Literal["confirmed_rule", "reject_summary", "rule_with_exception"]] = Field(
+        default_factory=list
+    )
     confirmed_preference: Optional[PreferenceRecordModel] = None
     exception_actions: List[ObjectPlacementModel] = Field(default_factory=list)
     rejected_hypotheses: List[str] = Field(default_factory=list)
@@ -82,6 +80,7 @@ class StateUpdate:
         )
         self.action_model = self.model.with_structured_output(ActionAnswerInterpretation)
         self.preference_eliciting_model = self.model.with_structured_output(PreferenceElicitingInterpretation)
+        self.preference_summary_model = self.model.with_structured_output(PreferenceSummaryInterpretation)
         self.open_dimensions_update_model = self.model.with_structured_output(OpenPreferenceDimensionsUpdate)
 
     def interpret_action_answer(
@@ -103,8 +102,6 @@ Return exactly one update type:
   the answer rules out one or more receptacles for the target object
 - general_rule:
   the answer upgrades from object placement to a general rule
-- no_update:
-  the answer does not support any reliable state update
 
 Rules:
 - use only exact receptacle names from the provided receptacles
@@ -119,9 +116,6 @@ Rules:
         user_prompt = f"""
 Question pattern:
 action_oriented
-
-Internal source:
-action
 
 Target object:
 {target}
@@ -165,7 +159,7 @@ Current confirmed_preferences:
         self,
         *,
         state: AgentState,
-        target: str,
+        hypothesis: str,
         covered_objects: List[str],
         answer: str,
         question: Optional[str] = None,
@@ -177,11 +171,9 @@ Return exactly one update type:
 - confirmed_rule:
   the answer gives a stable rule
 - no_preference:
-  the answer says there is no special preference for this dimension
+  the answer says there is no special preference for this hypothesis
 - rule_with_exception:
   the answer gives a stable rule plus one or more object-level exceptions
-- no_update:
-  the answer is too weak to support a reliable update
 
 Rules:
 - use only exact receptacle names from the provided receptacles
@@ -189,8 +181,8 @@ Rules:
 - if the answer gives a stable rule, put it in confirmed_preference with source = "elicited"
 - confirmed_preference.covered_objects must be a subset of the current intent_covered_objects that is explicitly supported by the answer
 - only use the full current intent_covered_objects when the answer clearly supports the whole set
-- make the hypothesis concrete enough to be useful for placement, not just an abstract restatement of the dimension
-- if there is no preference, add the target dimension or a short equivalent text to rejected_hypotheses
+- make the hypothesis concrete enough to be useful for placement, not just an abstract restatement of the target hypothesis
+- if there is no preference, add the target hypothesis or a short equivalent text to rejected_hypotheses
 - rejected_hypotheses must be empty unless update_type = "no_preference"
 - if there is an exception object with a clear placement, add it to exception_actions
 - be conservative
@@ -200,11 +192,8 @@ Rules:
 Question pattern:
 preference_eliciting
 
-Internal source:
-scene_gap
-
-Target dimension:
-{target}
+Target hypothesis:
+{hypothesis}
 
 Current intent covered_objects:
 {covered_objects}
@@ -224,8 +213,8 @@ Receptacles:
 Seen objects:
 {state["seen_objects"]}
 
-Current open_preference_dimensions:
-{state["open_preference_dimensions"]}
+Current open_preference_hypotheses:
+{state["open_preference_hypotheses"]}
 
 Current confirmed_actions:
 {state["confirmed_actions"]}
@@ -244,13 +233,144 @@ Current rejected_hypotheses:
             ]
         )
 
-    def update_open_preference_dimensions(
+    def interpret_preference_summary_answer(
+        self,
+        *,
+        state: AgentState,
+        hypothesis: str,
+        covered_objects: List[str],
+        answer: str,
+        question: Optional[str] = None,
+    ) -> PreferenceSummaryInterpretation:
+        system_prompt = """
+You interpret a preference-summary answer for a household rearrangement agent.
+
+Return zero or more update types:
+- confirmed_rule:
+  the answer confirms the summary rule, possibly with refinement
+- reject_summary:
+  the answer rejects the current summary hypothesis
+- rule_with_exception:
+  the answer confirms a rule and also gives one or more object-level exceptions
+
+You may return multiple update types when the answer does multiple things.
+Example:
+- reject the current summary but provide a better rule
+- confirm a rule and also give object-level exceptions
+
+Rules:
+- use only exact receptacle names from the provided receptacles
+- use only exact seen object names in covered_objects and exception_actions
+- if the answer confirms or refines a stable rule, put it in confirmed_preference with source = "confirmed"
+- confirmed_preference.covered_objects must be a subset of the current intent_covered_objects that is explicitly supported by the answer
+- only use the full current intent_covered_objects when the answer clearly supports the whole set
+- make the hypothesis concrete enough to be useful for placement
+- if the summary is rejected, add the target hypothesis or a short equivalent text to rejected_hypotheses
+- rejected_hypotheses should normally be non-empty when update_types includes "reject_summary"
+- if there is an exception object with a clear placement, add it to exception_actions
+- be conservative
+""".strip()
+
+        user_prompt = f"""
+Question pattern:
+preference_summary
+
+Target hypothesis:
+{hypothesis}
+
+Current intent covered_objects:
+{covered_objects}
+
+Question:
+{question}
+
+Answer:
+{answer}
+
+Room:
+{state["room"]}
+
+Receptacles:
+{state["receptacles"]}
+
+Seen objects:
+{state["seen_objects"]}
+
+Current confirmed_actions:
+{state["confirmed_actions"]}
+
+Current preference_candidates:
+{state["preference_candidates"]}
+
+Current confirmed_preferences:
+{state["confirmed_preferences"]}
+
+Current rejected_hypotheses:
+{state["rejected_hypotheses"]}
+""".strip()
+
+        return self.preference_summary_model.invoke(
+            [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+        )
+
+    def update_from_preference_summary_answer(
+        self,
+        *,
+        state: AgentState,
+        hypothesis: str,
+        covered_objects: List[str],
+        answer: str,
+        interpretation: PreferenceSummaryInterpretation,
+        question: Optional[str] = None,
+    ) -> AgentState:
+        _append_qa_history(
+            state=state,
+            question_pattern="preference_summary",
+            target=hypothesis,
+            answer=answer,
+            question=question,
+        )
+
+        update_types = _dedupe_keep_order(list(interpretation.update_types))
+
+        if "reject_summary" in update_types:
+            _remove_preference_candidate(state, hypothesis)
+            rejected = interpretation.rejected_hypotheses or [hypothesis]
+            state["rejected_hypotheses"] = _dedupe_keep_order([*state["rejected_hypotheses"], *rejected])
+
+        if interpretation.confirmed_preference is not None:
+            _remove_preference_candidate(state, hypothesis)
+            normalized = _normalize_confirmed_preference(
+                preference=interpretation.confirmed_preference,
+                seen_objects=state["seen_objects"],
+                receptacles=state["receptacles"],
+                default_source="confirmed",
+                fallback_covered_objects=covered_objects,
+            )
+            if normalized is not None:
+                if interpretation.exception_actions:
+                    normalized["exceptions"] = _dedupe_keep_order(
+                        [
+                            *normalized.get("exceptions", []),
+                            *[item.object_name for item in interpretation.exception_actions],
+                        ]
+                    )
+                _upsert_confirmed_preference(state, normalized)
+
+        _apply_confirmed_actions(state=state, placements=interpretation.exception_actions)
+
+        return recompute_predictions(state)
+
+    def update_open_preference_hypotheses(
         self,
         *,
         state: AgentState,
     ) -> List[str]:
         system_prompt = """
-You update open preference dimensions for a household rearrangement agent.
+You update open preference hypotheses for a household rearrangement agent.
 
 Your job:
 - infer which high-level preference dimensions are still worth asking directly
@@ -267,10 +387,13 @@ You may also use:
 - confirmed_actions
 - rejected_hypotheses
 
+Important:
+- return high-level preference dimensions, not object names, not receptacle names, and not full placement rules
+
 Rules:
-- return short dimension names, not full hypotheses
-- prefer dimensions that could still change placement decisions for unresolved objects
-- do not repeat dimensions already settled by confirmed_preferences
+- return short high-level hypothesis texts only
+- prefer hypotheses that could still change placement decisions for unresolved objects
+- do not repeat hypotheses already settled by confirmed_preferences
 - do not repeat rejected_hypotheses
 - return a small conservative list
 """.strip()
@@ -305,21 +428,31 @@ Rejected hypotheses:
                     {"role": "user", "content": user_prompt},
                 ]
             )
-            raw_dimensions = [item.strip() for item in result.dimensions if item.strip()]
+            raw_hypotheses = [item.strip() for item in result.dimensions if item.strip()]
         except Exception:
-            raw_dimensions = []
+            raw_hypotheses = []
 
         rejected = {_norm(item) for item in state["rejected_hypotheses"] if item.strip()}
+        seen_objects_norm = {_norm(item) for item in state["seen_objects"] if item.strip()}
+        receptacles_norm = {_norm(item) for item in state["receptacles"] if item.strip()}
         deduped: List[str] = []
         seen = set()
-        for item in raw_dimensions:
+        for item in raw_hypotheses:
             normalized = _norm(item)
+            if not normalized:
+                continue
             if normalized in seen or normalized in rejected:
+                continue
+            if normalized in seen_objects_norm or normalized in receptacles_norm:
+                continue
+            if any(obj in normalized for obj in seen_objects_norm):
+                continue
+            if any(rec in normalized for rec in receptacles_norm):
                 continue
             deduped.append(item)
             seen.add(normalized)
 
-        state["open_preference_dimensions"] = deduped
+        state["open_preference_hypotheses"] = deduped
         return deduped
 
 
@@ -341,7 +474,6 @@ def _append_qa_history(
     *,
     state: AgentState,
     question_pattern: QuestionPattern,
-    source: IntentSource,
     target: str,
     answer: str,
     question: Optional[str] = None,
@@ -350,20 +482,16 @@ def _append_qa_history(
     state["qa_history"].append(
         QAItem(
             question_pattern=question_pattern,
-            source=source,
             target=target,
             action_mode=action_mode,
-            question=question or state.get("current_question"),
+            question=question or "",
             answer=answer,
         )
     )
     state["budget_used"] += 1
-    state["current_pattern"] = question_pattern
-    state["current_question"] = question or state.get("current_question")
-    state["current_answer"] = answer
 
 
-def _upsert_confirmed_preference(state: AgentState, preference: ConfirmedPreference) -> None:
+def _upsert_confirmed_preference(state: AgentState, preference: PreferenceRecord) -> None:
     hypothesis_norm = _norm(preference.get("hypothesis", ""))
     if not hypothesis_norm:
         return
@@ -374,6 +502,16 @@ def _upsert_confirmed_preference(state: AgentState, preference: ConfirmedPrefere
     state["confirmed_preferences"].append(preference)
 
 
+def _remove_preference_candidate(state: AgentState, hypothesis: str) -> None:
+    hypothesis_norm = _norm(hypothesis)
+    if not hypothesis_norm:
+        return
+    state["preference_candidates"] = [
+        item for item in state["preference_candidates"]
+        if _norm(item.get("hypothesis", "")) != hypothesis_norm
+    ]
+
+
 def _normalize_confirmed_preference(
     *,
     preference: PreferenceRecordModel,
@@ -381,7 +519,7 @@ def _normalize_confirmed_preference(
     receptacles: List[str],
     default_source: Literal["elicited", "confirmed"],
     fallback_covered_objects: Optional[List[str]] = None,
-) -> Optional[ConfirmedPreference]:
+) -> Optional[PreferenceRecord]:
     hypothesis = preference.hypothesis.strip()
     if not hypothesis:
         return None
@@ -400,7 +538,7 @@ def _normalize_confirmed_preference(
     exceptions = _dedupe_keep_order([obj for obj in preference.exceptions if obj in allowed_objects])
     target_receptacle = preference.target_receptacle if preference.target_receptacle in allowed_receptacles else None
 
-    return ConfirmedPreference(
+    return PreferenceRecord(
         hypothesis=hypothesis,
         source=preference.source if preference.source in ("elicited", "confirmed") else default_source,
         covered_objects=covered_objects,
@@ -433,7 +571,6 @@ def update_from_action_answer(
     _append_qa_history(
         state=state,
         question_pattern="action_oriented",
-        source="action",
         target=target,
         answer=answer,
         question=question,
@@ -473,7 +610,7 @@ def update_from_action_answer(
 def update_from_preference_eliciting_answer(
     *,
     state: AgentState,
-    target: str,
+    hypothesis: str,
     covered_objects: List[str],
     answer: str,
     interpretation: PreferenceElicitingInterpretation,
@@ -482,19 +619,18 @@ def update_from_preference_eliciting_answer(
     _append_qa_history(
         state=state,
         question_pattern="preference_eliciting",
-        source="scene_gap",
-        target=target,
+        target=hypothesis,
         answer=answer,
         question=question,
     )
 
     if interpretation.update_type in ("confirmed_rule", "no_preference", "rule_with_exception"):
-        state["open_preference_dimensions"] = [
-            dim for dim in state["open_preference_dimensions"] if _norm(dim) != _norm(target)
+        state["open_preference_hypotheses"] = [
+            item for item in state["open_preference_hypotheses"] if _norm(item) != _norm(hypothesis)
         ]
 
     if interpretation.update_type == "no_preference":
-        rejected = interpretation.rejected_hypotheses or [target]
+        rejected = interpretation.rejected_hypotheses or [hypothesis]
         state["rejected_hypotheses"] = _dedupe_keep_order([*state["rejected_hypotheses"], *rejected])
         return recompute_predictions(state)
 
@@ -528,67 +664,86 @@ def update_from_preference_eliciting_answer(
 
 def update_state_with_answer(
     *,
-        state: AgentState,
-        question_pattern: QuestionPattern,
-        source: IntentSource,
-        target: str,
-        answer: str,
-        updater: StateUpdate,
-        question: Optional[str] = None,
-        action_mode: Optional[str] = None,
-        covered_objects: Optional[List[str]] = None,
+    state: AgentState,
+    question_pattern: QuestionPattern,
+    target: str,
+    answer: str,
+    updater: StateUpdate,
+    question: Optional[str] = None,
+    action_mode: Optional[str] = None,
+    covered_objects: Optional[List[str]] = None,
 ) -> AgentState:
-    if question_pattern != "action_oriented":
-        if question_pattern != "preference_eliciting":
-            raise NotImplementedError("This minimal state_update version currently supports action_oriented and preference_eliciting only.")
-        if source != "scene_gap":
-            raise ValueError("preference_eliciting updates must use source='scene_gap'.")
-
-        interpretation = updater.interpret_preference_eliciting_answer(
+    if question_pattern == "action_oriented":
+        interpretation = updater.interpret_action_answer(
             state=state,
             target=target,
+            answer=answer,
+            question=question,
+            action_mode=action_mode,
+        )
+        state = update_from_action_answer(
+            state=state,
+            target=target,
+            answer=answer,
+            interpretation=interpretation,
+            question=question,
+            action_mode=action_mode,
+        )
+        return state
+
+    if question_pattern == "preference_eliciting":
+        print(f"[eliciting] interpreting answer for hypothesis: {target}")
+        interpretation = updater.interpret_preference_eliciting_answer(
+            state=state,
+            hypothesis=target,
             covered_objects=covered_objects or [],
             answer=answer,
             question=question,
         )
+        print(f"[eliciting] interpretation finished: {interpretation.update_type}")
         state = update_from_preference_eliciting_answer(
             state=state,
-            target=target,
+            hypothesis=target,
             covered_objects=covered_objects or [],
             answer=answer,
             interpretation=interpretation,
             question=question,
         )
-        updater.update_open_preference_dimensions(state=state)
+        print("[eliciting] state write finished; refreshing open preference hypotheses...")
+        # Only elicitation updates should refresh open elicitation hypotheses.
+        updater.update_open_preference_hypotheses(state=state)
+        print("[eliciting] open preference hypotheses refresh finished")
         return state
-    if source != "action":
-        raise ValueError("action_oriented updates must use source='action'.")
 
-    interpretation = updater.interpret_action_answer(
-        state=state,
-        target=target,
-        answer=answer,
-        question=question,
-        action_mode=action_mode,
+    if question_pattern == "preference_summary":
+        interpretation = updater.interpret_preference_summary_answer(
+            state=state,
+            hypothesis=target,
+            covered_objects=covered_objects or [],
+            answer=answer,
+            question=question,
+        )
+        state = updater.update_from_preference_summary_answer(
+            state=state,
+            hypothesis=target,
+            covered_objects=covered_objects or [],
+            answer=answer,
+            interpretation=interpretation,
+            question=question,
+        )
+        return state
+
+    raise NotImplementedError(
+        "This minimal state_update version currently supports action_oriented, preference_eliciting, and preference_summary only."
     )
-    state = update_from_action_answer(
-        state=state,
-        target=target,
-        answer=answer,
-        interpretation=interpretation,
-        question=question,
-        action_mode=action_mode,
-    )
-    updater.update_open_preference_dimensions(state=state)
-    return state
 
 
-def update_open_preference_dimensions(
+def update_open_preference_hypotheses(
     *,
     state: AgentState,
     updater: StateUpdate,
 ) -> AgentState:
-    updater.update_open_preference_dimensions(state=state)
+    updater.update_open_preference_hypotheses(state=state)
     return state
 
 
@@ -618,190 +773,3 @@ def recompute_predictions(state: AgentState) -> AgentState:
         obj for obj in state["seen_objects"] if obj not in state["confirmed_actions"] and obj not in predicted_seen
     ]
     return state
-
-
-def _build_state_for_smoke(data_path: str, index: int) -> AgentState:
-    episode = get_episode(Path(data_path), index)
-    state = build_initial_state(
-        episode=episode,
-        strategy="parallel_exploration",
-        budget_total=5,
-    )
-    state["open_preference_dimensions"] = [
-        "fragility",
-        "accessibility",
-        "category_grouping",
-    ]
-    return state
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Smoke test for minimal state update.")
-    parser.add_argument("--data", type=str, default=str(DEFAULT_DATA_PATH))
-    parser.add_argument("--index", type=int, default=0)
-    parser.add_argument("--model", type=str, default=QUESTION_MODEL)
-    parser.add_argument("--base-url", type=str, default=OLLAMA_BASE_URL)
-    args = parser.parse_args()
-
-    episode = get_episode(Path(args.data), args.index)
-    updater = StateUpdate(model=args.model, base_url=args.base_url, temperature=0.0)
-    target = episode.seen_objects[0]
-    question = f"Where should I place the {target}?"
-    pref_target = "fragility"
-    pref_question = "Do you have a preference for where fragile items should go?"
-
-    direct_state = _build_state_for_smoke(args.data, args.index)
-    direct_answer = f"Put it in the {episode.receptacles[0]}."
-    direct_interpretation = updater.interpret_action_answer(
-        state=direct_state,
-        target=target,
-        answer=direct_answer,
-        question=question,
-        action_mode="direct_grounding",
-    )
-    direct_state = update_from_action_answer(
-        state=direct_state,
-        target=target,
-        answer=direct_answer,
-        interpretation=direct_interpretation,
-        question=question,
-        action_mode="direct_grounding",
-    )
-
-    exclude_state = _build_state_for_smoke(args.data, args.index)
-    exclude_answer = f"Not in the {episode.receptacles[0]}."
-    exclude_interpretation = updater.interpret_action_answer(
-        state=exclude_state,
-        target=target,
-        answer=exclude_answer,
-        question=question,
-        action_mode="boundary_probe",
-    )
-    exclude_state = update_from_action_answer(
-        state=exclude_state,
-        target=target,
-        answer=exclude_answer,
-        interpretation=exclude_interpretation,
-        question=question,
-        action_mode="boundary_probe",
-    )
-
-    rule_state = _build_state_for_smoke(args.data, args.index)
-    rule_answer = f"{target}s usually go in the {episode.receptacles[0]}."
-    rule_interpretation = updater.interpret_action_answer(
-        state=rule_state,
-        target=target,
-        answer=rule_answer,
-        question=question,
-        action_mode="boundary_probe",
-    )
-    rule_state = update_from_action_answer(
-        state=rule_state,
-        target=target,
-        answer=rule_answer,
-        interpretation=rule_interpretation,
-        question=question,
-        action_mode="boundary_probe",
-    )
-
-    pref_rule_state = _build_state_for_smoke(args.data, args.index)
-    pref_rule_answer = f"Fragile items usually go in the {episode.receptacles[0]}."
-    pref_rule_interpretation = updater.interpret_preference_eliciting_answer(
-        state=pref_rule_state,
-        target=pref_target,
-        covered_objects=episode.seen_objects[:2],
-        answer=pref_rule_answer,
-        question=pref_question,
-    )
-    pref_rule_state = update_from_preference_eliciting_answer(
-        state=pref_rule_state,
-        target=pref_target,
-        covered_objects=episode.seen_objects[:2],
-        answer=pref_rule_answer,
-        interpretation=pref_rule_interpretation,
-        question=pref_question,
-    )
-
-    no_pref_state = _build_state_for_smoke(args.data, args.index)
-    no_pref_answer = "I do not have a special preference for that."
-    no_pref_interpretation = updater.interpret_preference_eliciting_answer(
-        state=no_pref_state,
-        target=pref_target,
-        covered_objects=episode.seen_objects[:2],
-        answer=no_pref_answer,
-        question=pref_question,
-    )
-    no_pref_state = update_from_preference_eliciting_answer(
-        state=no_pref_state,
-        target=pref_target,
-        covered_objects=episode.seen_objects[:2],
-        answer=no_pref_answer,
-        interpretation=no_pref_interpretation,
-        question=pref_question,
-    )
-
-    exception_state = _build_state_for_smoke(args.data, args.index)
-    exception_object = episode.seen_objects[1] if len(episode.seen_objects) > 1 else episode.seen_objects[0]
-    exception_receptacle = (
-        episode.receptacles[1] if len(episode.receptacles) > 1 else episode.receptacles[0]
-    )
-    exception_answer = (
-        f"Fragile items usually go in the {episode.receptacles[0]}, "
-        f"but {exception_object} goes in the {exception_receptacle}."
-    )
-    exception_interpretation = updater.interpret_preference_eliciting_answer(
-        state=exception_state,
-        target=pref_target,
-        covered_objects=episode.seen_objects[:3],
-        answer=exception_answer,
-        question=pref_question,
-    )
-    exception_state = update_from_preference_eliciting_answer(
-        state=exception_state,
-        target=pref_target,
-        covered_objects=episode.seen_objects[:3],
-        answer=exception_answer,
-        interpretation=exception_interpretation,
-        question=pref_question,
-    )
-
-    print(
-        json.dumps(
-            {
-                "action_oriented": {
-                    "direct_place": {
-                        "interpretation": direct_interpretation.model_dump(),
-                        "state": direct_state,
-                    },
-                    "exclude_receptacle": {
-                        "interpretation": exclude_interpretation.model_dump(),
-                        "state": exclude_state,
-                    },
-                    "general_rule": {
-                        "interpretation": rule_interpretation.model_dump(),
-                        "state": rule_state,
-                    },
-                },
-                "preference_eliciting": {
-                    "confirmed_rule": {
-                        "interpretation": pref_rule_interpretation.model_dump(),
-                        "state": pref_rule_state,
-                    },
-                    "no_preference": {
-                        "interpretation": no_pref_interpretation.model_dump(),
-                        "state": no_pref_state,
-                    },
-                    "rule_with_exception": {
-                        "interpretation": exception_interpretation.model_dump(),
-                        "state": exception_state,
-                    },
-                },
-            },
-            indent=2,
-            ensure_ascii=False,
-        )
-    )
-
-
-if __name__ == "__main__":
-    main()

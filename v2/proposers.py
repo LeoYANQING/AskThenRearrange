@@ -12,6 +12,7 @@ try:
     from v2.agent_schema import (
         ActionIntent,
         AgentState,
+        PreferenceRecord,
         PreferenceElicitingIntent,
         PreferenceElicitingIntentBatch,
         PreferenceSummaryIntent,
@@ -19,11 +20,12 @@ try:
     )
     from v2.data import get_episode
     from v2.state_init import build_initial_state
-    from v2.state_update import StateUpdate, update_open_preference_dimensions
+    from v2.state_update import StateUpdate, update_open_preference_hypotheses
 except ModuleNotFoundError:
     from agent_schema import (
         ActionIntent,
         AgentState,
+        PreferenceRecord,
         PreferenceElicitingIntent,
         PreferenceElicitingIntentBatch,
         PreferenceSummaryIntent,
@@ -31,7 +33,7 @@ except ModuleNotFoundError:
     )
     from data import get_episode
     from state_init import build_initial_state
-    from state_update import StateUpdate, update_open_preference_dimensions
+    from state_update import StateUpdate, update_open_preference_hypotheses
 
 
 QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
@@ -67,7 +69,35 @@ def _existing_preference_texts(state: AgentState) -> set[str]:
         text = item.get("hypothesis", "").strip().lower()
         if text:
             existing.add(text)
+    for item in state["rejected_hypotheses"]:
+        text = item.strip().lower()
+        if text:
+            existing.add(text)
     return existing
+
+
+def _upsert_preference_candidate(
+    *,
+    state: AgentState,
+    hypothesis: str,
+    covered_objects: List[str],
+) -> None:
+    hypothesis_key = hypothesis.strip().lower()
+    if not hypothesis_key:
+        return
+
+    candidate = PreferenceRecord(
+        hypothesis=hypothesis,
+        source="induced",
+        covered_objects=covered_objects,
+        target_receptacle=None,
+        exceptions=[],
+    )
+    for idx, existing in enumerate(state["preference_candidates"]):
+        if existing.get("hypothesis", "").strip().lower() == hypothesis_key:
+            state["preference_candidates"][idx] = candidate
+            return
+    state["preference_candidates"].append(candidate)
 
 
 # =========================================================
@@ -113,7 +143,7 @@ You are a proposer for Preference-eliciting questions in a household rearrangeme
 
 Your job:
 Given the visible scene and current state, propose a small number of high-level
-preference dimensions that are worth asking the user directly.
+preference hypotheses that are worth asking the user directly.
 
 Important:
 - This is an empirical pattern called "preference_eliciting".
@@ -128,7 +158,7 @@ You may use:
 - room
 - receptacles
 - seen_objects
-- open_preference_dimensions
+- open_preference_hypotheses
 - already confirmed preferences
 
 You must not use:
@@ -146,22 +176,21 @@ Receptacles:
 Seen objects:
 {state["seen_objects"]}
 
-Open preference dimensions:
-{state["open_preference_dimensions"]}
+Open preference hypotheses:
+{state["open_preference_hypotheses"]}
 
 Confirmed preferences:
 {state["confirmed_preferences"]}
 
 Return a small list of Preference-eliciting intents.
 
-Use the current open_preference_dimensions as the primary source of candidate dimensions.
-If that list is non-empty, prefer proposing only from that list unless a listed dimension is clearly no longer useful.
+Use the current open_preference_hypotheses as the primary source of candidate hypotheses.
+If that list is non-empty, prefer proposing only from that list unless a listed hypothesis is clearly no longer useful.
 
 Each intent must:
-- source = "scene_gap"
 - question_pattern = "preference_eliciting"
-- dimension = a concise missing high-level preference dimension
-- covered_objects = exact seen objects related to that dimension
+- hypothesis = a concise missing high-level preference hypothesis
+- covered_objects = exact seen objects related to that hypothesis
 - priority = 0.0 to 1.0
 - question = one concise natural question directly asking that preference
 """.strip()
@@ -186,16 +215,16 @@ def _normalize_preference_eliciting_intents(
     max_intents: int,
 ) -> List[PreferenceElicitingIntent]:
     allowed_objects = set(state["seen_objects"])
-    open_dimensions = {item.strip().lower() for item in state["open_preference_dimensions"] if item.strip()}
+    open_hypotheses = {item.strip().lower() for item in state["open_preference_hypotheses"] if item.strip()}
     normalized: List[PreferenceElicitingIntent] = []
     seen_signatures = set()
 
     for item in intents:
-        dimension = item.dimension.strip()
+        hypothesis = item.hypothesis.strip()
         question = item.question.strip()
-        if not dimension or not question:
-            continue
-        if open_dimensions and dimension.lower() not in open_dimensions:
+        if not hypothesis or not question:
+        #     continue
+        # if open_hypotheses and hypothesis.lower() not in open_hypotheses:
             continue
 
         covered_objects = [
@@ -206,7 +235,7 @@ def _normalize_preference_eliciting_intents(
             continue
 
         signature = (
-            dimension.lower(),
+            hypothesis.lower(),
             tuple(sorted(covered_objects)),
         )
         if signature in seen_signatures:
@@ -215,9 +244,8 @@ def _normalize_preference_eliciting_intents(
 
         normalized.append(
             PreferenceElicitingIntent(
-                source="scene_gap",
                 question_pattern="preference_eliciting",
-                dimension=dimension,
+                hypothesis=hypothesis,
                 covered_objects=covered_objects,
                 priority=_clip_priority(item.priority),
                 question=question,
@@ -306,7 +334,6 @@ QA history:
 {state["qa_history"]}
 
 Return exactly one ActionIntent:
-- source = "action"
 - question_pattern = "action_oriented"
 - action_mode = "direct_grounding" or "boundary_probe"
 - object_name = one exact unresolved seen object
@@ -346,7 +373,6 @@ def _normalize_action_intent(
         action_mode = "direct_grounding"
 
     return ActionIntent(
-        source="action",
         question_pattern="action_oriented",
         action_mode=action_mode,
         object_name=object_name,
@@ -388,8 +414,6 @@ class PreferenceSummaryProposer:
         state: AgentState,
         max_intents: int = 3,
     ) -> List[PreferenceSummaryIntent]:
-        if len(state["confirmed_actions"]) < 2:
-            return []
 
         system_prompt = f"""
 You are a proposer for Preference-summary questions in a household rearrangement task.
@@ -404,7 +428,7 @@ Important:
 - Do NOT output preference-eliciting questions.
 - Be conservative.
 - Return at most {max_intents} intents.
-- Do not repeat an already existing candidate or confirmed preference.
+- Do not repeat an already existing candidate, confirmed preference, or rejected hypothesis.
 - Each intent must already include a natural user-facing summary question.
 - Use only exact seen object names in covered_objects.
 """.strip()
@@ -425,10 +449,12 @@ Existing preference candidates:
 Confirmed preferences:
 {state["confirmed_preferences"]}
 
+Rejected hypotheses:
+{state["rejected_hypotheses"]}
+
 Return a small list of Preference-summary intents.
 
 Each intent must:
-- source = "induced_hypothesis"
 - question_pattern = "preference_summary"
 - hypothesis = a concise rule summary to confirm
 - covered_objects = exact seen objects plausibly covered by the summary
@@ -457,6 +483,7 @@ def _normalize_preference_summary_intents(
 ) -> List[PreferenceSummaryIntent]:
     allowed_objects = set(state["seen_objects"])
     existing_hypotheses = _existing_preference_texts(state)
+    rejected_hypotheses = {item.strip().lower() for item in state["rejected_hypotheses"] if item.strip()}
 
     normalized: List[PreferenceSummaryIntent] = []
     seen_signatures = set()
@@ -468,6 +495,8 @@ def _normalize_preference_summary_intents(
         if not hypothesis or not question:
             continue
         if hypothesis.lower() in existing_hypotheses:
+            continue
+        if hypothesis.lower() in rejected_hypotheses:
             continue
 
         covered_objects = [
@@ -487,7 +516,6 @@ def _normalize_preference_summary_intents(
 
         normalized.append(
             PreferenceSummaryIntent(
-                source="induced_hypothesis",
                 question_pattern="preference_summary",
                 hypothesis=hypothesis,
                 covered_objects=covered_objects,
@@ -527,7 +555,14 @@ def propose_preference_summary_intents(
     proposer: PreferenceSummaryProposer,
     max_intents: int = 3,
 ) -> List[PreferenceSummaryIntent]:
-    return proposer.propose(state=state, max_intents=max_intents)
+    intents = proposer.propose(state=state, max_intents=max_intents)
+    for intent in intents:
+        _upsert_preference_candidate(
+            state=state,
+            hypothesis=intent.hypothesis,
+            covered_objects=list(intent.covered_objects),
+        )
+    return intents
 
 
 # =========================================================
@@ -584,7 +619,7 @@ def main() -> None:
         strategy=args.strategy,  # type: ignore[arg-type]
         budget_total=args.budget,
     )
-    state = update_open_preference_dimensions(
+    state = update_open_preference_hypotheses(
         state=state,
         updater=StateUpdate(model=args.model, base_url=args.base_url, temperature=0.0),
     )

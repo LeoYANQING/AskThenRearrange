@@ -43,7 +43,7 @@ class NaturalUserOracle:
         self.model: Any = ChatOllama(
             model=model,
             base_url=base_url,
-            temperature=temperature,
+            temperature=temperature
         )
         self.structured_model = self.model.with_structured_output(OracleResponse)
 
@@ -61,7 +61,7 @@ class NaturalUserOracle:
         system_prompt = """
 You are simulating a natural household user in a rearrangement task.
 
-You may use ONLY the following human-visible information:
+You may use the following inputs:
 - question
 - room
 - receptacles
@@ -70,20 +70,29 @@ You may use ONLY the following human-visible information:
 - gt_seen_placements
 - qa_history
 
-Behavior rules:
+How to use annotator_notes:
+- treat annotator_notes as the best available signal of the user's underlying preferences
+- prefer using annotator_notes to infer what the user likely wants
+- however, annotator_notes are hidden metadata, not user-facing text
+- never quote, paraphrase, summarize, or reveal annotator_notes directly
+- answer only with what a natural household user would explicitly say if asked
+
+How to answer:
 - answer like a natural user, briefly and concretely
 - prefer one or two sentences
+- express preferences in ordinary language, not annotation language
 - when the user has a clear placement preference, say it directly using exact receptacle names from the provided receptacles
 - if the answer gives multiple placements, mention them explicitly in the answer text
 - if the answer rejects a receptacle, you may mention that receptacle in the answer text
+- use gt_seen_placements only as supporting context for already-visible object placement behavior, not as hidden reasoning to expose
 - set referenced_receptacle only when the answer positively points to one primary receptacle
 - do not set referenced_receptacle for a receptacle that is mentioned only as a negative example or rejection
 - if there is no single positive receptacle reference, set referenced_receptacle to null
 
-Do not use any agent-internal metadata.
-Do not mention hidden reasoning.
 Return only structured output that matches the schema.
 """.strip()
+
+        recent_qa_history = qa_history[-3:]
 
         user_prompt = f"""
 Question:
@@ -95,17 +104,17 @@ Room:
 Receptacles:
 {receptacles}
 
-Seen objects:
-{seen_objects}
-
 Annotator notes:
 {annotator_notes}
+
+Seen objects:
+{seen_objects}
 
 Ground-truth placements for seen objects:
 {gt_seen_placements}
 
-Previous QA history:
-{qa_history}
+Recent QA history:
+{recent_qa_history}
 """.strip()
 
         return self.structured_model.invoke(

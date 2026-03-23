@@ -91,24 +91,23 @@ class AgentState(TypedDict):
     # Object -> receptacles explicitly ruled out by prior answers.
     excluded_receptacles: dict[str, List[str]]
 
-    # Preference hypotheses still worth asking directly.
-    open_preference_hypotheses: List[str]
-
-    # Induced but not yet confirmed preference rules.
-    preference_candidates: List[PreferenceRecord]
-
     # Preference rules that have already been explicitly confirmed.
     confirmed_preferences: List[PreferenceRecord]
+
+    # Preference hypotheses still worth asking directly.
+    open_preference_hypotheses: List[str]
 
     # Summary hypotheses that have been explicitly rejected.
     rejected_hypotheses: List[str]
 
+    # Induced but not yet confirmed preference rules.
+    preference_candidates: List[PreferenceRecord]
+
+    # Online placements derived from confirmed evidence during interaction.
+    online_placements_seen: PlacementMap
+    
     # Seen objects whose placement is still unresolved.
     unresolved_objects: List[str]
-
-    # Running prediction outputs.
-    predicted_placements_seen: PlacementMap
-    predicted_placements_unseen: PlacementMap
 
 
 __all__ = [

@@ -35,7 +35,7 @@ class FinalPlacementPlanner:
         self.model: Any = ChatOllama(
             model=model,
             base_url=base_url,
-            temperature=temperature,
+            temperature=temperature
         )
         self.structured_model = self.model.with_structured_output(FinalPlacementPlan)
 
@@ -171,7 +171,7 @@ def finalize_seen_placements(
     *,
     planner: FinalPlacementPlanner,
 ) -> PlacementMap:
-    finalized = dict(state["predicted_placements_seen"])
+    finalized = dict(state["online_placements_seen"])
     remaining = [obj for obj in state["seen_objects"] if obj not in finalized]
     planned = planner.plan_placements(
         state=state,
@@ -188,7 +188,7 @@ def finalize_unseen_placements(
     *,
     planner: FinalPlacementPlanner,
 ) -> PlacementMap:
-    finalized = dict(state["predicted_placements_unseen"])
+    finalized = {}
     remaining = [obj for obj in state["unseen_objects"] if obj not in finalized]
     planned = planner.plan_placements(
         state=state,
@@ -230,23 +230,23 @@ def evaluate_episode_state(
     *,
     planner: FinalPlacementPlanner,
 ) -> Dict[str, Any]:
-    finalized_predicted_seen = finalize_seen_placements(
+    finalized_seen = finalize_seen_placements(
         state,
         planner=planner,
     )
-    finalized_predicted_unseen = finalize_unseen_placements(
+    finalized_unseen = finalize_unseen_placements(
         state,
         planner=planner,
     )
     metrics = evaluate_episode_predictions(
         episode,
-        predicted_seen=finalized_predicted_seen,
-        predicted_unseen=finalized_predicted_unseen,
+        predicted_seen=finalized_seen,
+        predicted_unseen=finalized_unseen,
     )
     return {
         **metrics,
-        "finalized_predicted_placements_seen": finalized_predicted_seen,
-        "finalized_predicted_placements_unseen": finalized_predicted_unseen,
+        "finalized_placements_seen": finalized_seen,
+        "finalized_placements_unseen": finalized_unseen,
     }
 
 

@@ -13,7 +13,7 @@ try:
     from v2.oracle import NaturalUserOracle
     from v2.proposers import PreferenceSummaryProposer, propose_preference_summary_intents
     from v2.state_init import build_initial_state
-    from v2.state_update import StateUpdate, update_state_with_answer
+    from v2.state_update import StateUpdate
 except ModuleNotFoundError:
     from agent_schema import AgentState
     from data import DEFAULT_DATA_PATH, Episode, get_episode
@@ -21,7 +21,7 @@ except ModuleNotFoundError:
     from oracle import NaturalUserOracle
     from proposers import PreferenceSummaryProposer, propose_preference_summary_intents
     from state_init import build_initial_state
-    from state_update import StateUpdate, update_state_with_answer
+    from state_update import StateUpdate
 
 
 QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
@@ -36,9 +36,8 @@ def _state_snapshot(state: AgentState) -> Dict[str, Any]:
         "preference_candidates": state["preference_candidates"],
         "confirmed_preferences": state["confirmed_preferences"],
         "rejected_hypotheses": state["rejected_hypotheses"],
-        "predicted_placements_seen": state["predicted_placements_seen"],
-        "predicted_placements_unseen": state["predicted_placements_unseen"],
-        "unresolved_objects": state["unresolved_objects"],
+        "online_placements_seen": state["online_placements_seen"],
+                "unresolved_objects": state["unresolved_objects"],
         "qa_history_len": len(state["qa_history"]),
     }
 
@@ -102,14 +101,12 @@ def run_preference_summary_loop(
             qa_history=state["qa_history"],
         )
 
-        state = update_state_with_answer(
+        state = updater.update_state_from_preference_summary_answer(
             state=state,
-            question_pattern=intent.question_pattern,
-            target=intent.hypothesis,
+            hypothesis=intent.hypothesis,
+            covered_objects=list(intent.covered_objects),
             answer=oracle_response.answer,
             question=intent.question,
-            covered_objects=list(intent.covered_objects),
-            updater=updater,
         )
 
         print(f"=== Step {step_idx} ===")

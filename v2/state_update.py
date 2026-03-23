@@ -47,16 +47,14 @@ class ActionAnswerInterpretation(BaseModel):
 
 
 class PreferenceElicitingInterpretation(BaseModel):
-    update_type: Literal["confirmed_rule", "no_preference", "rule_with_exception"]
+    update_type: Literal["confirmed_rule", "reject_hypothesis", "rule_with_exception"]
     confirmed_preference: Optional[PreferenceRecordModel] = None
     exception_actions: List[ObjectPlacementModel] = Field(default_factory=list)
     rejected_hypotheses: List[str] = Field(default_factory=list)
 
 
 class PreferenceSummaryInterpretation(BaseModel):
-    update_types: List[Literal["confirmed_rule", "reject_summary", "rule_with_exception"]] = Field(
-        default_factory=list
-    )
+    update_type: Literal["confirmed_rule", "reject_summary", "rule_with_exception"]
     confirmed_preference: Optional[PreferenceRecordModel] = None
     exception_actions: List[ObjectPlacementModel] = Field(default_factory=list)
     rejected_hypotheses: List[str] = Field(default_factory=list)
@@ -76,7 +74,7 @@ class StateUpdate:
         self.model: Any = ChatOllama(
             model=model,
             base_url=base_url,
-            temperature=temperature,
+            temperature=temperature
         )
         self.action_model = self.model.with_structured_output(ActionAnswerInterpretation)
         self.preference_eliciting_model = self.model.with_structured_output(PreferenceElicitingInterpretation)
@@ -170,8 +168,8 @@ You interpret a preference-eliciting answer for a household rearrangement agent.
 Return exactly one update type:
 - confirmed_rule:
   the answer gives a stable rule
-- no_preference:
-  the answer says there is no special preference for this hypothesis
+- reject_hypothesis:
+  the answer rejects the current hypothesis
 - rule_with_exception:
   the answer gives a stable rule plus one or more object-level exceptions
 
@@ -182,8 +180,9 @@ Rules:
 - confirmed_preference.covered_objects must be a subset of the current intent_covered_objects that is explicitly supported by the answer
 - only use the full current intent_covered_objects when the answer clearly supports the whole set
 - make the hypothesis concrete enough to be useful for placement, not just an abstract restatement of the target hypothesis
-- if there is no preference, add the target hypothesis or a short equivalent text to rejected_hypotheses
-- rejected_hypotheses must be empty unless update_type = "no_preference"
+- if the answer clearly gives one shared receptacle that applies to the supported covered_objects, prefer setting confirmed_preference.target_receptacle to that receptacle
+- if the hypothesis is rejected, add the target hypothesis or a short equivalent text to rejected_hypotheses
+- rejected_hypotheses should normally be non-empty when update_type = "reject_hypothesis"
 - if there is an exception object with a clear placement, add it to exception_actions
 - be conservative
 """.strip()
@@ -224,6 +223,7 @@ Current confirmed_preferences:
 
 Current rejected_hypotheses:
 {state["rejected_hypotheses"]}
+
 """.strip()
 
         return self.preference_eliciting_model.invoke(
@@ -245,18 +245,13 @@ Current rejected_hypotheses:
         system_prompt = """
 You interpret a preference-summary answer for a household rearrangement agent.
 
-Return zero or more update types:
+Return exactly one update type:
 - confirmed_rule:
   the answer confirms the summary rule, possibly with refinement
 - reject_summary:
   the answer rejects the current summary hypothesis
 - rule_with_exception:
   the answer confirms a rule and also gives one or more object-level exceptions
-
-You may return multiple update types when the answer does multiple things.
-Example:
-- reject the current summary but provide a better rule
-- confirm a rule and also give object-level exceptions
 
 Rules:
 - use only exact receptacle names from the provided receptacles
@@ -266,7 +261,8 @@ Rules:
 - only use the full current intent_covered_objects when the answer clearly supports the whole set
 - make the hypothesis concrete enough to be useful for placement
 - if the summary is rejected, add the target hypothesis or a short equivalent text to rejected_hypotheses
-- rejected_hypotheses should normally be non-empty when update_types includes "reject_summary"
+- rejected_hypotheses should normally be non-empty when update_type = "reject_summary"
+- if the user rejects the current summary but provides a better stable rule, prefer returning confirmed_rule or rule_with_exception instead of reject_summary
 - if there is an exception object with a clear placement, add it to exception_actions
 - be conservative
 """.strip()
@@ -316,7 +312,7 @@ Current rejected_hypotheses:
             ]
         )
 
-    def update_from_preference_summary_answer(
+    def apply_preference_summary_interpretation(
         self,
         *,
         state: AgentState,
@@ -333,16 +329,15 @@ Current rejected_hypotheses:
             answer=answer,
             question=question,
         )
+        _remove_preference_candidate(state, hypothesis)
 
-        update_types = _dedupe_keep_order(list(interpretation.update_types))
-
-        if "reject_summary" in update_types:
-            _remove_preference_candidate(state, hypothesis)
+        if interpretation.update_type == "reject_summary":
             rejected = interpretation.rejected_hypotheses or [hypothesis]
             state["rejected_hypotheses"] = _dedupe_keep_order([*state["rejected_hypotheses"], *rejected])
+            return recompute_online_placements(state)
 
+        normalized = None
         if interpretation.confirmed_preference is not None:
-            _remove_preference_candidate(state, hypothesis)
             normalized = _normalize_confirmed_preference(
                 preference=interpretation.confirmed_preference,
                 seen_objects=state["seen_objects"],
@@ -350,6 +345,113 @@ Current rejected_hypotheses:
                 default_source="confirmed",
                 fallback_covered_objects=covered_objects,
             )
+
+        if interpretation.update_type == "confirmed_rule":
+            if normalized is not None:
+                _upsert_confirmed_preference(state, normalized)
+            return recompute_online_placements(state)
+
+        if interpretation.update_type == "rule_with_exception":
+            if normalized is not None:
+                normalized["exceptions"] = _dedupe_keep_order(
+                    [
+                        *normalized.get("exceptions", []),
+                        *[item.object_name for item in interpretation.exception_actions],
+                    ]
+                )
+                _upsert_confirmed_preference(state, normalized)
+            _apply_confirmed_actions(state=state, placements=interpretation.exception_actions)
+            return recompute_online_placements(state)
+
+        raise ValueError(f"Unsupported preference summary update_type: {interpretation.update_type}")
+
+    def apply_action_interpretation(
+        self,
+        *,
+        state: AgentState,
+        target: str,
+        answer: str,
+        interpretation: ActionAnswerInterpretation,
+        question: Optional[str] = None,
+        action_mode: Optional[str] = None,
+    ) -> AgentState:
+        _append_qa_history(
+            state=state,
+            question_pattern="action_oriented",
+            target=target,
+            answer=answer,
+            question=question,
+            action_mode=action_mode,
+        )
+
+        allowed_receptacles = set(state["receptacles"])
+        if interpretation.update_type == "direct_place":
+            receptacle = interpretation.confirmed_action_receptacle
+            if receptacle in allowed_receptacles:
+                state["confirmed_actions"][target] = receptacle
+
+        elif interpretation.update_type == "exclude_receptacle":
+            excluded = [r for r in interpretation.excluded_receptacles if r in allowed_receptacles]
+            if excluded:
+                existing = state["excluded_receptacles"].get(target, [])
+                state["excluded_receptacles"][target] = _dedupe_keep_order([*existing, *excluded])
+
+        elif interpretation.update_type == "general_rule" and interpretation.confirmed_preference is not None:
+            normalized = _normalize_confirmed_preference(
+                preference=interpretation.confirmed_preference,
+                seen_objects=state["seen_objects"],
+                receptacles=state["receptacles"],
+                default_source="confirmed",
+            )
+            if normalized is not None:
+                _upsert_confirmed_preference(state, normalized)
+
+        _apply_confirmed_actions(state=state, placements=interpretation.confirmed_actions)
+
+        return recompute_online_placements(state)
+
+    def apply_preference_eliciting_interpretation(
+        self,
+        *,
+        state: AgentState,
+        hypothesis: str,
+        covered_objects: List[str],
+        answer: str,
+        interpretation: PreferenceElicitingInterpretation,
+        question: Optional[str] = None,
+    ) -> AgentState:
+        _append_qa_history(
+            state=state,
+            question_pattern="preference_eliciting",
+            target=hypothesis,
+            answer=answer,
+            question=question,
+        )
+        state["open_preference_hypotheses"] = [
+            item for item in state["open_preference_hypotheses"] if _norm(item) != _norm(hypothesis)
+        ]
+
+        if interpretation.update_type == "reject_hypothesis":
+            rejected = interpretation.rejected_hypotheses or [hypothesis]
+            state["rejected_hypotheses"] = _dedupe_keep_order([*state["rejected_hypotheses"], *rejected])
+            return recompute_online_placements(state)
+
+        normalized = None
+        if interpretation.confirmed_preference is not None:
+            normalized = _normalize_confirmed_preference(
+                preference=interpretation.confirmed_preference,
+                seen_objects=state["seen_objects"],
+                receptacles=state["receptacles"],
+                default_source="elicited",
+                fallback_covered_objects=covered_objects,
+            )
+
+        if interpretation.update_type == "confirmed_rule":
+            if normalized is not None:
+                _upsert_confirmed_preference(state, normalized)
+            return recompute_online_placements(state)
+
+        if interpretation.update_type == "rule_with_exception":
             if normalized is not None:
                 if interpretation.exception_actions:
                     normalized["exceptions"] = _dedupe_keep_order(
@@ -359,10 +461,87 @@ Current rejected_hypotheses:
                         ]
                     )
                 _upsert_confirmed_preference(state, normalized)
+            _apply_confirmed_actions(state=state, placements=interpretation.exception_actions)
+            return recompute_online_placements(state)
 
-        _apply_confirmed_actions(state=state, placements=interpretation.exception_actions)
+        raise ValueError(f"Unsupported preference eliciting update_type: {interpretation.update_type}")
 
-        return recompute_predictions(state)
+    def update_state_from_action_answer(
+        self,
+        *,
+        state: AgentState,
+        target: str,
+        answer: str,
+        question: Optional[str] = None,
+        action_mode: Optional[str] = None,
+    ) -> AgentState:
+        interpretation = self.interpret_action_answer(
+            state=state,
+            target=target,
+            answer=answer,
+            question=question,
+            action_mode=action_mode,
+        )
+        return self.apply_action_interpretation(
+            state=state,
+            target=target,
+            answer=answer,
+            interpretation=interpretation,
+            question=question,
+            action_mode=action_mode,
+        )
+
+    def update_state_from_preference_eliciting_answer(
+        self,
+        *,
+        state: AgentState,
+        hypothesis: str,
+        covered_objects: Optional[List[str]],
+        answer: str,
+        question: Optional[str] = None,
+    ) -> AgentState:
+        interpretation = self.interpret_preference_eliciting_answer(
+            state=state,
+            hypothesis=hypothesis,
+            covered_objects=covered_objects or [],
+            answer=answer,
+            question=question,
+        )
+        state = self.apply_preference_eliciting_interpretation(
+            state=state,
+            hypothesis=hypothesis,
+            covered_objects=covered_objects or [],
+            answer=answer,
+            interpretation=interpretation,
+            question=question,
+        )
+        self.update_open_preference_hypotheses(state=state)
+        return state
+
+    def update_state_from_preference_summary_answer(
+        self,
+        *,
+        state: AgentState,
+        hypothesis: str,
+        covered_objects: Optional[List[str]],
+        answer: str,
+        question: Optional[str] = None,
+    ) -> AgentState:
+        interpretation = self.interpret_preference_summary_answer(
+            state=state,
+            hypothesis=hypothesis,
+            covered_objects=covered_objects or [],
+            answer=answer,
+            question=question,
+        )
+        return self.apply_preference_summary_interpretation(
+            state=state,
+            hypothesis=hypothesis,
+            covered_objects=covered_objects or [],
+            answer=answer,
+            interpretation=interpretation,
+            question=question,
+        )
 
     def update_open_preference_hypotheses(
         self,
@@ -373,29 +552,20 @@ Current rejected_hypotheses:
 You update open preference hypotheses for a household rearrangement agent.
 
 Your job:
-- infer which high-level preference dimensions are still worth asking directly
-- focus on unresolved objects and remaining uncertainty
+Infer the small set of remaining preference hypotheses that are still worth asking.
 
-Prioritize:
-- unresolved_objects
-- confirmed_preferences
+Prefer hypotheses that:
+- could affect multiple unresolved objects
+- could change likely placement regions or receptacles
+- are not already resolved by confirmed_preferences or confirmed_actions
 
-You may also use:
-- room
-- receptacles
-- seen_objects
-- confirmed_actions
-- rejected_hypotheses
+Avoid hypotheses that are:
+- too vague to affect placement decisions
+- redundant with confirmed or rejected preferences
+- only relevant to one unresolved object unless no broader hypothesis remains
 
-Important:
-- return high-level preference dimensions, not object names, not receptacle names, and not full placement rules
-
-Rules:
-- return short high-level hypothesis texts only
-- prefer hypotheses that could still change placement decisions for unresolved objects
-- do not repeat hypotheses already settled by confirmed_preferences
-- do not repeat rejected_hypotheses
-- return a small conservative list
+Return only short high-level preference hypotheses.
+Return only hypotheses that would still justify spending a future question.
 """.strip()
 
         user_prompt = f"""
@@ -419,6 +589,8 @@ Confirmed preferences:
 
 Rejected hypotheses:
 {state["rejected_hypotheses"]}
+
+Generate only hypotheses that would still be worth spending a future question on.
 """.strip()
 
         try:
@@ -433,6 +605,7 @@ Rejected hypotheses:
             raw_hypotheses = []
 
         rejected = {_norm(item) for item in state["rejected_hypotheses"] if item.strip()}
+        confirmed = {_norm(item.get("hypothesis", "")) for item in state["confirmed_preferences"] if item.get("hypothesis", "").strip()}
         seen_objects_norm = {_norm(item) for item in state["seen_objects"] if item.strip()}
         receptacles_norm = {_norm(item) for item in state["receptacles"] if item.strip()}
         deduped: List[str] = []
@@ -441,7 +614,7 @@ Rejected hypotheses:
             normalized = _norm(item)
             if not normalized:
                 continue
-            if normalized in seen or normalized in rejected:
+            if normalized in seen or normalized in rejected or normalized in confirmed:
                 continue
             if normalized in seen_objects_norm or normalized in receptacles_norm:
                 continue
@@ -540,7 +713,7 @@ def _normalize_confirmed_preference(
 
     return PreferenceRecord(
         hypothesis=hypothesis,
-        source=preference.source if preference.source in ("elicited", "confirmed") else default_source,
+        source=default_source,
         covered_objects=covered_objects,
         target_receptacle=target_receptacle,
         exceptions=exceptions,
@@ -559,200 +732,11 @@ def _apply_confirmed_actions(
             state["confirmed_actions"][item.object_name] = item.receptacle
 
 
-def update_from_action_answer(
-    *,
-    state: AgentState,
-    target: str,
-    answer: str,
-    interpretation: ActionAnswerInterpretation,
-    question: Optional[str] = None,
-    action_mode: Optional[str] = None,
-) -> AgentState:
-    _append_qa_history(
-        state=state,
-        question_pattern="action_oriented",
-        target=target,
-        answer=answer,
-        question=question,
-        action_mode=action_mode,
-    )
-
-    allowed_receptacles = set(state["receptacles"])
-    if interpretation.update_type == "direct_place":
-        receptacle = interpretation.confirmed_action_receptacle
-        if receptacle in allowed_receptacles:
-            state["confirmed_actions"][target] = receptacle
-
-    elif interpretation.update_type == "exclude_receptacle":
-        excluded = [r for r in interpretation.excluded_receptacles if r in allowed_receptacles]
-        if excluded:
-            existing = state["excluded_receptacles"].get(target, [])
-            state["excluded_receptacles"][target] = _dedupe_keep_order([*existing, *excluded])
-            remaining = [r for r in state["receptacles"] if r not in state["excluded_receptacles"][target]]
-            if len(remaining) == 1:
-                state["confirmed_actions"][target] = remaining[0]
-
-    elif interpretation.update_type == "general_rule" and interpretation.confirmed_preference is not None:
-        normalized = _normalize_confirmed_preference(
-            preference=interpretation.confirmed_preference,
-            seen_objects=state["seen_objects"],
-            receptacles=state["receptacles"],
-            default_source="confirmed",
-        )
-        if normalized is not None:
-            _upsert_confirmed_preference(state, normalized)
-
-    _apply_confirmed_actions(state=state, placements=interpretation.confirmed_actions)
-
-    return recompute_predictions(state)
 
 
-def update_from_preference_eliciting_answer(
-    *,
-    state: AgentState,
-    hypothesis: str,
-    covered_objects: List[str],
-    answer: str,
-    interpretation: PreferenceElicitingInterpretation,
-    question: Optional[str] = None,
-) -> AgentState:
-    _append_qa_history(
-        state=state,
-        question_pattern="preference_eliciting",
-        target=hypothesis,
-        answer=answer,
-        question=question,
-    )
-
-    if interpretation.update_type in ("confirmed_rule", "no_preference", "rule_with_exception"):
-        state["open_preference_hypotheses"] = [
-            item for item in state["open_preference_hypotheses"] if _norm(item) != _norm(hypothesis)
-        ]
-
-    if interpretation.update_type == "no_preference":
-        rejected = interpretation.rejected_hypotheses or [hypothesis]
-        state["rejected_hypotheses"] = _dedupe_keep_order([*state["rejected_hypotheses"], *rejected])
-        return recompute_predictions(state)
-
-    if interpretation.confirmed_preference is not None:
-        normalized = _normalize_confirmed_preference(
-            preference=interpretation.confirmed_preference,
-            seen_objects=state["seen_objects"],
-            receptacles=state["receptacles"],
-            default_source="elicited",
-            fallback_covered_objects=covered_objects,
-        )
-        if normalized is not None:
-            if interpretation.exception_actions:
-                normalized["exceptions"] = _dedupe_keep_order(
-                    [
-                        *normalized.get("exceptions", []),
-                        *[item.object_name for item in interpretation.exception_actions],
-                    ]
-                )
-            _upsert_confirmed_preference(state, normalized)
-
-    _apply_confirmed_actions(state=state, placements=interpretation.exception_actions)
-
-    if interpretation.update_type == "no_preference" and interpretation.rejected_hypotheses:
-        state["rejected_hypotheses"] = _dedupe_keep_order(
-            [*state["rejected_hypotheses"], *interpretation.rejected_hypotheses]
-        )
-
-    return recompute_predictions(state)
-
-
-def update_state_with_answer(
-    *,
-    state: AgentState,
-    question_pattern: QuestionPattern,
-    target: str,
-    answer: str,
-    updater: StateUpdate,
-    question: Optional[str] = None,
-    action_mode: Optional[str] = None,
-    covered_objects: Optional[List[str]] = None,
-) -> AgentState:
-    if question_pattern == "action_oriented":
-        interpretation = updater.interpret_action_answer(
-            state=state,
-            target=target,
-            answer=answer,
-            question=question,
-            action_mode=action_mode,
-        )
-        state = update_from_action_answer(
-            state=state,
-            target=target,
-            answer=answer,
-            interpretation=interpretation,
-            question=question,
-            action_mode=action_mode,
-        )
-        return state
-
-    if question_pattern == "preference_eliciting":
-        print(f"[eliciting] interpreting answer for hypothesis: {target}")
-        interpretation = updater.interpret_preference_eliciting_answer(
-            state=state,
-            hypothesis=target,
-            covered_objects=covered_objects or [],
-            answer=answer,
-            question=question,
-        )
-        print(f"[eliciting] interpretation finished: {interpretation.update_type}")
-        state = update_from_preference_eliciting_answer(
-            state=state,
-            hypothesis=target,
-            covered_objects=covered_objects or [],
-            answer=answer,
-            interpretation=interpretation,
-            question=question,
-        )
-        print("[eliciting] state write finished; refreshing open preference hypotheses...")
-        # Only elicitation updates should refresh open elicitation hypotheses.
-        updater.update_open_preference_hypotheses(state=state)
-        print("[eliciting] open preference hypotheses refresh finished")
-        return state
-
-    if question_pattern == "preference_summary":
-        interpretation = updater.interpret_preference_summary_answer(
-            state=state,
-            hypothesis=target,
-            covered_objects=covered_objects or [],
-            answer=answer,
-            question=question,
-        )
-        state = updater.update_from_preference_summary_answer(
-            state=state,
-            hypothesis=target,
-            covered_objects=covered_objects or [],
-            answer=answer,
-            interpretation=interpretation,
-            question=question,
-        )
-        return state
-
-    raise NotImplementedError(
-        "This minimal state_update version currently supports action_oriented, preference_eliciting, and preference_summary only."
-    )
-
-
-def update_open_preference_hypotheses(
-    *,
-    state: AgentState,
-    updater: StateUpdate,
-) -> AgentState:
-    updater.update_open_preference_hypotheses(state=state)
-    return state
-
-
-def recompute_predictions(state: AgentState) -> AgentState:
-    predicted_seen = dict(state["confirmed_actions"])
+def recompute_online_placements(state: AgentState) -> AgentState:
+    online_seen = dict(state["confirmed_actions"])
     # At this stage we only ground placements for seen objects.
-    # Keep unseen predictions empty until a later evaluation phase.
-    predicted_unseen = {}
-
     for preference in state["confirmed_preferences"]:
         receptacle = preference.get("target_receptacle")
         if not receptacle:
@@ -760,16 +744,15 @@ def recompute_predictions(state: AgentState) -> AgentState:
 
         exceptions = set(preference.get("exceptions", []))
         for obj in preference.get("covered_objects", []):
-            if obj in state["seen_objects"] and obj not in predicted_seen and obj not in exceptions:
-                predicted_seen[obj] = receptacle
+            if obj in state["seen_objects"] and obj not in online_seen and obj not in exceptions:
+                online_seen[obj] = receptacle
 
     for obj, excluded in state["excluded_receptacles"].items():
-        if predicted_seen.get(obj) in excluded:
-            predicted_seen.pop(obj, None)
+        if online_seen.get(obj) in excluded:
+            online_seen.pop(obj, None)
 
-    state["predicted_placements_seen"] = predicted_seen
-    state["predicted_placements_unseen"] = predicted_unseen
+    state["online_placements_seen"] = online_seen
     state["unresolved_objects"] = [
-        obj for obj in state["seen_objects"] if obj not in state["confirmed_actions"] and obj not in predicted_seen
+        obj for obj in state["seen_objects"] if obj not in state["confirmed_actions"] and obj not in online_seen
     ]
     return state

@@ -20,7 +20,7 @@ try:
     )
     from v2.data import get_episode
     from v2.state_init import build_initial_state
-    from v2.state_update import StateUpdate, update_open_preference_hypotheses
+    from v2.state_update import StateUpdate
 except ModuleNotFoundError:
     from agent_schema import (
         ActionIntent,
@@ -33,7 +33,7 @@ except ModuleNotFoundError:
     )
     from data import get_episode
     from state_init import build_initial_state
-    from state_update import StateUpdate, update_open_preference_hypotheses
+    from state_update import StateUpdate
 
 
 QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
@@ -126,7 +126,7 @@ class PreferenceElicitingProposer:
         self.model: Any = ChatOllama(
             model=model,
             base_url=base_url,
-            temperature=temperature,
+            temperature=temperature
         )
         self.structured_model = self.model.with_structured_output(
             PreferenceElicitingIntentBatch
@@ -137,33 +137,32 @@ class PreferenceElicitingProposer:
         *,
         state: AgentState,
         max_intents: int = 4,
+        guidance: str = "",
     ) -> List[PreferenceElicitingIntent]:
         system_prompt = f"""
-You are a proposer for Preference-eliciting questions in a household rearrangement task.
+You are a proposer for preference-eliciting questions in a household rearrangement task.
 
 Your job:
-Given the visible scene and current state, propose a small number of high-level
-preference hypotheses that are worth asking the user directly.
+Propose a small number of high-value preference questions that are worth spending budget on.
 
-Important:
-- This is an empirical pattern called "preference_eliciting".
-- Do NOT output action-oriented questions.
-- Do NOT output preference-summary questions.
-- Be conservative.
+Choose questions whose answers are most likely to:
+- clarify placements for multiple unresolved objects
+- reveal a stable placement rule or strong storage preference
+- reduce uncertainty not already explained by confirmed_preferences
+
+Avoid questions that:
+- only affect one unresolved object unless no broader question remains
+- restate an already confirmed preference
+- ask directly for a specific object placement
+
+Rules:
+- This pattern is always "preference_eliciting".
+- Do not output action-oriented questions.
+- Do not output preference-summary questions.
 - Return at most {max_intents} intents.
 - Each intent must already include a natural user-facing question.
 - Use only exact seen object names in covered_objects.
-
-You may use:
-- room
-- receptacles
-- seen_objects
-- open_preference_hypotheses
-- already confirmed preferences
-
-You must not use:
-- unseen_objects
-- hidden information
+- Ask about high-level preferences, not a direct final placement.
 """.strip()
 
         user_prompt = f"""
@@ -182,14 +181,15 @@ Open preference hypotheses:
 Confirmed preferences:
 {state["confirmed_preferences"]}
 
-Return a small list of Preference-eliciting intents.
+Guidance:
+{guidance}
 
-Use the current open_preference_hypotheses as the primary source of candidate hypotheses.
-If that list is non-empty, prefer proposing only from that list unless a listed hypothesis is clearly no longer useful.
+Choose the most useful unresolved preference question, not just a plausible one.
+Use open_preference_hypotheses as candidate directions, but prioritize the one with the highest expected impact on unresolved objects.
 
-Each intent must:
+Each intent must include:
 - question_pattern = "preference_eliciting"
-- hypothesis = a concise missing high-level preference hypothesis
+- hypothesis = a concise high-level preference hypothesis
 - covered_objects = exact seen objects related to that hypothesis
 - priority = 0.0 to 1.0
 - question = one concise natural question directly asking that preference
@@ -281,7 +281,7 @@ class ActionProposer:
         self.model: Any = ChatOllama(
             model=model,
             base_url=base_url,
-            temperature=temperature,
+            temperature=temperature
         )
         self.structured_model = self.model.with_structured_output(ActionIntent)
 
@@ -289,6 +289,7 @@ class ActionProposer:
         self,
         *,
         state: AgentState,
+        guidance: str = "",
     ) -> Optional[ActionIntent]:
         if not state["unresolved_objects"]:
             return None
@@ -315,7 +316,10 @@ Rules:
 - The output must already include a natural user-facing question.
 - Be conservative and stable.
 - Prefer boundary_probe only when there is a plausible confirmed preference whose boundary can be tested with the object.
+- Use the guidance as a soft instruction for whether this turn should probe a boundary, clean up a concrete placement, or collect evidence that could support a future summary.
 """.strip()
+
+        recent_qa_history = state["qa_history"][-3:]
 
         user_prompt = f"""
 Unresolved seen objects:
@@ -330,8 +334,11 @@ Preference candidates:
 Confirmed preferences:
 {state["confirmed_preferences"]}
 
-QA history:
-{state["qa_history"]}
+Guidance:
+{guidance}
+
+Recent QA history:
+{recent_qa_history}
 
 Return exactly one ActionIntent:
 - question_pattern = "action_oriented"
@@ -402,7 +409,7 @@ class PreferenceSummaryProposer:
         self.model: Any = ChatOllama(
             model=model,
             base_url=base_url,
-            temperature=temperature,
+            temperature=temperature
         )
         self.structured_model = self.model.with_structured_output(
             PreferenceSummaryIntentBatch
@@ -413,6 +420,7 @@ class PreferenceSummaryProposer:
         *,
         state: AgentState,
         max_intents: int = 3,
+        guidance: str = "",
     ) -> List[PreferenceSummaryIntent]:
 
         system_prompt = f"""
@@ -431,6 +439,7 @@ Important:
 - Do not repeat an already existing candidate, confirmed preference, or rejected hypothesis.
 - Each intent must already include a natural user-facing summary question.
 - Use only exact seen object names in covered_objects.
+- Use the guidance as a soft instruction about what kind of summary is most useful to confirm next.
 """.strip()
 
         user_prompt = f"""
@@ -451,6 +460,9 @@ Confirmed preferences:
 
 Rejected hypotheses:
 {state["rejected_hypotheses"]}
+
+Guidance:
+{guidance}
 
 Return a small list of Preference-summary intents.
 
@@ -619,10 +631,8 @@ def main() -> None:
         strategy=args.strategy,  # type: ignore[arg-type]
         budget_total=args.budget,
     )
-    state = update_open_preference_hypotheses(
-        state=state,
-        updater=StateUpdate(model=args.model, base_url=args.base_url, temperature=0.0),
-    )
+    updater = StateUpdate(model=args.model, base_url=args.base_url, temperature=0.0)
+    updater.update_open_preference_hypotheses(state=state)
 
     print("=== Current State ===")
     print(json.dumps(state, indent=2, ensure_ascii=False))

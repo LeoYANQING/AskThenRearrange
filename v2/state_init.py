@@ -53,9 +53,8 @@ def build_initial_state(
         # object solving state
         "unresolved_objects": list(episode.seen_objects),
 
-        # outputs
-        "predicted_placements_seen": {},
-        "predicted_placements_unseen": {},
+        # online derived placements
+        "online_placements_seen": {},
     }
 
     return state

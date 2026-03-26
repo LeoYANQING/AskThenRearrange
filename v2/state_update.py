@@ -247,11 +247,11 @@ You interpret a preference-summary answer for a household rearrangement agent.
 
 Return exactly one update type:
 - confirmed_rule:
-  the answer confirms the summary rule, possibly with refinement
+  the answer confirms or refines a summary rule that is useful for future placement decisions
 - reject_summary:
   the answer rejects the current summary hypothesis
 - rule_with_exception:
-  the answer confirms a rule and also gives one or more object-level exceptions
+  the answer confirms a useful rule and also gives one or more object-level exceptions
 
 Rules:
 - use only exact receptacle names from the provided receptacles
@@ -259,7 +259,7 @@ Rules:
 - if the answer confirms or refines a stable rule, put it in confirmed_preference with source = "confirmed"
 - confirmed_preference.covered_objects must be a subset of the current intent_covered_objects that is explicitly supported by the answer
 - only use the full current intent_covered_objects when the answer clearly supports the whole set
-- make the hypothesis concrete enough to be useful for placement
+- make the confirmed_preference concrete enough to guide future placements, not just restate the summary vaguely
 - if the summary is rejected, add the target hypothesis or a short equivalent text to rejected_hypotheses
 - rejected_hypotheses should normally be non-empty when update_type = "reject_summary"
 - if the user rejects the current summary but provides a better stable rule, prefer returning confirmed_rule or rule_with_exception instead of reject_summary

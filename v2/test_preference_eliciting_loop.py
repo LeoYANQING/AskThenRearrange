@@ -186,7 +186,7 @@ def main() -> None:
     parser.add_argument("--base-url", type=str, default=OLLAMA_BASE_URL)
     parser.add_argument("--plot-curve", action="store_true", default=True)
     parser.add_argument("--curve-output", type=str, default="")
-    parser.add_argument("--budget-list", type=str, default="1,2,3,4,5")
+    parser.add_argument("--budget-list", type=str, default="5")
     args = parser.parse_args()
 
     episode = get_episode(Path(args.data), args.index)

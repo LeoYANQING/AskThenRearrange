@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
+import time
 from pathlib import Path
 from typing import Any, Dict, List
 
 try:
     from v2.agent_schema import AgentState
     from v2.data import DEFAULT_DATA_PATH, Episode, get_episode
-    from v2.evaluation import FinalPlacementPlanner, evaluate_episode_state, plot_accuracy_curve
+    from v2.evaluation import FinalPlacementPlanner, evaluate_episode_state, plot_ablation_comparison, plot_accuracy_curve
     from v2.oracle import NaturalUserOracle
     from v2.proposers import ActionProposer, PreferenceElicitingProposer, PreferenceSummaryProposer
     from v2.question_policy import PolicyMode, QuestionDecision, QuestionPolicyController
@@ -18,7 +20,7 @@ try:
 except ModuleNotFoundError:
     from agent_schema import AgentState
     from data import DEFAULT_DATA_PATH, Episode, get_episode
-    from evaluation import FinalPlacementPlanner, evaluate_episode_state, plot_accuracy_curve
+    from evaluation import FinalPlacementPlanner, evaluate_episode_state, plot_ablation_comparison, plot_accuracy_curve
     from oracle import NaturalUserOracle
     from proposers import ActionProposer, PreferenceElicitingProposer, PreferenceSummaryProposer
     from question_policy import PolicyMode, QuestionDecision, QuestionPolicyController
@@ -26,8 +28,16 @@ except ModuleNotFoundError:
     from state_update import StateUpdate
 
 
-QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:14b")
+QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
+
+
+POLICY_LABELS = {
+    "direct_querying": "Direct Querying",
+    "user_preference_first": "User-Preference-First",
+    "parallel_exploration": "Parallel Exploration",
+    "hybrid_all": "Hybrid-All",
+}
 
 
 def _state_snapshot(state: AgentState) -> Dict[str, Any]:
@@ -45,6 +55,12 @@ def _state_snapshot(state: AgentState) -> Dict[str, Any]:
     }
 
 
+def _select_sample_indices(*, num_samples: int) -> List[int]:
+    if num_samples <= 0:
+        raise ValueError(f"num_samples must be positive, got {num_samples}")
+    return list(range(num_samples))
+
+
 def _parse_budget_list(value: str) -> List[int]:
     budgets: List[int] = []
     for item in value.split(","):
@@ -59,6 +75,12 @@ def _parse_budget_list(value: str) -> List[int]:
         raise ValueError("budget list must not be empty")
     return budgets
 
+
+
+def _append_jsonl(path: Path, payload: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(payload, ensure_ascii=False) + "\n")
 
 def _propose_intent(
     *,
@@ -267,10 +289,130 @@ def run_policy_episode(
     return final_state, evaluation
 
 
+
+def run_ablation_experiment(
+    *,
+    data_path: Path,
+    sample_indices: List[int],
+    budgets: List[int],
+    proposer_model: str,
+    oracle_model: str,
+    updater_model: str,
+    evaluation_model: str,
+    base_url: str,
+    log_path: Path | None = None,
+) -> Dict[str, List[Dict[str, Any]]]:
+    modes: List[PolicyMode] = [
+        "direct_querying",
+        "user_preference_first",
+        "parallel_exploration",
+        "hybrid_all",
+    ]
+    curves_by_mode: Dict[str, List[Dict[str, Any]]] = {}
+
+    experiment_started_at = time.perf_counter()
+
+    if log_path is not None:
+        _append_jsonl(
+            log_path,
+            {
+                "event": "ablation_started",
+                "sample_indices": sample_indices,
+                "budgets": budgets,
+                "modes": modes,
+            },
+        )
+
+    for mode in modes:
+        mode_points: List[Dict[str, Any]] = []
+        for budget in budgets:
+            seen_scores: List[float] = []
+            unseen_scores: List[float] = []
+            episode_durations_sec: List[float] = []
+            for index in sample_indices:
+                episode = get_episode(data_path, index)
+                started_at = time.perf_counter()
+                _, evaluation = run_policy_episode(
+                    episode=episode,
+                    budget=budget,
+                    mode=mode,
+                    proposer_model=proposer_model,
+                    oracle_model=oracle_model,
+                    updater_model=updater_model,
+                    evaluation_model=evaluation_model,
+                    base_url=base_url,
+                    verbose=False,
+                )
+                elapsed_sec = time.perf_counter() - started_at
+                episode_durations_sec.append(elapsed_sec)
+                seen_scores.append(float(evaluation["seen_accuracy"]))
+                unseen_scores.append(float(evaluation["unseen_accuracy"]))
+
+                if log_path is not None:
+                    _append_jsonl(
+                        log_path,
+                        {
+                            "event": "episode_finished",
+                            "mode": mode,
+                            "budget": budget,
+                            "episode_index": index,
+                            "episode_id": episode.episode_id,
+                            "elapsed_sec": elapsed_sec,
+                            "seen_accuracy": float(evaluation["seen_accuracy"]),
+                            "unseen_accuracy": float(evaluation["unseen_accuracy"]),
+                        },
+                    )
+
+            seen_mean = sum(seen_scores) / len(seen_scores)
+            unseen_mean = sum(unseen_scores) / len(unseen_scores)
+            if len(seen_scores) > 1:
+                seen_var = sum((value - seen_mean) ** 2 for value in seen_scores) / (len(seen_scores) - 1)
+                unseen_var = sum((value - unseen_mean) ** 2 for value in unseen_scores) / (len(unseen_scores) - 1)
+                seen_stderr = math.sqrt(seen_var) / math.sqrt(len(seen_scores))
+                unseen_stderr = math.sqrt(unseen_var) / math.sqrt(len(unseen_scores))
+            else:
+                seen_stderr = 0.0
+                unseen_stderr = 0.0
+
+            mean_episode_sec = sum(episode_durations_sec) / len(episode_durations_sec)
+
+            point = {
+                "budget": budget,
+                "seen_accuracy": seen_mean,
+                "unseen_accuracy": unseen_mean,
+                "seen_stderr": seen_stderr,
+                "unseen_stderr": unseen_stderr,
+                "num_episodes": len(sample_indices),
+                "mean_episode_sec": mean_episode_sec,
+            }
+            mode_points.append(point)
+
+            if log_path is not None:
+                _append_jsonl(
+                    log_path,
+                    {
+                        "event": "budget_aggregated",
+                        "mode": mode,
+                        **point,
+                    },
+                )
+        curves_by_mode[mode] = mode_points
+
+    if log_path is not None:
+        _append_jsonl(
+            log_path,
+            {
+                "event": "ablation_finished",
+                "total_elapsed_sec": time.perf_counter() - experiment_started_at,
+            },
+        )
+
+    return curves_by_mode
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Policy-driven multi-pattern dialogue loop.")
     parser.add_argument("--data", type=str, default=str(DEFAULT_DATA_PATH))
-    parser.add_argument("--index", type=int, default=0)
+    parser.add_argument("--num-samples", type=int, default=1)
     parser.add_argument(
         "--mode",
         type=str,
@@ -283,42 +425,81 @@ def main() -> None:
     parser.add_argument("--evaluation-model", type=str, default=QUESTION_MODEL)
     parser.add_argument("--base-url", type=str, default=OLLAMA_BASE_URL)
     parser.add_argument("--plot-curve", action="store_true", default=False)
-    parser.add_argument("--curve-output", type=str, default="")
+    parser.add_argument("--plot-ablation", action="store_true", default=False)
+    parser.add_argument("--output", type=str, default="")
+    parser.add_argument("--ablation-log", type=str, default="")
     parser.add_argument("--budget-list", type=str, default="5")
     args = parser.parse_args()
 
-    episode = get_episode(Path(args.data), args.index)
+    data_path = Path(args.data)
+    sample_indices = _select_sample_indices(num_samples=args.num_samples)
+    episode = get_episode(data_path, sample_indices[0])
     budgets = _parse_budget_list(args.budget_list)
+
+    if args.plot_ablation:
+        sample_indices = _select_sample_indices(num_samples=args.num_samples)
+        output_path = args.output or f"v2/plots/policy_ablation_{len(sample_indices)}ep.png"
+        log_path = Path(args.ablation_log) if args.ablation_log else Path(output_path).with_suffix(".jsonl")
+        if log_path.exists():
+            log_path.unlink()
+        curves_by_mode = run_ablation_experiment(
+            data_path=data_path,
+            sample_indices=sample_indices,
+            budgets=budgets,
+            proposer_model=args.proposer_model,
+            oracle_model=args.oracle_model,
+            updater_model=args.updater_model,
+            evaluation_model=args.evaluation_model,
+            base_url=args.base_url,
+            log_path=log_path,
+        )
+        episode_word = "episode" if len(sample_indices) == 1 else "episodes"
+        saved_path = plot_ablation_comparison(
+            curves_by_mode,
+            output_path=output_path,
+            title=f"Policy Ablation Across Budgets ({len(sample_indices)} {episode_word})",
+            mode_labels=POLICY_LABELS,
+        )
+        print(json.dumps({"num_samples": len(sample_indices), "sample_indices": sample_indices, "curves_by_mode": curves_by_mode, "saved_plot": saved_path, "saved_log": str(log_path)}, indent=2, ensure_ascii=False))
+        return
 
     if args.plot_curve:
         curve_points: List[Dict[str, Any]] = []
         for budget in budgets:
-            _, evaluation = run_policy_episode(
-                episode=episode,
-                budget=budget,
-                mode=args.mode,
-                proposer_model=args.proposer_model,
-                oracle_model=args.oracle_model,
-                updater_model=args.updater_model,
-                evaluation_model=args.evaluation_model,
-                base_url=args.base_url,
-                verbose=False,
-            )
+            seen_scores: List[float] = []
+            unseen_scores: List[float] = []
+            for index in sample_indices:
+                sample_episode = get_episode(data_path, index)
+                _, evaluation = run_policy_episode(
+                    episode=sample_episode,
+                    budget=budget,
+                    mode=args.mode,
+                    proposer_model=args.proposer_model,
+                    oracle_model=args.oracle_model,
+                    updater_model=args.updater_model,
+                    evaluation_model=args.evaluation_model,
+                    base_url=args.base_url,
+                    verbose=False,
+                )
+                seen_scores.append(float(evaluation["seen_accuracy"]))
+                unseen_scores.append(float(evaluation["unseen_accuracy"]))
+
             curve_points.append(
                 {
                     "budget": budget,
-                    "seen_accuracy": evaluation["seen_accuracy"],
-                    "unseen_accuracy": evaluation["unseen_accuracy"],
+                    "seen_accuracy": sum(seen_scores) / len(seen_scores),
+                    "unseen_accuracy": sum(unseen_scores) / len(unseen_scores),
                 }
             )
 
-        output_path = args.curve_output or f"v2/plots/{args.mode}_policy_accuracy_curve.png"
+        output_path = args.output or f"v2/plots/{args.mode}_policy_accuracy_curve.png"
+        episode_word = "sample" if len(sample_indices) == 1 else "samples"
         saved_path = plot_accuracy_curve(
             curve_points,
             output_path=output_path,
-            title=f"{args.mode} Accuracy vs Budget ({episode.episode_id})",
+            title=f"{args.mode} Accuracy vs Budget ({len(sample_indices)} {episode_word})",
         )
-        print(json.dumps({"curve_points": curve_points, "saved_plot": saved_path}, indent=2, ensure_ascii=False))
+        print(json.dumps({"num_samples": len(sample_indices), "sample_indices": sample_indices, "curve_points": curve_points, "saved_plot": saved_path}, indent=2, ensure_ascii=False))
         return
 
     for budget in budgets:

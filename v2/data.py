@@ -8,7 +8,7 @@ from typing import Any, Dict, List
 
 
 PlacementMap = Dict[str, str]
-DEFAULT_DATA_PATH = Path(__file__).resolve().parent / "data" / "scenarios_aug_tiny.json"
+DEFAULT_DATA_PATH = Path(__file__).resolve().parent / "data" / "scenarios_aug_revised.json"
 
 
 @dataclass

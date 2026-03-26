@@ -314,6 +314,9 @@ Rules:
 - The chosen object must be an exact unresolved seen object.
 - Do not choose an already confirmed object.
 - The output must already include a natural user-facing question.
+- The question must explicitly ask about the placement or boundary status of the chosen object.
+- The question must mention the chosen object by name.
+- Do not ask about purchasing, planning, unrelated tasks, or any object other than the chosen object.
 - Be conservative and stable.
 - Prefer boundary_probe only when there is a plausible confirmed preference whose boundary can be tested with the object.
 - Use the guidance as a soft instruction for whether this turn should probe a boundary, clean up a concrete placement, or collect evidence that could support a future summary.
@@ -345,7 +348,7 @@ Return exactly one ActionIntent:
 - action_mode = "direct_grounding" or "boundary_probe"
 - object_name = one exact unresolved seen object
 - priority = 0.0 to 1.0
-- question = one concise natural Action-oriented question
+- question = one concise natural Action-oriented question about that exact object's placement or boundary case
 """.strip()
 
         result = self.structured_model.invoke(
@@ -424,19 +427,26 @@ class PreferenceSummaryProposer:
     ) -> List[PreferenceSummaryIntent]:
 
         system_prompt = f"""
-You are a proposer for Preference-summary questions in a household rearrangement task.
+You are a proposer for preference-summary questions in a household rearrangement task.
 
 Your job:
-Infer a small number of high-level preference summaries from the confirmed action evidence,
-then generate concise summary-style questions asking the user to confirm or refine them.
+Propose a small number of high-value summary questions that are worth spending budget on.
 
-Important:
-- This empirical pattern is "preference_summary".
-- Do NOT output action-oriented questions.
-- Do NOT output preference-eliciting questions.
-- Be conservative.
+Choose summaries whose confirmation is most likely to:
+- explain multiple confirmed_actions or unresolved objects
+- compress existing object-level evidence into a useful placement rule
+- reduce uncertainty not already resolved by confirmed_preferences
+
+Avoid summaries that:
+- restate an already confirmed preference
+- are too weak or too narrow to affect future placement decisions
+- only describe one object unless no broader summary remains
+
+Rules:
+- This pattern is always "preference_summary".
+- Do not output action-oriented questions.
+- Do not output preference-eliciting questions.
 - Return at most {max_intents} intents.
-- Do not repeat an already existing candidate, confirmed preference, or rejected hypothesis.
 - Each intent must already include a natural user-facing summary question.
 - Use only exact seen object names in covered_objects.
 - Use the guidance as a soft instruction about what kind of summary is most useful to confirm next.
@@ -464,14 +474,15 @@ Rejected hypotheses:
 Guidance:
 {guidance}
 
-Return a small list of Preference-summary intents.
+Choose the most useful summary question, not just a plausible one.
+Use confirmed_actions as the main evidence source, and prefer a summary whose confirmation would improve future placement decisions.
 
-Each intent must:
+Each intent must include:
 - question_pattern = "preference_summary"
-- hypothesis = a concise rule summary to confirm
+- hypothesis = a concise summary rule to confirm
 - covered_objects = exact seen objects plausibly covered by the summary
 - priority = 0.0 to 1.0
-- question = one concise natural summary question asking for confirmation or correction
+- question = one concise natural summary question
 """.strip()
 
         result = self.structured_model.invoke(

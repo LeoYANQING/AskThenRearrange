@@ -186,18 +186,20 @@ Strategy: User-Preference-First.
         elif mode == "parallel_exploration":
             strategy_block = """
 Strategy: parallel-exploration.
-- Choose action_oriented when object-level evidence is still too weak to support a reliable summary.
-- Choose preference_summary when existing confirmed_actions or preference_candidates support a meaningful summary that could explain multiple unresolved or future objects.
-- Do not default to preference_summary just because some confirmed_actions already exist.
+- Choose action_oriented when the next object-level answer would most usefully extend current evidence, test a partial pattern, or create support for a future summary.
+- Prefer action questions that build on current confirmed_actions or confirmed_preferences rather than isolated one-off placements.
+- Choose preference_summary when existing confirmed_actions already support a stable multi-object rule that is worth confirming.
+- Do not choose preference_summary too early when the current evidence is still sparse, weak, or fragmented.
 - Do not choose preference_eliciting in this strategy.
 """.strip()
         else:
             strategy_block = """
 Strategy: Hybrid-All.
 - You may choose among preference_eliciting, action_oriented, and preference_summary.
-- Choose preference_summary when existing evidence can already support a reliable multi-object summary.
-- Choose preference_eliciting when an unresolved high-level hypothesis could clarify placements for multiple unresolved objects.
-- Choose action_oriented when current uncertainty is better reduced by grounding a concrete object or testing the boundary of an existing preference.
+- Choose preference_eliciting when a missing high-level preference could clarify placements for multiple unresolved objects.
+- Choose action_oriented when uncertainty is concentrated on specific unresolved objects and would be better reduced by grounding a concrete placement or testing the boundary of an existing preference.
+- Choose preference_summary when existing confirmed_actions already support a stable multi-object rule that is worth confirming.
+- Do not choose preference_summary too early when the current action evidence is still sparse or weak.
 - Do not default to any pattern solely because it is available.
 - Choose the pattern that would reduce the most uncertainty in the current AgentState.
 """.strip()

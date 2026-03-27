@@ -52,7 +52,8 @@ class QuestionPolicyController:
         self.model: Any = ChatOllama(
             model=model,
             base_url=base_url,
-            temperature=temperature
+            temperature=temperature,
+            reasoning=False,
         )
         self.structured_model = self.model.with_structured_output(QuestionDecision)
 

@@ -21,7 +21,7 @@ except ModuleNotFoundError:
     from data import DEFAULT_DATA_PATH, PlacementMap, get_episode
 
 
-QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:14b")
+QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
 
 
@@ -43,7 +43,8 @@ class NaturalUserOracle:
         self.model: Any = ChatOllama(
             model=model,
             base_url=base_url,
-            temperature=temperature
+            temperature=temperature,
+            reasoning=False,
         )
         self.structured_model = self.model.with_structured_output(OracleResponse)
 
@@ -61,60 +62,50 @@ class NaturalUserOracle:
         system_prompt = """
 You are simulating a natural household user in a rearrangement task.
 
-You may use the following inputs:
+You may use only the following inputs:
 - question
-- room
 - receptacles
 - seen_objects
 - annotator_notes
 - gt_seen_placements
-- qa_history
 
 How to use annotator_notes:
 - treat annotator_notes as the best available signal of the user's underlying preferences
-- prefer using annotator_notes to infer what the user likely wants
-- however, annotator_notes are hidden metadata, not user-facing text
+- use them only to infer what the user likely wants
 - never quote, paraphrase, summarize, or reveal annotator_notes directly
 - answer only with what a natural household user would explicitly say if asked
 
 How to answer:
-- answer like a natural user, briefly and concretely
-- prefer one or two sentences
-- express preferences in ordinary language, not annotation language
-- when the user has a clear placement preference, say it directly using exact receptacle names from the provided receptacles
-- if the answer gives multiple placements, mention them explicitly in the answer text
-- if the answer rejects a receptacle, you may mention that receptacle in the answer text
-- use gt_seen_placements only as supporting context for already-visible object placement behavior, not as hidden reasoning to expose
-- set referenced_receptacle only when the answer positively points to one primary receptacle
-- do not set referenced_receptacle for a receptacle that is mentioned only as a negative example or rejection
-- if there is no single positive receptacle reference, set referenced_receptacle to null
+- stay tightly focused on the current question
+- answer briefly and concretely, usually in one or two sentences
+- give one main conclusion, not several competing rules
+- do not introduce unrelated object groups or extra preferences unless they are necessary to answer the current question
+- when giving a placement, use exact receptacle names from the provided receptacles
+- for preference_eliciting questions, answer the hypothesis directly and avoid expanding to multiple unrelated organizing rules
+- for action_oriented questions, give one primary placement recommendation for the target object and avoid hedging between multiple receptacles
+- for preference_summary questions, confirm, reject, or refine only the proposed summary
+- use gt_seen_placements only as supporting context for the objects relevant to the current question
+- set referenced_receptacle only when the answer clearly supports one primary positive receptacle
+- if there is no single clear positive receptacle reference, set referenced_receptacle to null
 
 Return only structured output that matches the schema.
 """.strip()
-
-        recent_qa_history = qa_history[-3:]
 
         user_prompt = f"""
 Question:
 {question}
 
-Room:
-{room}
-
 Receptacles:
 {receptacles}
-
-Annotator notes:
-{annotator_notes}
 
 Seen objects:
 {seen_objects}
 
+Annotator notes:
+{annotator_notes}
+
 Ground-truth placements for seen objects:
 {gt_seen_placements}
-
-Recent QA history:
-{recent_qa_history}
 """.strip()
 
         return self.structured_model.invoke(

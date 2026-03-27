@@ -36,6 +36,7 @@ class FinalPlacementPlanner:
             model=model,
             base_url=base_url,
             temperature=temperature,
+            reasoning=False,
         )
         self.structured_model = self.model.with_structured_output(FinalPlacementPlan)
 

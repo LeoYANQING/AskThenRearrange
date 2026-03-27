@@ -74,7 +74,8 @@ class StateUpdate:
         self.model: Any = ChatOllama(
             model=model,
             base_url=base_url,
-            temperature=temperature
+            temperature=temperature,
+            reasoning=False,
         )
         self.action_model = self.model.with_structured_output(ActionAnswerInterpretation)
         self.preference_eliciting_model = self.model.with_structured_output(PreferenceElicitingInterpretation)
@@ -165,25 +166,34 @@ Current confirmed_preferences:
         system_prompt = """
 You interpret a preference-eliciting answer for a household rearrangement agent.
 
+Your goal:
+Convert the answer into the most useful state update for future placement decisions.
+
 Return exactly one update type:
 - confirmed_rule:
-  the answer gives a stable rule
+  the answer supports a stable rule
 - reject_hypothesis:
   the answer rejects the current hypothesis
 - rule_with_exception:
-  the answer gives a stable rule plus one or more object-level exceptions
+  the answer supports a stable rule plus one or more explicit object-level exceptions
+
+Interpretation priority:
+1. Identify any explicit object-level placements stated in the answer.
+2. Decide whether the target hypothesis is confirmed, rejected, or confirmed with exceptions.
+3. Preserve useful placement information even when the hypothesis is rejected.
 
 Rules:
 - use only exact receptacle names from the provided receptacles
-- use only exact seen object names in covered_objects and exception_actions
-- if the answer gives a stable rule, put it in confirmed_preference with source = "elicited"
+- use only exact seen object names in confirmed_preference.covered_objects and exception_actions
+- if the answer supports a stable rule, put it in confirmed_preference with source = "elicited"
 - confirmed_preference.covered_objects must be a subset of the current intent_covered_objects that is explicitly supported by the answer
 - only use the full current intent_covered_objects when the answer clearly supports the whole set
-- make the hypothesis concrete enough to be useful for placement, not just an abstract restatement of the target hypothesis
+- make the confirmed_preference concrete enough to guide future placements
 - if the answer clearly gives one shared receptacle that applies to the supported covered_objects, prefer setting confirmed_preference.target_receptacle to that receptacle
 - if the hypothesis is rejected, add the target hypothesis or a short equivalent text to rejected_hypotheses
 - rejected_hypotheses should normally be non-empty when update_type = "reject_hypothesis"
-- if there is an exception object with a clear placement, add it to exception_actions
+- if the answer gives explicit object-level placements, include them in exception_actions even when update_type = "reject_hypothesis"
+- use exception_actions only for clearly stated object -> receptacle facts; do not invent missing objects or receptacles
 - be conservative
 """.strip()
 
@@ -434,6 +444,7 @@ Current rejected_hypotheses:
         if interpretation.update_type == "reject_hypothesis":
             rejected = interpretation.rejected_hypotheses or [hypothesis]
             state["rejected_hypotheses"] = _dedupe_keep_order([*state["rejected_hypotheses"], *rejected])
+            _apply_confirmed_actions(state=state, placements=interpretation.exception_actions)
             return recompute_online_placements(state)
 
         normalized = None
@@ -551,18 +562,22 @@ Current rejected_hypotheses:
         system_prompt = """
 You update open preference hypotheses for a household rearrangement agent.
 
-Your job:
-Infer the small set of remaining preference hypotheses that are still worth asking.
+Your goal:
+Infer the small set of remaining high-value preference hypotheses that are still worth asking about.
 
-Prefer hypotheses that:
-- could affect multiple unresolved objects
-- could change likely placement regions or receptacles
-- are not already resolved by confirmed_preferences or confirmed_actions
+A good open hypothesis should:
+- affect multiple unresolved objects
+- explain unresolved placements in a way that could change future decisions
+- introduce a genuinely new preference dimension not already confirmed or rejected
 
-Avoid hypotheses that are:
-- too vague to affect placement decisions
-- redundant with confirmed or rejected preferences
-- only relevant to one unresolved object unless no broader hypothesis remains
+Avoid low-value hypotheses:
+- near-duplicates or paraphrases of rejected hypotheses
+- generic grouping statements that do not add a new decision axis
+- hypotheses that only affect one unresolved object unless no broader hypothesis remains
+- hypotheses already resolved by confirmed_preferences or clearly implied by confirmed_actions
+
+When previous answers reject a grouping or container hypothesis but reveal a different principle, shift to the revealed principle instead.
+Prefer dimensions like accessibility, fragility, safety, freshness, or power source over repeating another grouping variant.
 
 Return only short high-level preference hypotheses.
 Return only hypotheses that would still justify spending a future question.

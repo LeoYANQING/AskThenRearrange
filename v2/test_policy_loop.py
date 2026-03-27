@@ -28,7 +28,7 @@ except ModuleNotFoundError:
     from state_update import StateUpdate
 
 
-QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
+QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:14b")
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
 
 
@@ -412,7 +412,7 @@ def run_ablation_experiment(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Policy-driven multi-pattern dialogue loop.")
     parser.add_argument("--data", type=str, default=str(DEFAULT_DATA_PATH))
-    parser.add_argument("--num-samples", type=int, default=1)
+    parser.add_argument("--num-samples", type=int, default=10)
     parser.add_argument(
         "--mode",
         type=str,
@@ -428,7 +428,7 @@ def main() -> None:
     parser.add_argument("--plot-ablation", action="store_true", default=False)
     parser.add_argument("--output", type=str, default="")
     parser.add_argument("--ablation-log", type=str, default="")
-    parser.add_argument("--budget-list", type=str, default="5")
+    parser.add_argument("--budget-list", type=str, default="1,3,5")
     args = parser.parse_args()
 
     data_path = Path(args.data)

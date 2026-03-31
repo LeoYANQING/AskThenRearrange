@@ -18,20 +18,13 @@ def build_initial_state(
     Build the minimal explicit state for one episode.
 
     Semantic roles:
-    - preference_candidates:
-        induced but not yet confirmed rules
-    - confirmed_preferences:
-        confirmed user preference rules
     - confirmed_actions:
         confirmed seen object -> receptacle evidence
     - unresolved_objects:
         seen objects whose placements are not yet grounded
     """
     state: AgentState = {
-        # control
-        "strategy": strategy,
         "budget_total": budget_total,
-        "budget_used": 0,
 
         # task input
         "room": episode.room,
@@ -41,36 +34,30 @@ def build_initial_state(
 
         # interaction evidence
         "qa_history": [],
-        "confirmed_actions": {},
-        "excluded_receptacles": {},
+        "confirmed_actions": [],
 
         # preference belief state
-        "open_preference_hypotheses": [],
-        "preference_candidates": [],
         "confirmed_preferences": [],
-        "rejected_hypotheses": [],
+        "negative_preferences": [],
+        "negative_actions": [],
 
         # object solving state
         "unresolved_objects": list(episode.seen_objects),
-
-        # online derived placements
-        "online_placements_seen": {},
     }
 
     return state
 
 
 def _print_state_summary(state: AgentState) -> None:
-    print("strategy:", state["strategy"])
     print("budget_total:", state["budget_total"])
-    print("budget_used:", state["budget_used"])
+    print("budget_used:", len(state["qa_history"]))
     print("num_seen_objects:", len(state["seen_objects"]))
     print("num_unresolved_objects:", len(state["unresolved_objects"]))
     print("num_unseen_objects:", len(state["unseen_objects"]))
-    print("open_preference_hypotheses:", state["open_preference_hypotheses"])
-    print("confirmed_actions:", state["confirmed_actions"])
-    print("preference_candidates:", state["preference_candidates"])
     print("confirmed_preferences:", state["confirmed_preferences"])
+    print("confirmed_actions:", state["confirmed_actions"])
+    print("negative_preferences:", state["negative_preferences"])
+    print("negative_actions:", state["negative_actions"])
 
 
 if __name__ == "__main__":
@@ -122,6 +109,5 @@ if __name__ == "__main__":
         obj in state["unresolved_objects"] for obj in state["unseen_objects"]
     )
     print("unseen_objects appear in unresolved_objects? ->", unseen_in_unresolved)
-    print("confirmed_actions empty? ->", state["confirmed_actions"] == {})
-    print("preference_candidates empty? ->", state["preference_candidates"] == [])
+    print("confirmed_actions empty? ->", state["confirmed_actions"] == [])
     print("confirmed_preferences empty? ->", state["confirmed_preferences"] == [])

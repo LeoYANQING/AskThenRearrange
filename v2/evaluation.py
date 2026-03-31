@@ -51,7 +51,6 @@ class FinalPlacementPlanner:
         if not target_objects:
             return {}
 
-        excluded_receptacles = state["excluded_receptacles"] if respect_exclusions else {}
         scope_instruction = (
             "assign one receptacle to each remaining unresolved seen object"
             if scope == "seen"
@@ -61,16 +60,6 @@ class FinalPlacementPlanner:
             "use the current state as planning context"
             if scope == "seen"
             else "generalize conservatively from the current state"
-        )
-        exclusion_block = (
-            f"\nExcluded receptacles:\n{state['excluded_receptacles']}"
-            if respect_exclusions
-            else ""
-        )
-        exclusion_rule = (
-            "\n- respect excluded_receptacles for each object"
-            if respect_exclusions
-            else ""
         )
 
         system_prompt = f"""
@@ -86,14 +75,15 @@ You may use:
 - seen_objects
 - target_objects
 - confirmed_actions
-- excluded_receptacles
+- negative_actions
 - confirmed_preferences
 
 Rules:
 - return only exact target object names as keys
 - return only exact receptacle names from the provided receptacles
 - be consistent with confirmed_actions and confirmed_preferences
-- make a complete plan for all target_objects{exclusion_rule}
+- do not choose any object -> receptacle pair listed in negative_actions
+- make a complete plan for all target_objects
 - be consistent with confirmed_actions and confirmed_preferences
 """.strip()
 
@@ -113,9 +103,11 @@ Target objects:
 Confirmed actions:
 {state["confirmed_actions"]}
 
+Negative actions:
+{state["negative_actions"]}
+
 Confirmed preferences:
-{state["confirmed_preferences"]}
-{exclusion_block}
+{_confirmed_preferences(state)}
 """.strip()
 
         result = self.structured_model.invoke(
@@ -128,7 +120,7 @@ Confirmed preferences:
             result.placements,
             target_objects=target_objects,
             receptacles=state["receptacles"],
-            excluded_receptacles=excluded_receptacles,
+            negative_actions=state["negative_actions"],
         )
 
 
@@ -137,17 +129,18 @@ def _normalize_planned_placements(
     *,
     target_objects: List[str],
     receptacles: List[str],
-    excluded_receptacles: dict[str, List[str]],
+    negative_actions: List[dict],
 ) -> PlacementMap:
     target_set = set(target_objects)
     allowed_receptacles = set(receptacles)
+    negative_pairs = {(item["object_name"], item["receptacle"]) for item in negative_actions}
     normalized: PlacementMap = {}
     for obj, receptacle in placements.items():
         if obj not in target_set:
             continue
         if receptacle not in allowed_receptacles:
             continue
-        if receptacle in excluded_receptacles.get(obj, []):
+        if (obj, receptacle) in negative_pairs:
             continue
         normalized[obj] = receptacle
     return normalized
@@ -172,7 +165,7 @@ def finalize_seen_placements(
     *,
     planner: FinalPlacementPlanner,
 ) -> PlacementMap:
-    finalized = dict(state["online_placements_seen"])
+    finalized = _derived_seen_placements(state)
     remaining = [obj for obj in state["seen_objects"] if obj not in finalized]
     planned = planner.plan_placements(
         state=state,
@@ -199,6 +192,21 @@ def finalize_unseen_placements(
     )
     finalized.update(planned)
     return finalized
+
+
+def _confirmed_preferences(state: AgentState) -> List[dict]:
+    return state["confirmed_preferences"]
+
+
+def _confirmed_action_map(state: AgentState) -> PlacementMap:
+    return {
+        item["object_name"]: item["receptacle"]
+        for item in state["confirmed_actions"]
+    }
+
+
+def _derived_seen_placements(state: AgentState) -> PlacementMap:
+    return _confirmed_action_map(state)
 
 
 def evaluate_episode_predictions(

@@ -42,17 +42,59 @@ POLICY_LABELS = {
 
 def _state_snapshot(state: AgentState) -> Dict[str, Any]:
     return {
-        "budget_used": state["budget_used"],
-        "open_preference_hypotheses": state["open_preference_hypotheses"],
+        "budget_used": len(state["qa_history"]),
         "confirmed_actions": state["confirmed_actions"],
-        "excluded_receptacles": state["excluded_receptacles"],
-        "preference_candidates": state["preference_candidates"],
+        "negative_actions": state["negative_actions"],
         "confirmed_preferences": state["confirmed_preferences"],
-        "rejected_hypotheses": state["rejected_hypotheses"],
-        "online_placements_seen": state["online_placements_seen"],
+        "negative_preferences": state["negative_preferences"],
         "unresolved_objects": state["unresolved_objects"],
         "qa_history_len": len(state["qa_history"]),
     }
+
+
+def _print_policy_step(
+    *,
+    mode: PolicyMode,
+    episode: Episode,
+    step_idx: int,
+    decision: QuestionDecision,
+    intent: Any,
+    oracle_response: Any,
+    state: AgentState,
+) -> None:
+    question = intent.question if hasattr(intent, "question") else str(intent.get("question", ""))
+    print(
+        f"[Episode {episode.episode_id} | Question Step {step_idx}] "
+        f"mode={mode} pattern={decision.question_pattern}"
+    )
+    print(f"  guidance: {decision.guidance}")
+    print(f"  question: {question}")
+    print(f"  answer: {oracle_response.answer}")
+    snapshot = _state_snapshot(state)
+    print(
+        "  state:"
+        f" budget_used={snapshot['budget_used']},"
+        f" unresolved={len(snapshot['unresolved_objects'])},"
+        f" confirmed_actions={len(snapshot['confirmed_actions'])},"
+        f" confirmed_preferences={len(snapshot['confirmed_preferences'])},"
+        f" negative_preferences={len(snapshot['negative_preferences'])},"
+        f" negative_actions={len(snapshot['negative_actions'])}"
+    )
+    print(
+        json.dumps(
+            {
+                "policy_mode": mode,
+                "question_pattern": decision.question_pattern,
+                "guidance": decision.guidance,
+                "intent": intent.model_dump() if hasattr(intent, "model_dump") else intent,
+                "question": question,
+                "oracle_response": oracle_response.model_dump(),
+                "state": snapshot,
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
+    )
 
 
 def _select_sample_indices(*, num_samples: int) -> List[int]:
@@ -91,12 +133,11 @@ def _propose_intent(
     summary_proposer: PreferenceSummaryProposer,
 ):
     if decision.question_pattern == "preference_eliciting":
-        intents = eliciting_proposer.propose(
+        intent = eliciting_proposer.propose(
             state=state,
-            max_intents=3,
             guidance=decision.guidance,
         )
-        return intents[0] if intents else None
+        return intent
 
     if decision.question_pattern == "action_oriented":
         return action_proposer.propose(
@@ -128,18 +169,16 @@ def run_policy_loop(
     updater: StateUpdate,
 ) -> AgentState:
     step_idx = 0
-    while state["budget_used"] < state["budget_total"]:
+    while len(state["qa_history"]) < state["budget_total"]:
         step_idx += 1
-        print(f"[step {step_idx}] planning policy...")
         decision = controller.plan_next_question(
             state=state,
             mode=mode,
         )
         if decision is None:
-            print(f"[step {step_idx}] no policy decision available")
+            print(f"[Episode {episode.episode_id} | Question Step {step_idx}] no policy decision available")
             break
 
-        print(f"[step {step_idx}] proposing intent for {decision.question_pattern}...")
         intent = _propose_intent(
             state=state,
             decision=decision,
@@ -148,12 +187,12 @@ def run_policy_loop(
             summary_proposer=summary_proposer,
         )
         if intent is None:
-            print(f"[step {step_idx}] no proposer intent available for {decision.question_pattern}")
+            print(f"[Episode {episode.episode_id} | Question Step {step_idx}] no proposer intent available for {decision.question_pattern}")
             break
 
-        print(f"[step {step_idx}] querying oracle...")
+        question = intent.question if hasattr(intent, "question") else str(intent.get("question", ""))
         oracle_response = oracle.answer(
-            question=intent.question,
+            question=question,
             room=state["room"],
             receptacles=state["receptacles"],
             seen_objects=state["seen_objects"],
@@ -162,14 +201,13 @@ def run_policy_loop(
             qa_history=state["qa_history"],
         )
 
-        print(f"[step {step_idx}] updating state...")
         if decision.question_pattern == "preference_eliciting":
             state = updater.update_state_from_preference_eliciting_answer(
                 state=state,
-                hypothesis=intent.hypothesis,
-                covered_objects=list(intent.covered_objects),
+                hypothesis=str(intent.get("hypothesis", "")),
+                covered_objects=list(intent.get("covered_objects", [])),
                 answer=oracle_response.answer,
-                question=intent.question,
+                question=question,
             )
         elif decision.question_pattern == "action_oriented":
             state = updater.update_state_from_action_answer(
@@ -182,30 +220,23 @@ def run_policy_loop(
         elif decision.question_pattern == "preference_summary":
             state = updater.update_state_from_preference_summary_answer(
                 state=state,
-                hypothesis=intent.hypothesis,
-                covered_objects=list(intent.covered_objects),
+                hypothesis=str(intent.get("hypothesis", "")),
+                covered_objects=list(intent.get("covered_objects", [])),
                 answer=oracle_response.answer,
-                question=intent.question,
+                question=question,
             )
         else:
             raise ValueError(f"Unsupported pattern: {decision.question_pattern}")
 
-        print(f"=== Step {step_idx} ===")
-        print(
-            json.dumps(
-                {
-                    "policy_mode": mode,
-                    "question_pattern": decision.question_pattern,
-                    "guidance": decision.guidance,
-                    "intent": intent.model_dump(),
-                    "oracle_response": oracle_response.model_dump(),
-                    "state": _state_snapshot(state),
-                },
-                indent=2,
-                ensure_ascii=False,
-            )
+        _print_policy_step(
+            mode=mode,
+            episode=episode,
+            step_idx=step_idx,
+            decision=decision,
+            intent=intent,
+            oracle_response=oracle_response,
+            state=state,
         )
-        print()
 
     return state
 
@@ -224,7 +255,7 @@ def run_policy_episode(
 ) -> tuple[AgentState, Dict[str, Any]]:
     state = build_initial_state(
         episode=episode,
-        strategy="",
+        strategy="parallel_exploration",
         budget_total=budget,
     )
     controller = QuestionPolicyController(
@@ -262,8 +293,6 @@ def run_policy_episode(
         base_url=base_url,
         temperature=0.0,
     )
-
-    updater.update_open_preference_hypotheses(state=state)
 
     if verbose:
         print("=== Initial State ===")

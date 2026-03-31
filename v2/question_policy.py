@@ -63,7 +63,7 @@ class QuestionPolicyController:
         state: AgentState,
         mode: PolicyMode,
     ) -> Optional[QuestionDecision]:
-        if state["budget_used"] >= state["budget_total"]:
+        if _budget_used(state) >= state["budget_total"]:
             return None
 
         allowed_patterns = self._allowed_patterns(state=state, mode=mode)
@@ -121,7 +121,7 @@ class QuestionPolicyController:
         state: AgentState,
         mode: PolicyMode,
     ) -> List[QuestionPattern]:
-        can_eliciting = bool(state["open_preference_hypotheses"])
+        can_eliciting = bool(state["unresolved_objects"])
         can_action = bool(state["unresolved_objects"])
         can_summary = self._summary_is_available(state=state)
 
@@ -158,15 +158,13 @@ class QuestionPolicyController:
 
     def _summary_is_available(self, *, state: AgentState) -> bool:
         summarized_objects = set()
-        for item in state["confirmed_preferences"]:
+        for item in _confirmed_preferences(state):
             summarized_objects.update(item.get("covered_objects", []))
 
         unsummarized_action_count = sum(
-            1 for obj in state["confirmed_actions"] if obj not in summarized_objects
+            1 for obj in _confirmed_action_objects(state) if obj not in summarized_objects
         )
-        return bool(state["preference_candidates"]) or (
-            len(state["confirmed_actions"]) >= 2 and unsummarized_action_count >= 2
-        )
+        return len(state["confirmed_actions"]) >= 2 and unsummarized_action_count >= 2
 
     def _system_prompt(self, *, mode: PolicyMode) -> str:
         if mode == "direct_querying":
@@ -239,11 +237,11 @@ Return only structured output.
         allowed_patterns: List[QuestionPattern],
     ) -> str:
         summarized_objects = set()
-        for item in state["confirmed_preferences"]:
+        for item in _confirmed_preferences(state):
             summarized_objects.update(item.get("covered_objects", []))
 
         unsummarized_action_count = sum(
-            1 for obj in state["confirmed_actions"] if obj not in summarized_objects
+            1 for obj in _confirmed_action_objects(state) if obj not in summarized_objects
         )
         recent_qa_history = state["qa_history"][-3:]
         history_patterns = [
@@ -263,24 +261,19 @@ Allowed question patterns:
 {allowed_patterns}
 
 Derived state summary:
-- budget_left: {max(0, state['budget_total'] - state['budget_used'])}
+- budget_left: {max(0, state['budget_total'] - _budget_used(state))}
 - num_unresolved: {len(state['unresolved_objects'])}
-- num_open_hypotheses: {len(state['open_preference_hypotheses'])}
 - num_confirmed_actions: {len(state['confirmed_actions'])}
-- num_confirmed_preferences: {len(state['confirmed_preferences'])}
-- num_preference_candidates: {len(state['preference_candidates'])}
+- num_confirmed_preferences: {len(_confirmed_preferences(state))}
 - num_unsummarized_actions: {unsummarized_action_count}
 - last_pattern: {last_pattern}
 - recent_pattern_streak: {recent_pattern_streak}
 
 Current state:
-- open_preference_hypotheses: {state['open_preference_hypotheses']}
 - unresolved_objects: {state['unresolved_objects']}
 - confirmed_actions: {state['confirmed_actions']}
-- excluded_receptacles: {state['excluded_receptacles']}
-- preference_candidates: {state['preference_candidates']}
-- confirmed_preferences: {state['confirmed_preferences']}
-- rejected_hypotheses: {state['rejected_hypotheses']}
+- confirmed_preferences: {_confirmed_preferences(state)}
+- negative_preferences: {state['negative_preferences']}
 - recent_qa_history: {recent_qa_history}
 """.strip()
 
@@ -301,3 +294,15 @@ __all__ = [
     "QuestionDecision",
     "QuestionPolicyController",
 ]
+
+
+def _budget_used(state: AgentState) -> int:
+    return len(state["qa_history"])
+
+
+def _confirmed_preferences(state: AgentState) -> List[dict]:
+    return state["confirmed_preferences"]
+
+
+def _confirmed_action_objects(state: AgentState) -> List[str]:
+    return [item["object_name"] for item in state["confirmed_actions"]]

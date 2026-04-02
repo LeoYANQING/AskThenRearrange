@@ -44,17 +44,68 @@ class ActionAnswerInterpretation(BaseModel):
 
 
 class PreferenceElicitingStateUpdate(BaseModel):
-    confirmed_preference: Optional[LearnedPreferenceModel] = None
+    category_rule: str = Field(
+        default="",
+        description=(
+            "A short generalizable category-level organizing rule the answer supports. "
+            "Fill this when the answer reveals a habit or principle like 'I always keep X in Y' or 'Y category belongs in Z'. "
+            "Leave empty string only if the answer contains no organizing rule at all."
+        ),
+    )
+    category_rule_covered_objects: List[str] = Field(
+        default_factory=list,
+        description="Exact seen object names covered by the category_rule. Must be a subset of seen_objects.",
+    )
+    category_rule_receptacle: str = Field(
+        default="",
+        description=(
+            "Exact receptacle name from the receptacles list if the category_rule resolves to one specific place. "
+            "Leave empty if the rule is ambiguous, conditional, or not tied to a single receptacle."
+        ),
+    )
     confirmed_actions: List[ObjectPlacementModel] = Field(default_factory=list)
     negative_actions: List[ObjectPlacementModel] = Field(default_factory=list)
     negative_preference: Optional[str] = None
 
 
-class PreferenceSummaryInterpretation(BaseModel):
-    update_type: Literal["confirmed_rule", "reject_summary", "rule_with_exception"]
-    confirmed_preference: Optional[LearnedPreferenceModel] = None
-    exception_actions: List[ObjectPlacementModel] = Field(default_factory=list)
-    negative_preferences: List[str] = Field(default_factory=list)
+class PreferenceInductionInterpretation(BaseModel):
+    update_type: Literal["confirmed_rule", "reject_induction", "rule_with_exception"]
+    confirmed_hypothesis: str = Field(
+        default="",
+        description=(
+            "The confirmed or refined preference rule as a concise sentence. "
+            "Fill when update_type is 'confirmed_rule' or 'rule_with_exception'. "
+            "Leave empty for 'reject_induction'."
+        ),
+    )
+    confirmed_covered_objects: List[str] = Field(
+        default_factory=list,
+        description=(
+            "Exact seen object names explicitly supported by the confirmed rule. "
+            "Must be a subset of intent_covered_objects. "
+            "Leave empty to inherit all intent_covered_objects."
+        ),
+    )
+    confirmed_receptacle: Optional[str] = Field(
+        default=None,
+        description=(
+            "Exact receptacle name from the provided receptacles list if the confirmed rule resolves "
+            "to one specific place. Fill when update_type is 'confirmed_rule' or 'rule_with_exception' "
+            "and the answer clearly points to a single receptacle. Leave null if ambiguous."
+        ),
+    )
+    exception_object_name: str = Field(
+        default="",
+        description="Exact seen object name that is an exception to the rule. Fill only for 'rule_with_exception'.",
+    )
+    exception_receptacle: str = Field(
+        default="",
+        description="Exact receptacle name where the exception object should go. Fill only for 'rule_with_exception'.",
+    )
+    negative_preferences: List[str] = Field(
+        default_factory=list,
+        description="Hypothesis text(s) to reject. Fill when update_type is 'reject_induction'.",
+    )
 
 
 class StateUpdate:
@@ -75,7 +126,7 @@ class StateUpdate:
         )
         self.action_model = self.model.with_structured_output(ActionAnswerInterpretation)
         self.preference_eliciting_model = self.model.with_structured_output(PreferenceElicitingStateUpdate)
-        self.preference_summary_model = self.model.with_structured_output(PreferenceSummaryInterpretation)
+        self.preference_induction_model = self.model.with_structured_output(PreferenceInductionInterpretation)
 
     def interpret_action_answer(
         self,
@@ -146,7 +197,7 @@ Current confirmed_preferences:
             ]
         )
 
-    def interpret_preference_summary_answer(
+    def interpret_preference_induction_answer(
         self,
         *,
         state: AgentState,
@@ -154,35 +205,44 @@ Current confirmed_preferences:
         covered_objects: List[str],
         answer: str,
         question: Optional[str] = None,
-    ) -> PreferenceSummaryInterpretation:
+    ) -> PreferenceInductionInterpretation:
         system_prompt = """
-You interpret a preference-summary answer for a household rearrangement agent.
+You interpret a preference-induction answer for a household rearrangement agent.
+
+The agent proposed a hypothesis about how a group of objects should be organized and asked the user to confirm or refine it.
 
 Return exactly one update type:
-- confirmed_rule:
-  the answer confirms or refines a summary rule that is useful for future placement decisions
-- reject_summary:
-  the answer rejects the current summary hypothesis
-- rule_with_exception:
-  the answer confirms a useful rule and also gives one or more object-level exceptions
+- confirmed_rule: the answer confirms or refines the hypothesis as a stable organizing rule
+- reject_induction: the answer rejects the hypothesis as incorrect or inapplicable
+- rule_with_exception: the answer confirms the rule but mentions one specific object that is an exception
+
+Field instructions:
+- confirmed_hypothesis: fill when update_type is confirmed_rule or rule_with_exception
+  - write the confirmed (or refined) rule as one concise sentence
+  - if the user refines the hypothesis, write the refined version
+  - example: "everyday kitchenware should be stored in the kitchen cabinet"
+  - leave empty string for reject_induction
+- confirmed_covered_objects: exact seen object names from intent_covered_objects that the confirmed rule applies to
+  - leave empty to inherit all intent_covered_objects
+- confirmed_receptacle: exact receptacle name from the provided receptacles list if the confirmed rule points to one place
+  - fill when the answer clearly identifies a single destination (e.g. "Yes, they all go on the bookshelf")
+  - must be an exact name from the receptacles list
+  - leave null if the answer is ambiguous or covers multiple locations
+- exception_object_name: fill only for rule_with_exception — one exact seen object name that is an exception
+- exception_receptacle: fill only for rule_with_exception — exact receptacle for the exception object
+- negative_preferences: fill when update_type is reject_induction — include the rejected hypothesis or a short summary of what was rejected
 
 Rules:
-- use only exact receptacle names from the provided receptacles
-- use only exact seen object names in covered_objects and exception_actions
-- if the answer confirms or refines a stable rule, put it in confirmed_preference with source = "confirmed"
-- confirmed_preference.covered_objects must be a subset of the current intent_covered_objects that is explicitly supported by the answer
-- only use the full current intent_covered_objects when the answer clearly supports the whole set
-- make the confirmed_preference concrete enough to guide future placements, not just restate the summary vaguely
-- if the summary is rejected, add the target hypothesis or a short equivalent text to negative_preferences
-- negative_preferences should normally be non-empty when update_type = "reject_summary"
-- if the user rejects the current summary but provides a better stable rule, prefer returning confirmed_rule or rule_with_exception instead of reject_summary
-- if there is an exception object with a clear placement, add it to exception_actions
+- use only exact receptacle names from the provided receptacles list
+- use only exact seen object names from the seen_objects list
+- if the user provides a corrected rule instead of a flat rejection, prefer confirmed_rule over reject_induction
+- do not invent placements not stated in the answer
 - be conservative
 """.strip()
 
         user_prompt = f"""
 Question pattern:
-preference_summary
+preference_induction
 
 Target hypothesis:
 {hypothesis}
@@ -215,7 +275,7 @@ Current negative_preferences:
 {state["negative_preferences"]}
 """.strip()
 
-        return self.preference_summary_model.invoke(
+        return self.preference_induction_model.invoke(
             [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
@@ -229,25 +289,38 @@ Current negative_preferences:
         hypothesis: str,
         covered_objects: List[str],
         answer: str,
+        question: Optional[str] = None,
     ) -> PreferenceElicitingStateUpdate:
         system_prompt = """
 Interpret one preference-eliciting answer for a household rearrangement agent.
 
-Return only the minimal update for the current AgentState.
+The question was about the user's organizing HABIT or PRINCIPLE for a category. The answer may describe
+how the user organizes, why items go to a certain spot, or confirm/deny a suggested location.
 
-Allowed outputs:
-- confirmed_preference: a short family-level preference the answer supports
-- negative_preference: a short rejected hypothesis
-- confirmed_actions: exact seen object -> receptacle facts explicitly stated
-- negative_actions: exact seen object -> receptacle facts explicitly ruled out
+Output fields:
+- category_rule: a short generalizable organizing rule extracted from the answer.
+  Fill this whenever the answer reveals a habit or principle, even if phrased as "I usually keep X in Y"
+  or "I always put those near Z" or "they tend to stay in one spot".
+  Leave empty ONLY if the answer contains no organizing rule at all.
+- category_rule_covered_objects: seen objects this rule applies to (subset of seen_objects).
+- category_rule_receptacle: exact receptacle name if the rule resolves to ONE specific place.
+  Leave empty if the answer is ambiguous ("somewhere in the living room"), conditional, or multi-location.
+- confirmed_actions: object -> receptacle mappings EXPLICITLY stated for a SINGLE named object with ONE
+  unambiguous receptacle. If the answer gives "X or Y" options, do NOT add to confirmed_actions.
+- negative_actions: only when the answer EXPLICITLY says an object should NOT go to a specific receptacle.
+- negative_preference: only if the user explicitly rejects the hypothesis.
 
 Rules:
-- be conservative
-- use only exact seen object names
-- use only exact receptacle names
-- confirmed_preference should be a short grouping preference, not a placement sentence
-- if the answer rejects the current hypothesis, fill negative_preference
-- if the answer confirms the current hypothesis, prefer keeping it close to the original wording
+- use only exact seen object names from seen_objects
+- use only exact receptacle names from receptacles
+- category_rule should be a category-level rule, not a per-object placement sentence
+  - good: "writing and memory items belong on the reading shelf"
+  - good: "I always keep cleaning supplies under the sink"
+  - good: "electronic accessories tend to stay in the media console"
+  - bad: "the salt shaker goes on the countertop"
+- category_rule_receptacle must be an exact match from the provided receptacles list
+- category_rule and confirmed_actions are not mutually exclusive — fill both when applicable
+- DO NOT add to negative_actions because an object was not mentioned
 """.strip()
 
         user_prompt = f"""
@@ -257,6 +330,9 @@ Hypothesis:
 Covered objects:
 {covered_objects}
 
+Question:
+{question or ""}
+
 Answer:
 {answer}
 
@@ -265,6 +341,12 @@ Receptacles:
 
 Seen objects:
 {state["seen_objects"]}
+
+Unresolved objects (still need placement):
+{state["unresolved_objects"]}
+
+Current confirmed_actions:
+{state["confirmed_actions"]}
 """.strip()
 
         return self.preference_eliciting_model.invoke(
@@ -274,25 +356,25 @@ Seen objects:
             ]
         )
 
-    def apply_preference_summary_interpretation(
+    def apply_preference_induction_interpretation(
         self,
         *,
         state: AgentState,
         hypothesis: str,
         covered_objects: List[str],
         answer: str,
-        interpretation: PreferenceSummaryInterpretation,
+        interpretation: PreferenceInductionInterpretation,
         question: Optional[str] = None,
     ) -> AgentState:
         _append_qa_history(
             state=state,
-            question_pattern="preference_summary",
+            question_pattern="preference_induction",
             target=hypothesis,
             answer=answer,
             question=question,
         )
 
-        if interpretation.update_type == "reject_summary":
+        if interpretation.update_type == "reject_induction":
             rejected = interpretation.negative_preferences or [hypothesis]
             for item in rejected:
                 _upsert_negative_preference(
@@ -300,31 +382,59 @@ Seen objects:
                     hypothesis=item,
                     covered_objects=covered_objects,
                 )
-            _apply_confirmed_actions(state=state, placements=interpretation.exception_actions)
-            _remove_negative_actions_for_confirmed(state=state, placements=interpretation.exception_actions)
+            _apply_single_exception(state=state, interpretation=interpretation)
             return recompute_online_placements(state)
 
+        # Build normalized preference from flat fields
         normalized = None
-        if interpretation.confirmed_preference is not None:
+        if interpretation.confirmed_hypothesis.strip():
             normalized = _normalize_confirmed_preference(
-                preference=interpretation.confirmed_preference,
+                preference=LearnedPreferenceModel(
+                    hypothesis=interpretation.confirmed_hypothesis.strip(),
+                    covered_objects=interpretation.confirmed_covered_objects,
+                ),
                 seen_objects=state["seen_objects"],
                 fallback_covered_objects=covered_objects,
             )
 
         if interpretation.update_type == "confirmed_rule":
             if normalized is not None:
+                resolved = _fuzzy_match_receptacle(
+                    interpretation.confirmed_receptacle or "", state["receptacles"]
+                ) or _auto_resolve_from_hypothesis(
+                    state=state,
+                    hypothesis_text=interpretation.confirmed_hypothesis,
+                    covered_objects=normalized.get("covered_objects", []),
+                )
+                if resolved:
+                    normalized["receptacle"] = resolved
+                    unresolved_set = set(state["unresolved_objects"])
+                    for obj in normalized.get("covered_objects", []):
+                        if obj in unresolved_set:
+                            _upsert_confirmed_action(state, object_name=obj, receptacle=resolved)
                 _upsert_confirmed_preference(state, normalized)
             return recompute_online_placements(state)
 
         if interpretation.update_type == "rule_with_exception":
             if normalized is not None:
+                resolved = _fuzzy_match_receptacle(
+                    interpretation.confirmed_receptacle or "", state["receptacles"]
+                ) or _auto_resolve_from_hypothesis(
+                    state=state,
+                    hypothesis_text=interpretation.confirmed_hypothesis,
+                    covered_objects=normalized.get("covered_objects", []),
+                )
+                if resolved:
+                    normalized["receptacle"] = resolved
+                    unresolved_set = set(state["unresolved_objects"])
+                    for obj in normalized.get("covered_objects", []):
+                        if obj in unresolved_set:
+                            _upsert_confirmed_action(state, object_name=obj, receptacle=resolved)
                 _upsert_confirmed_preference(state, normalized)
-            _apply_confirmed_actions(state=state, placements=interpretation.exception_actions)
-            _remove_negative_actions_for_confirmed(state=state, placements=interpretation.exception_actions)
+            _apply_single_exception(state=state, interpretation=interpretation)
             return recompute_online_placements(state)
 
-        raise ValueError(f"Unsupported preference summary update_type: {interpretation.update_type}")
+        raise ValueError(f"Unsupported preference induction update_type: {interpretation.update_type}")
 
     def apply_action_interpretation(
         self,
@@ -362,6 +472,13 @@ Seen objects:
                 seen_objects=state["seen_objects"],
             )
             if normalized is not None:
+                resolved = _auto_resolve_from_hypothesis(
+                    state=state,
+                    hypothesis_text=interpretation.confirmed_preference.hypothesis,
+                    covered_objects=normalized.get("covered_objects", []),
+                )
+                if resolved:
+                    normalized["receptacle"] = resolved
                 _upsert_confirmed_preference(state, normalized)
 
         _apply_confirmed_actions(state=state, placements=interpretation.confirmed_actions)
@@ -407,12 +524,14 @@ Seen objects:
         covered_objects: Optional[List[str]],
         answer: str,
         question: Optional[str] = None,
+        oracle_receptacle: Optional[str] = None,
     ) -> AgentState:
         update = self.interpret_preference_eliciting_answer(
             state=state,
             hypothesis=hypothesis,
             covered_objects=covered_objects or [],
             answer=answer,
+            question=question,
         )
         _append_qa_history(
             state=state,
@@ -427,20 +546,42 @@ Seen objects:
                 hypothesis=update.negative_preference,
                 covered_objects=covered_objects or [],
             )
-        if update.confirmed_preference is not None:
+        if update.category_rule.strip():
+            receptacle = _fuzzy_match_receptacle(
+                update.category_rule_receptacle.strip(), state["receptacles"]
+            )
+            if not receptacle:
+                receptacle = _fuzzy_match_receptacle(
+                    (oracle_receptacle or "").strip(), state["receptacles"]
+                )
             normalized = _normalize_confirmed_preference(
-                preference=update.confirmed_preference,
+                preference=LearnedPreferenceModel(
+                    hypothesis=update.category_rule.strip(),
+                    covered_objects=update.category_rule_covered_objects,
+                ),
                 seen_objects=state["seen_objects"],
                 fallback_covered_objects=covered_objects or [],
+                receptacle=receptacle,
             )
             if normalized is not None:
                 _upsert_confirmed_preference(state, normalized)
+                if receptacle:
+                    unresolved_set = set(state["unresolved_objects"])
+                    for obj in normalized.get("covered_objects", []):
+                        if obj in unresolved_set:
+                            _upsert_confirmed_action(state, object_name=obj, receptacle=receptacle)
+                else:
+                    _auto_resolve_from_hypothesis(
+                        state=state,
+                        hypothesis_text=update.category_rule,
+                        covered_objects=normalized.get("covered_objects", []),
+                    )
         _apply_confirmed_actions(state=state, placements=update.confirmed_actions)
         _remove_negative_actions_for_confirmed(state=state, placements=update.confirmed_actions)
         _apply_negative_actions(state=state, placements=update.negative_actions)
         return recompute_online_placements(state)
 
-    def update_state_from_preference_summary_answer(
+    def update_state_from_preference_induction_answer(
         self,
         *,
         state: AgentState,
@@ -449,14 +590,14 @@ Seen objects:
         answer: str,
         question: Optional[str] = None,
     ) -> AgentState:
-        interpretation = self.interpret_preference_summary_answer(
+        interpretation = self.interpret_preference_induction_answer(
             state=state,
             hypothesis=hypothesis,
             covered_objects=covered_objects or [],
             answer=answer,
             question=question,
         )
-        return self.apply_preference_summary_interpretation(
+        return self.apply_preference_induction_interpretation(
             state=state,
             hypothesis=hypothesis,
             covered_objects=covered_objects or [],
@@ -477,6 +618,29 @@ def _dedupe_keep_order(items: Iterable[str]) -> List[str]:
 
 def _norm(text: str) -> str:
     return " ".join(text.lower().strip().split())
+
+
+def _fuzzy_match_receptacle(text: str, receptacles: List[str]) -> str:
+    """Return an exact receptacle name by progressive matching, or '' if no match.
+
+    Priority:
+    1. Exact match (case-insensitive)
+    2. Extracted text is a substring of a receptacle name
+    3. A receptacle name is a substring of the extracted text
+    """
+    if not text:
+        return ""
+    text_norm = text.strip().lower()
+    for r in receptacles:
+        if r.lower() == text_norm:
+            return r
+    for r in receptacles:
+        if text_norm in r.lower():
+            return r
+    for r in receptacles:
+        if r.lower() in text_norm:
+            return r
+    return ""
 
 
 def _apply_negative_action_receptacles(
@@ -556,17 +720,6 @@ def _append_qa_history(
     )
 
 
-def _confirmed_action_map(state: AgentState) -> dict[str, str]:
-    return {
-        item["object_name"]: item["receptacle"]
-        for item in state["confirmed_actions"]
-    }
-
-
-def _confirmed_action_objects(state: AgentState) -> set[str]:
-    return {item["object_name"] for item in state["confirmed_actions"]}
-
-
 def _upsert_confirmed_action(
     state: AgentState,
     *,
@@ -624,6 +777,7 @@ def _normalize_confirmed_preference(
     preference: LearnedPreferenceModel,
     seen_objects: List[str],
     fallback_covered_objects: Optional[List[str]] = None,
+    receptacle: str = "",
 ) -> Optional[LearnedPreference]:
     hypothesis = preference.hypothesis.strip()
     if not hypothesis:
@@ -640,10 +794,10 @@ def _normalize_confirmed_preference(
             else:
                 covered_objects = fallback
 
-    return LearnedPreference(
-        hypothesis=hypothesis,
-        covered_objects=covered_objects,
-    )
+    result = LearnedPreference(hypothesis=hypothesis, covered_objects=covered_objects)
+    if receptacle:
+        result["receptacle"] = receptacle
+    return result
 
 
 def _apply_confirmed_actions(
@@ -670,3 +824,38 @@ def recompute_online_placements(state: AgentState) -> AgentState:
         obj for obj in state["seen_objects"] if obj not in confirmed_objects
     ]
     return state
+
+
+def _auto_resolve_from_hypothesis(
+    *,
+    state: AgentState,
+    hypothesis_text: str,
+    covered_objects: List[str],
+) -> str:
+    """If the hypothesis text mentions exactly one receptacle, resolve all covered objects to it.
+    Returns the matched receptacle name, or "" if no unambiguous match."""
+    matched = [r for r in state["receptacles"] if r in hypothesis_text]
+    if len(matched) != 1:
+        return ""
+    receptacle = matched[0]
+    unresolved_set = set(state["unresolved_objects"])
+    for obj in covered_objects:
+        if obj in unresolved_set:
+            _upsert_confirmed_action(state, object_name=obj, receptacle=receptacle)
+    return receptacle
+
+
+def _apply_single_exception(
+    *,
+    state: AgentState,
+    interpretation: PreferenceInductionInterpretation,
+) -> None:
+    """Apply a single exception object→receptacle placement from a preference_induction result."""
+    obj = interpretation.exception_object_name.strip()
+    rec = interpretation.exception_receptacle.strip()
+    if not obj or not rec:
+        return
+    if obj not in state["seen_objects"] or rec not in state["receptacles"]:
+        return
+    _upsert_confirmed_action(state, object_name=obj, receptacle=rec)
+    _remove_negative_action(state=state, object_name=obj, receptacle=rec)

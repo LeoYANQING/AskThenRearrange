@@ -13,7 +13,7 @@ try:
     from v2.data import DEFAULT_DATA_PATH, Episode, get_episode
     from v2.evaluation import FinalPlacementPlanner, evaluate_episode_state, plot_ablation_comparison, plot_accuracy_curve
     from v2.oracle import NaturalUserOracle
-    from v2.proposers import ActionProposer, PreferenceElicitingProposer, PreferenceSummaryProposer
+    from v2.proposers import ActionProposer, PreferenceElicitingProposer, PreferenceInductionProposer
     from v2.question_policy import PolicyMode, QuestionDecision, QuestionPolicyController
     from v2.state_init import build_initial_state
     from v2.state_update import StateUpdate
@@ -22,7 +22,7 @@ except ModuleNotFoundError:
     from data import DEFAULT_DATA_PATH, Episode, get_episode
     from evaluation import FinalPlacementPlanner, evaluate_episode_state, plot_ablation_comparison, plot_accuracy_curve
     from oracle import NaturalUserOracle
-    from proposers import ActionProposer, PreferenceElicitingProposer, PreferenceSummaryProposer
+    from proposers import ActionProposer, PreferenceElicitingProposer, PreferenceInductionProposer
     from question_policy import PolicyMode, QuestionDecision, QuestionPolicyController
     from state_init import build_initial_state
     from state_update import StateUpdate
@@ -130,7 +130,7 @@ def _propose_intent(
     decision: QuestionDecision,
     eliciting_proposer: PreferenceElicitingProposer,
     action_proposer: ActionProposer,
-    summary_proposer: PreferenceSummaryProposer,
+    induction_proposer: PreferenceInductionProposer,
 ):
     if decision.question_pattern == "preference_eliciting":
         intent = eliciting_proposer.propose(
@@ -145,8 +145,8 @@ def _propose_intent(
             guidance=decision.guidance,
         )
 
-    if decision.question_pattern == "preference_summary":
-        intents = summary_proposer.propose(
+    if decision.question_pattern == "preference_induction":
+        intents = induction_proposer.propose(
             state=state,
             max_intents=3,
             guidance=decision.guidance,
@@ -164,7 +164,7 @@ def run_policy_loop(
     controller: QuestionPolicyController,
     eliciting_proposer: PreferenceElicitingProposer,
     action_proposer: ActionProposer,
-    summary_proposer: PreferenceSummaryProposer,
+    induction_proposer: PreferenceInductionProposer,
     oracle: NaturalUserOracle,
     updater: StateUpdate,
 ) -> AgentState:
@@ -184,7 +184,7 @@ def run_policy_loop(
             decision=decision,
             eliciting_proposer=eliciting_proposer,
             action_proposer=action_proposer,
-            summary_proposer=summary_proposer,
+            induction_proposer=induction_proposer,
         )
         if intent is None:
             print(f"[Episode {episode.episode_id} | Question Step {step_idx}] no proposer intent available for {decision.question_pattern}")
@@ -208,6 +208,7 @@ def run_policy_loop(
                 covered_objects=list(intent.get("covered_objects", [])),
                 answer=oracle_response.answer,
                 question=question,
+                oracle_receptacle=oracle_response.referenced_receptacle,
             )
         elif decision.question_pattern == "action_oriented":
             state = updater.update_state_from_action_answer(
@@ -217,8 +218,8 @@ def run_policy_loop(
                 question=intent.question,
                 action_mode=intent.action_mode,
             )
-        elif decision.question_pattern == "preference_summary":
-            state = updater.update_state_from_preference_summary_answer(
+        elif decision.question_pattern == "preference_induction":
+            state = updater.update_state_from_preference_induction_answer(
                 state=state,
                 hypothesis=str(intent.get("hypothesis", "")),
                 covered_objects=list(intent.get("covered_objects", [])),
@@ -273,7 +274,7 @@ def run_policy_episode(
         base_url=base_url,
         temperature=0.0,
     )
-    summary_proposer = PreferenceSummaryProposer(
+    induction_proposer = PreferenceInductionProposer(
         model=proposer_model,
         base_url=base_url,
         temperature=0.0,
@@ -306,7 +307,7 @@ def run_policy_episode(
         controller=controller,
         eliciting_proposer=eliciting_proposer,
         action_proposer=action_proposer,
-        summary_proposer=summary_proposer,
+        induction_proposer=induction_proposer,
         oracle=oracle,
         updater=updater,
     )

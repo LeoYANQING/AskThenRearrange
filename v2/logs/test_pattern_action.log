@@ -1,0 +1,230 @@
+=== Sample 1/3 | pattern=action_oriented | budget=3 | index=49 | id=episode_49 | room=bedroom ===
+[Sample episode_49 | Question Step 1] running action_oriented...
+[Sample episode_49 | Question Step 1] action_oriented
+  question: Where should the folded linen shirt go?
+  answer: The folded linen shirt goes on the wardrobe shelf.
+  timings: propose=4.636s, oracle=0.701s, update=0.909s
+  state: budget_used=1, unresolved=11, confirmed_actions=1, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_49 | Question Step 2] running action_oriented...
+[Sample episode_49 | Question Step 2] action_oriented
+  question: Where should the reading glasses go?
+  answer: The reading glasses go on the bedside table.
+  timings: propose=0.890s, oracle=0.618s, update=0.713s
+  state: budget_used=2, unresolved=10, confirmed_actions=2, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_49 | Question Step 3] running action_oriented...
+[Sample episode_49 | Question Step 3] action_oriented
+  question: Where should the rigid-cover photo diary go?
+  answer: The rigid-cover photo diary goes on the reading shelf.
+  timings: propose=0.944s, oracle=0.657s, update=0.850s
+  state: budget_used=3, unresolved=9, confirmed_actions=3, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+=== Sample Result | id=episode_49 | seen=0.7500 | unseen=0.5833 ===
+  timings: loop=10.921s, evaluation=3.210s, total=14.482s
+=== Sample 2/3 | pattern=action_oriented | budget=3 | index=53 | id=episode_53 | room=bedroom ===
+[Sample episode_53 | Question Step 1] running action_oriented...
+[Sample episode_53 | Question Step 1] action_oriented
+  question: Where should the wireless earbuds case go?
+  answer: The wireless earbuds case goes in the nightstand drawer.
+  timings: propose=0.905s, oracle=0.640s, update=0.899s
+  state: budget_used=1, unresolved=11, confirmed_actions=1, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_53 | Question Step 2] running action_oriented...
+[Sample episode_53 | Question Step 2] action_oriented
+  question: Where should the leather-bound notebook go?
+  answer: The leather-bound notebook goes on the bedroom bookshelf.
+  timings: propose=0.866s, oracle=0.612s, update=0.833s
+  state: budget_used=2, unresolved=10, confirmed_actions=2, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_53 | Question Step 3] running action_oriented...
+[Sample episode_53 | Question Step 3] action_oriented
+  question: Where should the hardcover novel go?
+  answer: The hardcover novel goes on the bedroom bookshelf.
+  timings: propose=0.931s, oracle=0.670s, update=0.854s
+  state: budget_used=3, unresolved=9, confirmed_actions=3, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+=== Sample Result | id=episode_53 | seen=0.5833 | unseen=0.5833 ===
+  timings: loop=7.210s, evaluation=3.374s, total=10.961s
+=== Sample 3/3 | pattern=action_oriented | budget=3 | index=97 | id=episode_97 | room=kitchen ===
+[Sample episode_97 | Question Step 1] running action_oriented...
+[Sample episode_97 | Question Step 1] action_oriented
+  question: Where should the silicone snack bag go?
+  answer: The silicone snack bag goes in the lower cabinet.
+  timings: propose=0.950s, oracle=0.632s, update=0.898s
+  state: budget_used=1, unresolved=11, confirmed_actions=1, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_97 | Question Step 2] running action_oriented...
+[Sample episode_97 | Question Step 2] action_oriented
+  question: Where should the milk carton go?
+  answer: The milk carton goes on the refrigerator shelf.
+  timings: propose=0.870s, oracle=0.680s, update=0.873s
+  state: budget_used=2, unresolved=10, confirmed_actions=2, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_97 | Question Step 3] running action_oriented...
+[Sample episode_97 | Question Step 3] action_oriented
+  question: Where should the rechargeable spice grinder go?
+  answer: The rechargeable spice grinder goes in the kitchen drawer.
+  timings: propose=0.920s, oracle=0.682s, update=0.848s
+  state: budget_used=3, unresolved=9, confirmed_actions=3, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+=== Sample Result | id=episode_97 | seen=0.3333 | unseen=0.3333 ===
+  timings: loop=7.353s, evaluation=3.235s, total=10.929s
+=== Sample 1/3 | pattern=action_oriented | budget=6 | index=49 | id=episode_49 | room=bedroom ===
+[Sample episode_49 | Question Step 1] running action_oriented...
+[Sample episode_49 | Question Step 1] action_oriented
+  question: Where should the folded linen shirt go?
+  answer: The folded linen shirt goes on the wardrobe shelf.
+  timings: propose=0.897s, oracle=0.667s, update=0.923s
+  state: budget_used=1, unresolved=11, confirmed_actions=1, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_49 | Question Step 2] running action_oriented...
+[Sample episode_49 | Question Step 2] action_oriented
+  question: Where should the reading glasses go?
+  answer: The reading glasses go on the bedside table.
+  timings: propose=0.837s, oracle=0.625s, update=0.788s
+  state: budget_used=2, unresolved=10, confirmed_actions=2, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_49 | Question Step 3] running action_oriented...
+[Sample episode_49 | Question Step 3] action_oriented
+  question: Where should the rigid-cover photo diary go?
+  answer: The rigid-cover photo diary goes on the reading shelf.
+  timings: propose=0.945s, oracle=0.718s, update=0.878s
+  state: budget_used=3, unresolved=9, confirmed_actions=3, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_49 | Question Step 4] running action_oriented...
+[Sample episode_49 | Question Step 4] action_oriented
+  question: Where should the leather-bound notebook go?
+  answer: The leather-bound notebook goes on the reading shelf.
+  timings: propose=0.971s, oracle=0.635s, update=0.755s
+  state: budget_used=4, unresolved=8, confirmed_actions=4, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_49 | Question Step 5] running action_oriented...
+[Sample episode_49 | Question Step 5] action_oriented
+  question: Where should the glass skincare jar go?
+  answer: The glass skincare jar goes on the dresser top.
+  timings: propose=0.909s, oracle=0.639s, update=0.701s
+  state: budget_used=5, unresolved=7, confirmed_actions=5, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_49 | Question Step 6] running action_oriented...
+[Sample episode_49 | Question Step 6] action_oriented
+  question: Where should the plug-in bedside lamp go?
+  answer: The plug-in bedside lamp goes on the bedside table.
+  timings: propose=0.972s, oracle=0.645s, update=0.912s
+  state: budget_used=6, unresolved=6, confirmed_actions=6, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+=== Sample Result | id=episode_49 | seen=0.7500 | unseen=0.5833 ===
+  timings: loop=14.418s, evaluation=2.832s, total=17.602s
+=== Sample 2/3 | pattern=action_oriented | budget=6 | index=53 | id=episode_53 | room=bedroom ===
+[Sample episode_53 | Question Step 1] running action_oriented...
+[Sample episode_53 | Question Step 1] action_oriented
+  question: Where should the wireless earbuds case go?
+  answer: The wireless earbuds case goes in the nightstand drawer.
+  timings: propose=0.916s, oracle=0.649s, update=0.867s
+  state: budget_used=1, unresolved=11, confirmed_actions=1, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_53 | Question Step 2] running action_oriented...
+[Sample episode_53 | Question Step 2] action_oriented
+  question: Where should the leather-bound notebook go?
+  answer: The leather-bound notebook goes on the bedroom bookshelf.
+  timings: propose=0.808s, oracle=0.649s, update=0.849s
+  state: budget_used=2, unresolved=10, confirmed_actions=2, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_53 | Question Step 3] running action_oriented...
+[Sample episode_53 | Question Step 3] action_oriented
+  question: Where should the hardcover novel go?
+  answer: The hardcover novel goes on the bedroom bookshelf.
+  timings: propose=0.894s, oracle=0.637s, update=0.832s
+  state: budget_used=3, unresolved=9, confirmed_actions=3, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_53 | Question Step 4] running action_oriented...
+[Sample episode_53 | Question Step 4] action_oriented
+  question: Where should the current paperback novel go?
+  answer: The current paperback novel goes on the nightstand.
+  timings: propose=0.926s, oracle=0.618s, update=0.721s
+  state: budget_used=4, unresolved=8, confirmed_actions=4, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_53 | Question Step 5] running action_oriented...
+[Sample episode_53 | Question Step 5] action_oriented
+  question: Where should the water tumbler go?
+  answer: The water tumbler goes on the nightstand.
+  timings: propose=0.999s, oracle=0.619s, update=0.835s
+  state: budget_used=5, unresolved=7, confirmed_actions=5, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_53 | Question Step 6] running action_oriented...
+[Sample episode_53 | Question Step 6] action_oriented
+  question: Where should the porcelain ring tray go?
+  answer: The porcelain ring tray goes on the dresser top.
+  timings: propose=0.934s, oracle=0.674s, update=0.739s
+  state: budget_used=6, unresolved=6, confirmed_actions=6, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+=== Sample Result | id=episode_53 | seen=0.6667 | unseen=0.6667 ===
+  timings: loop=14.170s, evaluation=2.838s, total=17.355s
+=== Sample 3/3 | pattern=action_oriented | budget=6 | index=97 | id=episode_97 | room=kitchen ===
+[Sample episode_97 | Question Step 1] running action_oriented...
+[Sample episode_97 | Question Step 1] action_oriented
+  question: Where should the silicone snack bag go?
+  answer: The silicone snack bag goes in the lower cabinet.
+  timings: propose=0.866s, oracle=0.615s, update=0.924s
+  state: budget_used=1, unresolved=11, confirmed_actions=1, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_97 | Question Step 2] running action_oriented...
+[Sample episode_97 | Question Step 2] action_oriented
+  question: Where should the milk carton go?
+  answer: The milk carton goes on the refrigerator shelf.
+  timings: propose=0.881s, oracle=0.642s, update=0.804s
+  state: budget_used=2, unresolved=10, confirmed_actions=2, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_97 | Question Step 3] running action_oriented...
+[Sample episode_97 | Question Step 3] action_oriented
+  question: Where should the rechargeable spice grinder go?
+  answer: The rechargeable spice grinder goes in the kitchen drawer.
+  timings: propose=0.876s, oracle=0.624s, update=0.847s
+  state: budget_used=3, unresolved=9, confirmed_actions=3, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_97 | Question Step 4] running action_oriented...
+[Sample episode_97 | Question Step 4] action_oriented
+  question: Where should the rubber-seal lunch box go?
+  answer: The rubber-seal lunch box goes in the lower cabinet.
+  timings: propose=1.008s, oracle=0.627s, update=0.917s
+  state: budget_used=4, unresolved=8, confirmed_actions=4, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_97 | Question Step 5] running action_oriented...
+[Sample episode_97 | Question Step 5] action_oriented
+  question: Where should the placemat stack go?
+  answer: The placemat stack goes in the lower cabinet.
+  timings: propose=0.899s, oracle=0.638s, update=0.806s
+  state: budget_used=5, unresolved=7, confirmed_actions=5, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+[Sample episode_97 | Question Step 6] running action_oriented...
+[Sample episode_97 | Question Step 6] action_oriented
+  question: Where should the bamboo tongs go?
+  answer: The bamboo tongs go in the kitchen drawer.
+  timings: propose=0.913s, oracle=0.690s, update=0.738s
+  state: budget_used=6, unresolved=6, confirmed_actions=6, confirmed_preferences=0, negative_preferences=0, negative_actions=0
+
+=== Sample Result | id=episode_97 | seen=0.5833 | unseen=0.5000 ===
+  timings: loop=14.318s, evaluation=2.930s, total=17.577s
+{
+  "pattern": "action_oriented",
+  "sample_indices": [
+    49,
+    53,
+    97
+  ],
+  "curve_points": [
+    {
+      "budget": 3,
+      "seen_accuracy": 0.5555555555555556,
+      "unseen_accuracy": 0.5,
+      "num_samples": 3
+    },
+    {
+      "budget": 6,
+      "seen_accuracy": 0.6666666666666666,
+      "unseen_accuracy": 0.5833333333333334,
+      "num_samples": 3
+    }
+  ],
+  "saved_plot": "v2/plots/action_oriented_loop_accuracy_curve.png"
+}

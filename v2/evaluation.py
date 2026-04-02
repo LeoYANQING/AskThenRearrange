@@ -46,68 +46,100 @@ class FinalPlacementPlanner:
         state: AgentState,
         target_objects: List[str],
         scope: str,
-        respect_exclusions: bool,
     ) -> PlacementMap:
         if not target_objects:
             return {}
 
-        scope_instruction = (
-            "assign one receptacle to each remaining unresolved seen object"
-            if scope == "seen"
-            else "assign one receptacle to each unseen object"
-        )
-        extra_instruction = (
-            "use the current state as planning context"
-            if scope == "seen"
-            else "generalize conservatively from the current state"
-        )
+        if scope == "seen":
+            system_prompt = """
+You complete the final seen-object placement plan for a household rearrangement agent.
 
-        system_prompt = f"""
-You complete the final {scope}-object placement plan for a household rearrangement agent.
+Your job: assign one receptacle to each remaining unresolved seen object.
 
-Your job:
-- {scope_instruction}
-- {extra_instruction}
-
-You may use:
-- room
-- receptacles
-- seen_objects
-- target_objects
-- confirmed_actions
-- negative_actions
-- confirmed_preferences
+How to use the evidence:
+- confirmed_actions of semantically similar objects are the strongest signal — prefer these for analogy
+- confirmed_preferences provide category-level context; a preference's "receptacle" field (if present) tells you where that category goes
+- only apply a confirmed_preference to a target object if the object clearly belongs to that preference's category
+- do not let a broad category rule override a more specific analogy from confirmed_actions
 
 Rules:
 - return only exact target object names as keys
-- return only exact receptacle names from the provided receptacles
-- be consistent with confirmed_actions and confirmed_preferences
+- return only exact receptacle names from the provided receptacles list
 - do not choose any object -> receptacle pair listed in negative_actions
 - make a complete plan for all target_objects
-- be consistent with confirmed_actions and confirmed_preferences
+""".strip()
+        else:
+            system_prompt = """
+You complete the final unseen-object placement plan for a household rearrangement agent.
+
+Unseen objects are objects the user has not yet seen or handled. They belong in the same household
+and should be organized following the same principles the user expressed for the seen objects.
+
+Inference strategy — apply in order for each unseen object:
+
+Step 1 — confirmed_preferences match:
+  For each unseen object, read every confirmed_preference.
+  Each preference has a "hypothesis" (category description) and optionally a "receptacle" field (exact place).
+  If the object's type, function, or use context fits the hypothesis category:
+    - If "receptacle" is present and non-empty, assign the object to that receptacle directly.
+    - If "receptacle" is absent or empty, infer the receptacle from the hypothesis text.
+  Example: preference {hypothesis: "reading materials", receptacle: "display shelf"} → assign any book-like unseen object to display shelf.
+
+Step 2 — confirmed_actions analogy:
+  If no confirmed_preference matches clearly, find the most semantically similar seen object in confirmed_actions.
+  Apply the same receptacle as that similar seen object.
+  Example: seen "plastic toy bin → decorative basket" → unseen "plastic puzzle case" is similar → decorative basket.
+
+Step 3 — receptacle frequency fallback:
+  If still uncertain, assign the receptacle that appears most frequently in confirmed_actions for that object type.
+
+Rules:
+- return only exact target object names as keys
+- return only exact receptacle names from the provided receptacles list
+- do not choose any object -> receptacle pair listed in negative_actions
+- make a complete plan for all target_objects
+- prefer a specific confirmed rule over a generic guess
 """.strip()
 
-        user_prompt = f"""
+        if scope == "seen":
+            user_prompt = f"""
 Room:
 {state["room"]}
 
 Receptacles:
 {state["receptacles"]}
 
-Seen objects:
-{state["seen_objects"]}
-
-Target objects:
+Target objects (assign each to one receptacle):
 {target_objects}
 
-Confirmed actions:
+Confirmed actions (already decided placements):
 {state["confirmed_actions"]}
 
-Negative actions:
-{state["negative_actions"]}
+Confirmed preferences (learned rules):
+{state["confirmed_preferences"]}
 
-Confirmed preferences:
-{_confirmed_preferences(state)}
+Negative actions (forbidden pairs):
+{state["negative_actions"]}
+""".strip()
+        else:
+            user_prompt = f"""
+Room:
+{state["room"]}
+
+Receptacles:
+{state["receptacles"]}
+
+Seen objects (for context — their organization reflects the user's preferences):
+{state["seen_objects"]}
+
+Confirmed actions for seen objects (use as analogy evidence):
+{state["confirmed_actions"]}
+
+Confirmed preferences (category-level rules — primary inference source):
+{state["confirmed_preferences"]}
+
+Target unseen objects (assign each to one receptacle by generalizing the rules above):
+{target_objects}
 """.strip()
 
         result = self.structured_model.invoke(
@@ -165,16 +197,10 @@ def finalize_seen_placements(
     *,
     planner: FinalPlacementPlanner,
 ) -> PlacementMap:
-    finalized = _derived_seen_placements(state)
-    remaining = [obj for obj in state["seen_objects"] if obj not in finalized]
-    planned = planner.plan_placements(
-        state=state,
-        target_objects=remaining,
-        scope="seen",
-        respect_exclusions=True,
-    )
-    finalized.update(planned)
-    return finalized
+    confirmed = {item["object_name"]: item["receptacle"] for item in state["confirmed_actions"]}
+    remaining = [obj for obj in state["seen_objects"] if obj not in confirmed]
+    planned = planner.plan_placements(state=state, target_objects=remaining, scope="seen")
+    return {**confirmed, **planned}
 
 
 def finalize_unseen_placements(
@@ -182,31 +208,11 @@ def finalize_unseen_placements(
     *,
     planner: FinalPlacementPlanner,
 ) -> PlacementMap:
-    finalized = {}
-    remaining = [obj for obj in state["unseen_objects"] if obj not in finalized]
-    planned = planner.plan_placements(
+    return planner.plan_placements(
         state=state,
-        target_objects=remaining,
+        target_objects=state["unseen_objects"],
         scope="unseen",
-        respect_exclusions=False,
     )
-    finalized.update(planned)
-    return finalized
-
-
-def _confirmed_preferences(state: AgentState) -> List[dict]:
-    return state["confirmed_preferences"]
-
-
-def _confirmed_action_map(state: AgentState) -> PlacementMap:
-    return {
-        item["object_name"]: item["receptacle"]
-        for item in state["confirmed_actions"]
-    }
-
-
-def _derived_seen_placements(state: AgentState) -> PlacementMap:
-    return _confirmed_action_map(state)
 
 
 def evaluate_episode_predictions(
@@ -288,18 +294,34 @@ def plot_ablation_comparison(
         "user_preference_first": "#1f77b4",
         "parallel_exploration": "#d55e00",
         "hybrid_all": "#2a9d8f",
+        # pattern ablation modes
+        "raw_llm": "#aaaaaa",
+        "action_oriented": "#2f2f2f",
+        "preference_eliciting": "#1f77b4",
+        "preference_induction_cold": "#d55e00",
+        "preference_induction_seeded": "#2a9d8f",
     }
     markers = {
         "direct_querying": "o",
         "user_preference_first": "s",
         "parallel_exploration": "^",
         "hybrid_all": "D",
+        "raw_llm": "x",
+        "action_oriented": "o",
+        "preference_eliciting": "s",
+        "preference_induction_cold": "^",
+        "preference_induction_seeded": "D",
     }
     linestyles = {
         "direct_querying": "-",
         "user_preference_first": "-",
         "parallel_exploration": "-",
         "hybrid_all": "--",
+        "raw_llm": ":",
+        "action_oriented": "-",
+        "preference_eliciting": "-",
+        "preference_induction_cold": "--",
+        "preference_induction_seeded": "-",
     }
 
     fig, axes = plt.subplots(1, 2, figsize=(10.8, 4.2), sharex=True, sharey=True)

@@ -1,0 +1,382 @@
+=== Sample 1/26 | raw_llm | budget=1 | index=26 | id=episode_26 | room=living room ===
+=== Result | id=episode_26 | seen=0.2500 | unseen=0.2500 | total=8.0s ===
+=== Sample 2/26 | raw_llm | budget=1 | index=27 | id=episode_27 | room=living room ===
+=== Result | id=episode_27 | seen=0.2500 | unseen=0.5000 | total=3.6s ===
+=== Sample 3/26 | raw_llm | budget=1 | index=28 | id=episode_28 | room=living room ===
+=== Result | id=episode_28 | seen=0.4167 | unseen=0.6667 | total=4.2s ===
+=== Sample 4/26 | raw_llm | budget=1 | index=29 | id=episode_29 | room=living room ===
+=== Result | id=episode_29 | seen=0.5833 | unseen=0.4167 | total=4.4s ===
+=== Sample 5/26 | raw_llm | budget=1 | index=30 | id=episode_30 | room=living room ===
+=== Result | id=episode_30 | seen=0.6667 | unseen=0.5000 | total=4.2s ===
+=== Sample 6/26 | raw_llm | budget=1 | index=31 | id=episode_31 | room=living room ===
+=== Result | id=episode_31 | seen=0.7500 | unseen=0.6667 | total=4.3s ===
+=== Sample 7/26 | raw_llm | budget=1 | index=32 | id=episode_32 | room=living room ===
+=== Result | id=episode_32 | seen=0.6667 | unseen=0.6667 | total=4.1s ===
+=== Sample 8/26 | raw_llm | budget=1 | index=33 | id=episode_33 | room=living room ===
+=== Result | id=episode_33 | seen=0.1667 | unseen=0.2500 | total=3.7s ===
+=== Sample 9/26 | raw_llm | budget=1 | index=34 | id=episode_34 | room=bedroom ===
+=== Result | id=episode_34 | seen=0.2500 | unseen=0.5833 | total=3.6s ===
+=== Sample 10/26 | raw_llm | budget=1 | index=35 | id=episode_35 | room=bedroom ===
+=== Result | id=episode_35 | seen=0.8333 | unseen=0.7500 | total=4.6s ===
+=== Sample 11/26 | raw_llm | budget=1 | index=36 | id=episode_36 | room=bedroom ===
+=== Result | id=episode_36 | seen=0.5833 | unseen=0.5833 | total=4.4s ===
+=== Sample 12/26 | raw_llm | budget=1 | index=37 | id=episode_37 | room=bedroom ===
+=== Result | id=episode_37 | seen=0.4167 | unseen=0.4167 | total=4.4s ===
+=== Sample 13/26 | raw_llm | budget=1 | index=38 | id=episode_38 | room=bedroom ===
+=== Result | id=episode_38 | seen=0.5833 | unseen=0.4167 | total=4.6s ===
+=== Sample 14/26 | raw_llm | budget=1 | index=39 | id=episode_39 | room=bedroom ===
+=== Result | id=episode_39 | seen=0.4167 | unseen=0.5833 | total=4.4s ===
+=== Sample 15/26 | raw_llm | budget=1 | index=40 | id=episode_40 | room=bedroom ===
+=== Result | id=episode_40 | seen=0.8333 | unseen=0.8333 | total=4.7s ===
+=== Sample 16/26 | raw_llm | budget=1 | index=41 | id=episode_41 | room=bedroom ===
+=== Result | id=episode_41 | seen=0.6667 | unseen=0.5000 | total=4.3s ===
+=== Sample 17/26 | raw_llm | budget=1 | index=42 | id=episode_42 | room=bedroom ===
+=== Result | id=episode_42 | seen=0.3333 | unseen=0.4167 | total=4.6s ===
+=== Sample 18/26 | raw_llm | budget=1 | index=43 | id=episode_43 | room=bedroom ===
+=== Result | id=episode_43 | seen=0.5000 | unseen=0.2500 | total=4.7s ===
+=== Sample 19/26 | raw_llm | budget=1 | index=44 | id=episode_44 | room=bedroom ===
+=== Result | id=episode_44 | seen=0.3333 | unseen=0.3333 | total=4.5s ===
+=== Sample 20/26 | raw_llm | budget=1 | index=45 | id=episode_45 | room=bedroom ===
+=== Result | id=episode_45 | seen=0.3333 | unseen=0.5000 | total=4.3s ===
+=== Sample 21/26 | raw_llm | budget=1 | index=46 | id=episode_46 | room=bedroom ===
+=== Result | id=episode_46 | seen=0.7500 | unseen=0.5833 | total=4.2s ===
+=== Sample 22/26 | raw_llm | budget=1 | index=47 | id=episode_47 | room=bedroom ===
+=== Result | id=episode_47 | seen=0.5000 | unseen=0.4167 | total=4.5s ===
+=== Sample 23/26 | raw_llm | budget=1 | index=48 | id=episode_48 | room=bedroom ===
+=== Result | id=episode_48 | seen=0.8333 | unseen=0.2500 | total=4.6s ===
+=== Sample 24/26 | raw_llm | budget=1 | index=49 | id=episode_49 | room=bedroom ===
+=== Result | id=episode_49 | seen=0.6667 | unseen=0.5000 | total=4.5s ===
+=== Sample 25/26 | raw_llm | budget=1 | index=50 | id=episode_50 | room=bedroom ===
+=== Result | id=episode_50 | seen=0.5000 | unseen=0.4167 | total=4.2s ===
+=== Sample 26/26 | raw_llm | budget=1 | index=51 | id=episode_51 | room=bedroom ===
+=== Result | id=episode_51 | seen=0.4167 | unseen=0.4167 | total=4.4s ===
+=== Sample 1/26 | raw_llm | budget=2 | index=26 | id=episode_26 | room=living room ===
+=== Result | id=episode_26 | seen=0.0000 | unseen=0.0000 | total=6.8s ===
+=== Sample 2/26 | raw_llm | budget=2 | index=27 | id=episode_27 | room=living room ===
+=== Result | id=episode_27 | seen=0.5000 | unseen=0.2500 | total=5.5s ===
+=== Sample 3/26 | raw_llm | budget=2 | index=28 | id=episode_28 | room=living room ===
+=== Result | id=episode_28 | seen=0.2500 | unseen=0.5000 | total=5.5s ===
+=== Sample 4/26 | raw_llm | budget=2 | index=29 | id=episode_29 | room=living room ===
+=== Result | id=episode_29 | seen=0.5833 | unseen=0.5833 | total=6.5s ===
+=== Sample 5/26 | raw_llm | budget=2 | index=30 | id=episode_30 | room=living room ===
+=== Result | id=episode_30 | seen=0.8333 | unseen=0.5000 | total=5.6s ===
+=== Sample 6/26 | raw_llm | budget=2 | index=31 | id=episode_31 | room=living room ===
+=== Result | id=episode_31 | seen=0.7500 | unseen=0.6667 | total=5.7s ===
+=== Sample 7/26 | raw_llm | budget=2 | index=32 | id=episode_32 | room=living room ===
+=== Result | id=episode_32 | seen=0.1667 | unseen=0.5000 | total=4.8s ===
+=== Sample 8/26 | raw_llm | budget=2 | index=33 | id=episode_33 | room=living room ===
+=== Result | id=episode_33 | seen=0.5000 | unseen=0.5833 | total=5.6s ===
+=== Sample 9/26 | raw_llm | budget=2 | index=34 | id=episode_34 | room=bedroom ===
+=== Result | id=episode_34 | seen=0.8333 | unseen=0.6667 | total=6.0s ===
+=== Sample 10/26 | raw_llm | budget=2 | index=35 | id=episode_35 | room=bedroom ===
+=== Result | id=episode_35 | seen=0.5000 | unseen=0.6667 | total=6.0s ===
+=== Sample 11/26 | raw_llm | budget=2 | index=36 | id=episode_36 | room=bedroom ===
+=== Result | id=episode_36 | seen=0.5833 | unseen=0.7500 | total=5.9s ===
+=== Sample 12/26 | raw_llm | budget=2 | index=37 | id=episode_37 | room=bedroom ===
+=== Result | id=episode_37 | seen=0.3333 | unseen=0.2500 | total=6.6s ===
+=== Sample 13/26 | raw_llm | budget=2 | index=38 | id=episode_38 | room=bedroom ===
+=== Result | id=episode_38 | seen=0.7500 | unseen=0.4167 | total=5.8s ===
+=== Sample 14/26 | raw_llm | budget=2 | index=39 | id=episode_39 | room=bedroom ===
+=== Result | id=episode_39 | seen=0.4167 | unseen=0.3333 | total=5.8s ===
+=== Sample 15/26 | raw_llm | budget=2 | index=40 | id=episode_40 | room=bedroom ===
+=== Result | id=episode_40 | seen=0.6667 | unseen=0.5833 | total=5.6s ===
+=== Sample 16/26 | raw_llm | budget=2 | index=41 | id=episode_41 | room=bedroom ===
+=== Result | id=episode_41 | seen=0.6667 | unseen=0.6667 | total=5.9s ===
+=== Sample 17/26 | raw_llm | budget=2 | index=42 | id=episode_42 | room=bedroom ===
+=== Result | id=episode_42 | seen=0.3333 | unseen=0.3333 | total=6.0s ===
+=== Sample 18/26 | raw_llm | budget=2 | index=43 | id=episode_43 | room=bedroom ===
+=== Result | id=episode_43 | seen=0.3333 | unseen=0.2500 | total=5.8s ===
+=== Sample 19/26 | raw_llm | budget=2 | index=44 | id=episode_44 | room=bedroom ===
+=== Result | id=episode_44 | seen=0.2500 | unseen=0.3333 | total=5.8s ===
+=== Sample 20/26 | raw_llm | budget=2 | index=45 | id=episode_45 | room=bedroom ===
+=== Result | id=episode_45 | seen=0.3333 | unseen=0.5833 | total=5.6s ===
+=== Sample 21/26 | raw_llm | budget=2 | index=46 | id=episode_46 | room=bedroom ===
+=== Result | id=episode_46 | seen=0.8333 | unseen=0.6667 | total=5.6s ===
+=== Sample 22/26 | raw_llm | budget=2 | index=47 | id=episode_47 | room=bedroom ===
+=== Result | id=episode_47 | seen=0.5000 | unseen=0.4167 | total=6.0s ===
+=== Sample 23/26 | raw_llm | budget=2 | index=48 | id=episode_48 | room=bedroom ===
+=== Result | id=episode_48 | seen=0.7500 | unseen=0.4167 | total=5.8s ===
+=== Sample 24/26 | raw_llm | budget=2 | index=49 | id=episode_49 | room=bedroom ===
+=== Result | id=episode_49 | seen=0.6667 | unseen=0.5000 | total=5.8s ===
+=== Sample 25/26 | raw_llm | budget=2 | index=50 | id=episode_50 | room=bedroom ===
+=== Result | id=episode_50 | seen=0.6667 | unseen=0.5000 | total=6.1s ===
+=== Sample 26/26 | raw_llm | budget=2 | index=51 | id=episode_51 | room=bedroom ===
+=== Result | id=episode_51 | seen=0.5000 | unseen=0.3333 | total=5.6s ===
+=== Sample 1/26 | raw_llm | budget=3 | index=26 | id=episode_26 | room=living room ===
+=== Result | id=episode_26 | seen=0.5000 | unseen=0.5000 | total=7.1s ===
+=== Sample 2/26 | raw_llm | budget=3 | index=27 | id=episode_27 | room=living room ===
+=== Result | id=episode_27 | seen=0.5833 | unseen=0.8333 | total=7.0s ===
+=== Sample 3/26 | raw_llm | budget=3 | index=28 | id=episode_28 | room=living room ===
+=== Result | id=episode_28 | seen=0.3333 | unseen=0.5000 | total=7.3s ===
+=== Sample 4/26 | raw_llm | budget=3 | index=29 | id=episode_29 | room=living room ===
+=== Result | id=episode_29 | seen=0.5833 | unseen=0.5833 | total=7.9s ===
+=== Sample 5/26 | raw_llm | budget=3 | index=30 | id=episode_30 | room=living room ===
+=== Result | id=episode_30 | seen=0.7500 | unseen=0.5000 | total=7.0s ===
+=== Sample 6/26 | raw_llm | budget=3 | index=31 | id=episode_31 | room=living room ===
+=== Result | id=episode_31 | seen=0.5833 | unseen=0.6667 | total=6.9s ===
+=== Sample 7/26 | raw_llm | budget=3 | index=32 | id=episode_32 | room=living room ===
+=== Result | id=episode_32 | seen=0.6667 | unseen=0.6667 | total=7.0s ===
+=== Sample 8/26 | raw_llm | budget=3 | index=33 | id=episode_33 | room=living room ===
+=== Result | id=episode_33 | seen=0.4167 | unseen=0.5000 | total=7.2s ===
+=== Sample 9/26 | raw_llm | budget=3 | index=34 | id=episode_34 | room=bedroom ===
+=== Result | id=episode_34 | seen=0.9167 | unseen=0.8333 | total=7.7s ===
+=== Sample 10/26 | raw_llm | budget=3 | index=35 | id=episode_35 | room=bedroom ===
+=== Result | id=episode_35 | seen=0.6667 | unseen=0.7500 | total=7.4s ===
+=== Sample 11/26 | raw_llm | budget=3 | index=36 | id=episode_36 | room=bedroom ===
+=== Result | id=episode_36 | seen=0.5833 | unseen=0.6667 | total=7.8s ===
+=== Sample 12/26 | raw_llm | budget=3 | index=37 | id=episode_37 | room=bedroom ===
+=== Result | id=episode_37 | seen=0.2500 | unseen=0.7500 | total=7.3s ===
+=== Sample 13/26 | raw_llm | budget=3 | index=38 | id=episode_38 | room=bedroom ===
+=== Result | id=episode_38 | seen=0.7500 | unseen=0.8333 | total=7.2s ===
+=== Sample 14/26 | raw_llm | budget=3 | index=39 | id=episode_39 | room=bedroom ===
+=== Result | id=episode_39 | seen=0.4167 | unseen=0.3333 | total=7.2s ===
+=== Sample 15/26 | raw_llm | budget=3 | index=40 | id=episode_40 | room=bedroom ===
+=== Result | id=episode_40 | seen=0.6667 | unseen=0.5833 | total=7.1s ===
+=== Sample 16/26 | raw_llm | budget=3 | index=41 | id=episode_41 | room=bedroom ===
+=== Result | id=episode_41 | seen=0.5000 | unseen=0.5000 | total=7.2s ===
+=== Sample 17/26 | raw_llm | budget=3 | index=42 | id=episode_42 | room=bedroom ===
+=== Result | id=episode_42 | seen=0.2500 | unseen=0.5833 | total=7.5s ===
+=== Sample 18/26 | raw_llm | budget=3 | index=43 | id=episode_43 | room=bedroom ===
+=== Result | id=episode_43 | seen=0.5000 | unseen=0.4167 | total=7.2s ===
+=== Sample 19/26 | raw_llm | budget=3 | index=44 | id=episode_44 | room=bedroom ===
+=== Result | id=episode_44 | seen=0.5000 | unseen=0.5833 | total=7.3s ===
+=== Sample 20/26 | raw_llm | budget=3 | index=45 | id=episode_45 | room=bedroom ===
+=== Result | id=episode_45 | seen=0.3333 | unseen=0.7500 | total=7.0s ===
+=== Sample 21/26 | raw_llm | budget=3 | index=46 | id=episode_46 | room=bedroom ===
+=== Result | id=episode_46 | seen=0.8333 | unseen=0.6667 | total=6.9s ===
+=== Sample 22/26 | raw_llm | budget=3 | index=47 | id=episode_47 | room=bedroom ===
+=== Result | id=episode_47 | seen=0.8333 | unseen=0.7500 | total=7.4s ===
+=== Sample 23/26 | raw_llm | budget=3 | index=48 | id=episode_48 | room=bedroom ===
+=== Result | id=episode_48 | seen=0.6667 | unseen=0.5000 | total=7.4s ===
+=== Sample 24/26 | raw_llm | budget=3 | index=49 | id=episode_49 | room=bedroom ===
+=== Result | id=episode_49 | seen=0.6667 | unseen=0.5833 | total=7.2s ===
+=== Sample 25/26 | raw_llm | budget=3 | index=50 | id=episode_50 | room=bedroom ===
+=== Result | id=episode_50 | seen=0.7500 | unseen=0.5833 | total=7.6s ===
+=== Sample 26/26 | raw_llm | budget=3 | index=51 | id=episode_51 | room=bedroom ===
+=== Result | id=episode_51 | seen=0.4167 | unseen=0.5000 | total=6.8s ===
+=== Sample 1/26 | raw_llm | budget=4 | index=26 | id=episode_26 | room=living room ===
+=== Result | id=episode_26 | seen=0.0000 | unseen=0.0000 | total=5703.4s ===
+=== Sample 2/26 | raw_llm | budget=4 | index=27 | id=episode_27 | room=living room ===
+=== Result | id=episode_27 | seen=0.6667 | unseen=0.7500 | total=8.8s ===
+=== Sample 3/26 | raw_llm | budget=4 | index=28 | id=episode_28 | room=living room ===
+=== Result | id=episode_28 | seen=0.3333 | unseen=0.5000 | total=8.8s ===
+=== Sample 4/26 | raw_llm | budget=4 | index=29 | id=episode_29 | room=living room ===
+=== Result | id=episode_29 | seen=0.5833 | unseen=0.5000 | total=8.9s ===
+=== Sample 5/26 | raw_llm | budget=4 | index=30 | id=episode_30 | room=living room ===
+=== Result | id=episode_30 | seen=0.7500 | unseen=0.6667 | total=8.8s ===
+=== Sample 6/26 | raw_llm | budget=4 | index=31 | id=episode_31 | room=living room ===
+=== Result | id=episode_31 | seen=0.7500 | unseen=0.6667 | total=9.0s ===
+=== Sample 7/26 | raw_llm | budget=4 | index=32 | id=episode_32 | room=living room ===
+=== Result | id=episode_32 | seen=0.7500 | unseen=0.6667 | total=8.6s ===
+=== Sample 8/26 | raw_llm | budget=4 | index=33 | id=episode_33 | room=living room ===
+=== Result | id=episode_33 | seen=0.2500 | unseen=0.5000 | total=10.8s ===
+=== Sample 9/26 | raw_llm | budget=4 | index=34 | id=episode_34 | room=bedroom ===
+=== Result | id=episode_34 | seen=0.9167 | unseen=0.8333 | total=9.5s ===
+=== Sample 10/26 | raw_llm | budget=4 | index=35 | id=episode_35 | room=bedroom ===
+=== Result | id=episode_35 | seen=0.8333 | unseen=0.7500 | total=9.2s ===
+=== Sample 11/26 | raw_llm | budget=4 | index=36 | id=episode_36 | room=bedroom ===
+=== Result | id=episode_36 | seen=0.5833 | unseen=0.5000 | total=9.0s ===
+=== Sample 12/26 | raw_llm | budget=4 | index=37 | id=episode_37 | room=bedroom ===
+=== Result | id=episode_37 | seen=0.8333 | unseen=0.6667 | total=8.8s ===
+=== Sample 13/26 | raw_llm | budget=4 | index=38 | id=episode_38 | room=bedroom ===
+=== Result | id=episode_38 | seen=0.8333 | unseen=0.9167 | total=8.7s ===
+=== Sample 14/26 | raw_llm | budget=4 | index=39 | id=episode_39 | room=bedroom ===
+=== Result | id=episode_39 | seen=0.5833 | unseen=0.3333 | total=9.0s ===
+=== Sample 15/26 | raw_llm | budget=4 | index=40 | id=episode_40 | room=bedroom ===
+=== Result | id=episode_40 | seen=0.6667 | unseen=0.6667 | total=8.9s ===
+=== Sample 16/26 | raw_llm | budget=4 | index=41 | id=episode_41 | room=bedroom ===
+=== Result | id=episode_41 | seen=0.8333 | unseen=0.8333 | total=8.9s ===
+=== Sample 17/26 | raw_llm | budget=4 | index=42 | id=episode_42 | room=bedroom ===
+=== Result | id=episode_42 | seen=0.2500 | unseen=0.6667 | total=8.9s ===
+=== Sample 18/26 | raw_llm | budget=4 | index=43 | id=episode_43 | room=bedroom ===
+=== Result | id=episode_43 | seen=0.5833 | unseen=0.5833 | total=9.2s ===
+=== Sample 19/26 | raw_llm | budget=4 | index=44 | id=episode_44 | room=bedroom ===
+=== Result | id=episode_44 | seen=0.5000 | unseen=0.5833 | total=8.9s ===
+=== Sample 20/26 | raw_llm | budget=4 | index=45 | id=episode_45 | room=bedroom ===
+=== Result | id=episode_45 | seen=0.5833 | unseen=0.7500 | total=8.7s ===
+=== Sample 21/26 | raw_llm | budget=4 | index=46 | id=episode_46 | room=bedroom ===
+=== Result | id=episode_46 | seen=0.9167 | unseen=0.7500 | total=8.6s ===
+=== Sample 22/26 | raw_llm | budget=4 | index=47 | id=episode_47 | room=bedroom ===
+=== Result | id=episode_47 | seen=0.8333 | unseen=0.7500 | total=9.4s ===
+=== Sample 23/26 | raw_llm | budget=4 | index=48 | id=episode_48 | room=bedroom ===
+=== Result | id=episode_48 | seen=0.6667 | unseen=0.6667 | total=9.1s ===
+=== Sample 24/26 | raw_llm | budget=4 | index=49 | id=episode_49 | room=bedroom ===
+=== Result | id=episode_49 | seen=0.6667 | unseen=0.5833 | total=8.9s ===
+=== Sample 25/26 | raw_llm | budget=4 | index=50 | id=episode_50 | room=bedroom ===
+=== Result | id=episode_50 | seen=0.7500 | unseen=0.6667 | total=9.4s ===
+=== Sample 26/26 | raw_llm | budget=4 | index=51 | id=episode_51 | room=bedroom ===
+=== Result | id=episode_51 | seen=0.6667 | unseen=0.5833 | total=8.7s ===
+=== Sample 1/26 | raw_llm | budget=5 | index=26 | id=episode_26 | room=living room ===
+=== Result | id=episode_26 | seen=0.0000 | unseen=0.0000 | total=5689.3s ===
+=== Sample 2/26 | raw_llm | budget=5 | index=27 | id=episode_27 | room=living room ===
+=== Result | id=episode_27 | seen=0.8333 | unseen=0.6667 | total=10.6s ===
+=== Sample 3/26 | raw_llm | budget=5 | index=28 | id=episode_28 | room=living room ===
+=== Result | id=episode_28 | seen=0.5833 | unseen=0.5833 | total=10.3s ===
+=== Sample 4/26 | raw_llm | budget=5 | index=29 | id=episode_29 | room=living room ===
+=== Result | id=episode_29 | seen=0.6667 | unseen=0.5000 | total=11.1s ===
+=== Sample 5/26 | raw_llm | budget=5 | index=30 | id=episode_30 | room=living room ===
+=== Result | id=episode_30 | seen=0.8333 | unseen=0.8333 | total=10.3s ===
+=== Sample 6/26 | raw_llm | budget=5 | index=31 | id=episode_31 | room=living room ===
+=== Result | id=episode_31 | seen=0.5833 | unseen=0.5000 | total=10.4s ===
+=== Sample 7/26 | raw_llm | budget=5 | index=32 | id=episode_32 | room=living room ===
+=== Result | id=episode_32 | seen=0.5833 | unseen=0.4167 | total=10.0s ===
+=== Sample 8/26 | raw_llm | budget=5 | index=33 | id=episode_33 | room=living room ===
+=== Result | id=episode_33 | seen=0.6667 | unseen=0.5833 | total=10.2s ===
+=== Sample 9/26 | raw_llm | budget=5 | index=34 | id=episode_34 | room=bedroom ===
+=== Result | id=episode_34 | seen=0.9167 | unseen=0.9167 | total=11.0s ===
+=== Sample 10/26 | raw_llm | budget=5 | index=35 | id=episode_35 | room=bedroom ===
+=== Result | id=episode_35 | seen=1.0000 | unseen=0.8333 | total=10.4s ===
+=== Sample 11/26 | raw_llm | budget=5 | index=36 | id=episode_36 | room=bedroom ===
+=== Result | id=episode_36 | seen=0.5833 | unseen=0.5000 | total=10.2s ===
+=== Sample 12/26 | raw_llm | budget=5 | index=37 | id=episode_37 | room=bedroom ===
+=== Result | id=episode_37 | seen=0.6667 | unseen=0.6667 | total=10.3s ===
+=== Sample 13/26 | raw_llm | budget=5 | index=38 | id=episode_38 | room=bedroom ===
+=== Result | id=episode_38 | seen=0.7500 | unseen=0.9167 | total=10.4s ===
+=== Sample 14/26 | raw_llm | budget=5 | index=39 | id=episode_39 | room=bedroom ===
+=== Result | id=episode_39 | seen=0.5833 | unseen=0.4167 | total=10.3s ===
+=== Sample 15/26 | raw_llm | budget=5 | index=40 | id=episode_40 | room=bedroom ===
+=== Result | id=episode_40 | seen=0.7500 | unseen=0.5833 | total=10.5s ===
+=== Sample 16/26 | raw_llm | budget=5 | index=41 | id=episode_41 | room=bedroom ===
+=== Result | id=episode_41 | seen=0.8333 | unseen=1.0000 | total=10.4s ===
+=== Sample 17/26 | raw_llm | budget=5 | index=42 | id=episode_42 | room=bedroom ===
+=== Result | id=episode_42 | seen=0.7500 | unseen=0.5000 | total=11.3s ===
+=== Sample 18/26 | raw_llm | budget=5 | index=43 | id=episode_43 | room=bedroom ===
+=== Result | id=episode_43 | seen=0.7500 | unseen=0.5833 | total=10.8s ===
+=== Sample 19/26 | raw_llm | budget=5 | index=44 | id=episode_44 | room=bedroom ===
+=== Result | id=episode_44 | seen=0.4167 | unseen=0.7500 | total=10.2s ===
+=== Sample 20/26 | raw_llm | budget=5 | index=45 | id=episode_45 | room=bedroom ===
+=== Result | id=episode_45 | seen=0.6667 | unseen=0.8333 | total=9.9s ===
+=== Sample 21/26 | raw_llm | budget=5 | index=46 | id=episode_46 | room=bedroom ===
+=== Result | id=episode_46 | seen=0.9167 | unseen=0.7500 | total=10.0s ===
+=== Sample 22/26 | raw_llm | budget=5 | index=47 | id=episode_47 | room=bedroom ===
+=== Result | id=episode_47 | seen=0.8333 | unseen=0.7500 | total=10.3s ===
+=== Sample 23/26 | raw_llm | budget=5 | index=48 | id=episode_48 | room=bedroom ===
+=== Result | id=episode_48 | seen=0.9167 | unseen=0.7500 | total=10.6s ===
+=== Sample 24/26 | raw_llm | budget=5 | index=49 | id=episode_49 | room=bedroom ===
+=== Result | id=episode_49 | seen=0.6667 | unseen=0.5833 | total=10.1s ===
+=== Sample 25/26 | raw_llm | budget=5 | index=50 | id=episode_50 | room=bedroom ===
+=== Result | id=episode_50 | seen=0.6667 | unseen=0.6667 | total=10.8s ===
+=== Sample 26/26 | raw_llm | budget=5 | index=51 | id=episode_51 | room=bedroom ===
+=== Result | id=episode_51 | seen=0.8333 | unseen=0.5000 | total=10.1s ===
+=== Sample 1/26 | raw_llm | budget=6 | index=26 | id=episode_26 | room=living room ===
+=== Result | id=episode_26 | seen=0.0000 | unseen=0.0000 | total=5683.9s ===
+=== Sample 2/26 | raw_llm | budget=6 | index=27 | id=episode_27 | room=living room ===
+=== Result | id=episode_27 | seen=0.9167 | unseen=0.5833 | total=12.4s ===
+=== Sample 3/26 | raw_llm | budget=6 | index=28 | id=episode_28 | room=living room ===
+=== Result | id=episode_28 | seen=0.5833 | unseen=0.5833 | total=11.7s ===
+=== Sample 4/26 | raw_llm | budget=6 | index=29 | id=episode_29 | room=living room ===
+=== Result | id=episode_29 | seen=0.6667 | unseen=0.6667 | total=12.3s ===
+=== Sample 5/26 | raw_llm | budget=6 | index=30 | id=episode_30 | room=living room ===
+=== Result | id=episode_30 | seen=0.8333 | unseen=0.8333 | total=11.8s ===
+=== Sample 6/26 | raw_llm | budget=6 | index=31 | id=episode_31 | room=living room ===
+=== Result | id=episode_31 | seen=0.7500 | unseen=0.6667 | total=11.8s ===
+=== Sample 7/26 | raw_llm | budget=6 | index=32 | id=episode_32 | room=living room ===
+=== Result | id=episode_32 | seen=0.8333 | unseen=0.4167 | total=11.4s ===
+=== Sample 8/26 | raw_llm | budget=6 | index=33 | id=episode_33 | room=living room ===
+=== Result | id=episode_33 | seen=0.6667 | unseen=0.5833 | total=11.7s ===
+=== Sample 9/26 | raw_llm | budget=6 | index=34 | id=episode_34 | room=bedroom ===
+=== Result | id=episode_34 | seen=0.9167 | unseen=0.8333 | total=11.8s ===
+=== Sample 10/26 | raw_llm | budget=6 | index=35 | id=episode_35 | room=bedroom ===
+=== Result | id=episode_35 | seen=0.8333 | unseen=0.0833 | total=11.8s ===
+=== Sample 11/26 | raw_llm | budget=6 | index=36 | id=episode_36 | room=bedroom ===
+=== Result | id=episode_36 | seen=0.6667 | unseen=0.5833 | total=11.9s ===
+=== Sample 12/26 | raw_llm | budget=6 | index=37 | id=episode_37 | room=bedroom ===
+=== Result | id=episode_37 | seen=0.5000 | unseen=0.5000 | total=12.3s ===
+=== Sample 13/26 | raw_llm | budget=6 | index=38 | id=episode_38 | room=bedroom ===
+=== Result | id=episode_38 | seen=0.8333 | unseen=0.9167 | total=12.0s ===
+=== Sample 14/26 | raw_llm | budget=6 | index=39 | id=episode_39 | room=bedroom ===
+=== Result | id=episode_39 | seen=0.6667 | unseen=0.3333 | total=11.9s ===
+=== Sample 15/26 | raw_llm | budget=6 | index=40 | id=episode_40 | room=bedroom ===
+=== Result | id=episode_40 | seen=0.7500 | unseen=0.5833 | total=13.5s ===
+=== Sample 16/26 | raw_llm | budget=6 | index=41 | id=episode_41 | room=bedroom ===
+=== Result | id=episode_41 | seen=1.0000 | unseen=0.7500 | total=12.6s ===
+=== Sample 17/26 | raw_llm | budget=6 | index=42 | id=episode_42 | room=bedroom ===
+=== Result | id=episode_42 | seen=0.8333 | unseen=0.4167 | total=12.2s ===
+=== Sample 18/26 | raw_llm | budget=6 | index=43 | id=episode_43 | room=bedroom ===
+=== Result | id=episode_43 | seen=0.8333 | unseen=0.5833 | total=11.8s ===
+=== Sample 19/26 | raw_llm | budget=6 | index=44 | id=episode_44 | room=bedroom ===
+=== Result | id=episode_44 | seen=0.5833 | unseen=0.8333 | total=12.1s ===
+=== Sample 20/26 | raw_llm | budget=6 | index=45 | id=episode_45 | room=bedroom ===
+=== Result | id=episode_45 | seen=0.7500 | unseen=0.8333 | total=11.1s ===
+=== Sample 21/26 | raw_llm | budget=6 | index=46 | id=episode_46 | room=bedroom ===
+=== Result | id=episode_46 | seen=0.9167 | unseen=0.5833 | total=11.3s ===
+=== Sample 22/26 | raw_llm | budget=6 | index=47 | id=episode_47 | room=bedroom ===
+=== Result | id=episode_47 | seen=0.7500 | unseen=0.7500 | total=11.7s ===
+=== Sample 23/26 | raw_llm | budget=6 | index=48 | id=episode_48 | room=bedroom ===
+=== Result | id=episode_48 | seen=0.9167 | unseen=0.8333 | total=12.3s ===
+=== Sample 24/26 | raw_llm | budget=6 | index=49 | id=episode_49 | room=bedroom ===
+=== Result | id=episode_49 | seen=0.7500 | unseen=0.5833 | total=11.6s ===
+=== Sample 25/26 | raw_llm | budget=6 | index=50 | id=episode_50 | room=bedroom ===
+=== Result | id=episode_50 | seen=0.8333 | unseen=0.6667 | total=12.3s ===
+=== Sample 26/26 | raw_llm | budget=6 | index=51 | id=episode_51 | room=bedroom ===
+=== Result | id=episode_51 | seen=0.8333 | unseen=0.4167 | total=11.4s ===
+{
+  "pattern": "raw_llm",
+  "sample_indices": [
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51
+  ],
+  "curve_points": [
+    {
+      "budget": 1,
+      "seen_accuracy": 0.5192307692307693,
+      "unseen_accuracy": 0.4871794871794871,
+      "num_samples": 26
+    },
+    {
+      "budget": 2,
+      "seen_accuracy": 0.5192307692307693,
+      "unseen_accuracy": 0.47115384615384615,
+      "num_samples": 26
+    },
+    {
+      "budget": 3,
+      "seen_accuracy": 0.5737179487179487,
+      "unseen_accuracy": 0.6121794871794873,
+      "num_samples": 26
+    },
+    {
+      "budget": 4,
+      "seen_accuracy": 0.6378205128205129,
+      "unseen_accuracy": 0.6282051282051282,
+      "num_samples": 26
+    },
+    {
+      "budget": 5,
+      "seen_accuracy": 0.7019230769230771,
+      "unseen_accuracy": 0.6378205128205129,
+      "num_samples": 26
+    },
+    {
+      "budget": 6,
+      "seen_accuracy": 0.7467948717948718,
+      "unseen_accuracy": 0.592948717948718,
+      "num_samples": 26
+    }
+  ],
+  "saved_plot": "v2/plots/raw_llm_accuracy_curve.png"
+}

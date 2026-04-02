@@ -16,8 +16,8 @@ try:
     from v2.proposers import (
         ActionProposer,
         PreferenceElicitingProposer,
-        PreferenceSummaryProposer,
-        propose_preference_summary_intents,
+        PreferenceInductionProposer,
+        propose_preference_induction_intents,
     )
     from v2.state_init import build_initial_state
     from v2.state_update import StateUpdate
@@ -29,8 +29,8 @@ except ModuleNotFoundError:
     from proposers import (
         ActionProposer,
         PreferenceElicitingProposer,
-        PreferenceSummaryProposer,
-        propose_preference_summary_intents,
+        PreferenceInductionProposer,
+        propose_preference_induction_intents,
     )
     from state_init import build_initial_state
     from state_update import StateUpdate
@@ -38,7 +38,7 @@ except ModuleNotFoundError:
 
 QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
-PatternName = Literal["action_oriented", "preference_eliciting", "preference_summary"]
+PatternName = Literal["action_oriented", "preference_eliciting", "preference_induction"]
 
 
 def _state_snapshot(state: AgentState) -> Dict[str, Any]:
@@ -240,7 +240,7 @@ def _confirmed_action_map(state: AgentState) -> Dict[str, str]:
     }
 
 
-def _seed_summary_state(state: AgentState, episode: Episode) -> AgentState:
+def _seed_induction_state(state: AgentState, episode: Episode) -> AgentState:
     grouped: Dict[str, List[str]] = {}
     for obj, receptacle in episode.seen_placements.items():
         grouped.setdefault(receptacle, []).append(obj)
@@ -324,12 +324,11 @@ def _run_eliciting_step(
     timings: Dict[str, float] = {}
 
     t0 = perf_counter()
-    intents = proposer.propose(
+    intent = proposer.propose(
         state=state,
-        max_intents=3,
     )
     timings["propose"] = perf_counter() - t0
-    if not intents:
+    if intent is None:
         return state, False, {
             "step": step_idx,
             "event": "no_intent",
@@ -337,7 +336,6 @@ def _run_eliciting_step(
             "timings": timings,
         }
 
-    intent = intents[0]
     question = str(intent.get("question", ""))
 
     t2 = perf_counter()
@@ -359,6 +357,7 @@ def _run_eliciting_step(
         covered_objects=list(intent.get("covered_objects", [])),
         answer=oracle_response.answer,
         question=question,
+        oracle_receptacle=oracle_response.referenced_receptacle,
     )
     timings["update"] = perf_counter() - t3
     return state, True, {
@@ -372,11 +371,11 @@ def _run_eliciting_step(
     }
 
 
-def _run_summary_step(
+def _run_induction_step(
     *,
     episode: Episode,
     state: AgentState,
-    proposer: PreferenceSummaryProposer,
+    proposer: PreferenceInductionProposer,
     oracle: NaturalUserOracle,
     updater: StateUpdate,
     step_idx: int,
@@ -384,7 +383,7 @@ def _run_summary_step(
     timings: Dict[str, float] = {}
 
     t0 = perf_counter()
-    intents = propose_preference_summary_intents(
+    intents = propose_preference_induction_intents(
         state=state,
         proposer=proposer,
         max_intents=3,
@@ -394,7 +393,7 @@ def _run_summary_step(
         return state, False, {
             "step": step_idx,
             "event": "no_intent",
-            "question_pattern": "preference_summary",
+            "question_pattern": "preference_induction",
             "timings": timings,
         }
 
@@ -413,7 +412,7 @@ def _run_summary_step(
     timings["oracle"] = perf_counter() - t1
 
     t2 = perf_counter()
-    state = updater.update_state_from_preference_summary_answer(
+    state = updater.update_state_from_preference_induction_answer(
         state=state,
         hypothesis=str(intent.get("hypothesis", "")),
         covered_objects=list(intent.get("covered_objects", [])),
@@ -424,7 +423,7 @@ def _run_summary_step(
 
     return state, True, {
         "step": step_idx,
-        "question_pattern": "preference_summary",
+        "question_pattern": "preference_induction",
         "intent": intent,
         "question": question,
         "oracle_response": oracle_response.model_dump(),
@@ -442,7 +441,7 @@ def run_question_pattern_loop(
     state: AgentState,
     action_proposer: ActionProposer,
     eliciting_proposer: PreferenceElicitingProposer,
-    summary_proposer: PreferenceSummaryProposer,
+    induction_proposer: PreferenceInductionProposer,
     oracle: NaturalUserOracle,
     updater: StateUpdate,
     verbose: bool,
@@ -475,10 +474,10 @@ def run_question_pattern_loop(
                 step_idx=step_idx,
             )
         else:
-            state, ok, step_log = _run_summary_step(
+            state, ok, step_log = _run_induction_step(
                 episode=episode,
                 state=state,
-                proposer=summary_proposer,
+                proposer=induction_proposer,
                 oracle=oracle,
                 updater=updater,
                 step_idx=step_idx,
@@ -510,6 +509,7 @@ def run_question_pattern_episode(
     evaluation_model: str,
     base_url: str,
     verbose: bool,
+    seed_induction: bool = True,
 ) -> tuple[AgentState, Dict[str, Any], List[Dict[str, Any]]]:
     sample_start = perf_counter()
     state = build_initial_state(
@@ -517,8 +517,8 @@ def run_question_pattern_episode(
         strategy=_default_strategy_for_pattern(pattern),  # type: ignore[arg-type]
         budget_total=budget,
     )
-    if pattern == "preference_summary":
-        state = _seed_summary_state(state, episode)
+    if pattern == "preference_induction" and seed_induction:
+        state = _seed_induction_state(state, episode)
 
     action_proposer = ActionProposer(
         model=proposer_model,
@@ -530,7 +530,7 @@ def run_question_pattern_episode(
         base_url=base_url,
         temperature=0.0,
     )
-    summary_proposer = PreferenceSummaryProposer(
+    induction_proposer = PreferenceInductionProposer(
         model=proposer_model,
         base_url=base_url,
         temperature=0.0,
@@ -560,7 +560,7 @@ def run_question_pattern_episode(
         state=state,
         action_proposer=action_proposer,
         eliciting_proposer=eliciting_proposer,
-        summary_proposer=summary_proposer,
+        induction_proposer=induction_proposer,
         oracle=oracle,
         updater=updater,
         verbose=verbose,
@@ -589,6 +589,7 @@ def run_question_pattern_experiment(
     model: str,
     base_url: str,
     verbose: bool,
+    seed_induction: bool = True,
 ) -> Dict[str, Any]:
     curve_points: List[Dict[str, Any]] = []
     for budget in budgets:
@@ -615,6 +616,7 @@ def run_question_pattern_experiment(
                 evaluation_model=model,
                 base_url=base_url,
                 verbose=verbose and len(sample_indices) == 1 and pos == 0,
+                seed_induction=seed_induction,
             )
             seen_scores.append(float(evaluation["seen_accuracy"]))
             unseen_scores.append(float(evaluation["unseen_accuracy"]))
@@ -656,7 +658,7 @@ def main(
             "--pattern",
             type=str,
             default=default_pattern or "action_oriented",
-            choices=["action_oriented", "preference_eliciting", "preference_summary"],
+            choices=["action_oriented", "preference_eliciting", "preference_induction"],
         )
     parser.add_argument("--data", type=str, default=str(DEFAULT_DATA_PATH))
     parser.add_argument("--num-samples", type=int, default=3)
@@ -665,6 +667,11 @@ def main(
     parser.add_argument("--base-url", type=str, default=OLLAMA_BASE_URL)
     parser.add_argument("--verbose", action="store_true")
     parser.add_argument("--budget-list", type=str, default="1,3,5")
+    parser.add_argument(
+        "--no-seed",
+        action="store_true",
+        help="Disable ground-truth seeding for preference_induction (cold-start evaluation).",
+    )
     args = parser.parse_args()
 
     pattern = (
@@ -686,6 +693,7 @@ def main(
         model=args.model,
         base_url=args.base_url,
         verbose=args.verbose,
+        seed_induction=not args.no_seed,
     )
     output_path = f"v2/plots/{pattern}_loop_accuracy_curve.png"
     saved_path = plot_accuracy_curve(

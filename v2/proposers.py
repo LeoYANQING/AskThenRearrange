@@ -31,7 +31,7 @@ DEFAULT_DATA_PATH = Path(__file__).resolve().parent / "data" / "scenarios_aug_ti
 
 
 class PreferenceQuestionIntent(TypedDict, total=False):
-    question_pattern: Literal["preference_eliciting", "preference_summary"]
+    question_pattern: Literal["preference_eliciting", "preference_induction"]
     hypothesis: str
     covered_objects: List[str]
     receptacle: Optional[str]
@@ -40,7 +40,7 @@ class PreferenceQuestionIntent(TypedDict, total=False):
 
 
 class PreferenceQuestionIntentModel(BaseModel):
-    question_pattern: Literal["preference_eliciting", "preference_summary"]
+    question_pattern: Literal["preference_eliciting", "preference_induction"]
     hypothesis: str = Field(description="A concise preference hypothesis worth asking the user to clarify.")
     covered_objects: List[str] = Field(
         description="Seen objects likely affected by this preference intent."
@@ -115,25 +115,6 @@ def _dedupe_keep_order(items: List[str]) -> List[str]:
     return out
 
 
-def _existing_preference_texts(state: AgentState) -> set[str]:
-    existing = set()
-    for item in state["confirmed_preferences"]:
-        text = item.get("hypothesis", "").strip().lower()
-        if text:
-            existing.add(text)
-    for item in state["negative_preferences"]:
-        text = item.get("hypothesis", "").strip().lower()
-        if text:
-            existing.add(text)
-    return existing
-
-def _confirmed_action_map(state: AgentState) -> dict[str, str]:
-    return {
-        item["object_name"]: item["receptacle"]
-        for item in state["confirmed_actions"]
-    }
-
-
 # =========================================================
 # Preference-eliciting proposer
 # =========================================================
@@ -190,29 +171,47 @@ class PreferenceElicitingProposer:
             if item.get("hypothesis", "").strip()
         ]
 
+        # Objects already addressed: covered by a confirmed preference rule OR in confirmed_actions
+        covered_by_preferences: set[str] = set()
+        for item in state["confirmed_preferences"]:
+            covered_by_preferences.update(item.get("covered_objects", []))
+        confirmed_action_objects = {item["object_name"] for item in state["confirmed_actions"]}
+        already_handled = covered_by_preferences | confirmed_action_objects
+
+        # Only ask about objects not yet addressed by any rule or direct action
+        genuinely_unresolved = [
+            obj for obj in state["unresolved_objects"]
+            if obj not in already_handled
+        ]
+        if not genuinely_unresolved:
+            return []
+
         system_prompt = f"""
 Generate preference candidates for future preference-eliciting questions in a household tidying task.
 
 Return at most {max_candidates} structured candidates based on the unresolved objects.
 
 Field requirements:
-- hypothesis: a short, usable household preference hypothesis.
+- hypothesis: a SHORT category label (2-5 words). It names a grouping of objects, NOT a placement.
 - covered_objects: several exact unresolved object names that are strong examples of the same hypothesis.
 
-Quality bar:
-- prefer short, natural, human-sayable hypotheses
-- hypotheses must come from an organizing preference
-- keep hypotheses specific enough to guide a question proposer
-- avoid vague umbrella phrases, long rationale-style wording, "X vs Y" comparisons, and near-duplicates
-- avoid hypotheses already confirmed or rejected
+CRITICAL hypothesis rules:
+- hypothesis must be a category label only — do NOT include receptacle names, verbs, or placement instructions
+- hypothesis must NOT contain words like "should", "belong", "go", "place", "put", "stored", or any room/receptacle name
+- if you know where items go, keep that knowledge to yourself — only name the category
 
 Style examples:
 - good: "bedside-use items"
 - good: "powered kitchen tools"
 - good: "reading materials"
-- bad: "Should electronics be grouped together?"
-- bad: "Electrical appliances vs non-electrical items"
-- bad: "Use frequency"
+- good: "electronic accessories"
+- good: "toy and game storage"
+- bad: "electronics should be placed in the media console" — contains receptacle name and verb
+- bad: "books go on the display shelf" — contains receptacle and verb
+- bad: "storage items for the ottoman" — contains receptacle name
+- bad: "Should electronics be grouped together?" — question form
+- bad: "Electrical appliances vs non-electrical items" — comparison
+- bad: "Use frequency" — too vague
 """.strip()
 
         user_prompt = f"""
@@ -225,16 +224,16 @@ Receptacles:
 Seen objects:
 {state["seen_objects"]}
 
-Unresolved objects:
-{state["unresolved_objects"]}
+Unresolved objects (still needing a preference question — do NOT generate hypotheses for objects already addressed):
+{genuinely_unresolved}
 
 Confirmed actions:
 {state["confirmed_actions"]}
 
-Confirmed preference hypotheses:
+Confirmed preference hypotheses (already asked — do not repeat or rephrase these):
 {confirmed_hypotheses}
 
-Negative preference hypotheses:
+Negative preference hypotheses (rejected — do not repeat):
 {negative_hypotheses}
 
 Return only structured candidates.
@@ -263,8 +262,8 @@ The hypothesis may be based on grouping, function, use context, or another reali
             for item in state["confirmed_preferences"]
             if item.get("hypothesis", "").strip()
         }
+        genuinely_unresolved_set = set(genuinely_unresolved)
         seen_objects_norm = {item.strip().lower() for item in state["seen_objects"] if item.strip()}
-        unresolved_object_set = set(state["unresolved_objects"])
         receptacles_norm = {item.strip().lower() for item in state["receptacles"] if item.strip()}
         deduped: List[BuiltPreferenceCandidateModel] = []
         seen = set()
@@ -273,7 +272,11 @@ The hypothesis may be based on grouping, function, use context, or another reali
             normalized = " ".join(hypothesis.lower().strip().split())
             if not normalized:
                 continue
-            if normalized in seen or normalized in rejected or normalized in confirmed:
+            if normalized in seen or normalized in rejected:
+                continue
+            # Substring dedup: skip if candidate phrase is contained in any confirmed/rejected hypothesis
+            # (handles mismatch between short candidate label and stored long-form hypothesis text)
+            if any(normalized in c for c in confirmed) or any(normalized in r for r in rejected):
                 continue
             if normalized in seen_objects_norm or normalized in receptacles_norm:
                 continue
@@ -283,9 +286,16 @@ The hypothesis may be based on grouping, function, use context, or another reali
                 continue
             covered_objects = [
                 obj for obj in _dedupe_keep_order(list(item.covered_objects))
-                if obj in unresolved_object_set
+                if obj in genuinely_unresolved_set
             ][:3]
             if not covered_objects:
+                continue
+            # Object-overlap dedup: skip only if all covered_objects already appear in an accepted candidate
+            # (prevents exact-duplicate candidates; allows partial-overlap candidates through)
+            covered_set = set(covered_objects)
+            if deduped and covered_set.issubset(
+                {obj for existing in deduped for obj in existing.covered_objects}
+            ):
                 continue
             deduped.append(
                 BuiltPreferenceCandidateModel(
@@ -317,18 +327,25 @@ Rules:
 - Do not invent a new grouping.
 - Keep the hypothesis exactly as given.
 - Keep covered_objects within the candidate's covered_objects.
-- Ask about the usual placement preference for that grouping.
-- Do not ask whether items should be grouped together.
-- Do not offer multiple-choice locations unless the candidate already includes a clear receptacle hint.
 - Prefer candidates that can clarify more than one unresolved object.
 - Return exactly one best preference-eliciting intent.
 
+Question goal:
+- The question must reveal the user's organizing HABIT or PRINCIPLE for that category — not just ask "where does it go".
+- The question MUST reference the hypothesis category name. Covered_objects may appear as clarifying examples only.
+- Ask how the user tends to organize, whether items stay in one spot, or why they assign things to a particular area.
+- Do NOT ask "where should X be placed?" — that is identical to an action-oriented question.
+- Do NOT ask whether items should be grouped together.
+
 Style examples:
-- good: "Where should media devices usually be placed?"
-- good: "Where do personal care items usually go?"
-- good: "Should powered kitchen tools usually be placed in the appliance cabinet?"
-- bad: "Would you like to group the personal care items together?"
-- bad: "Where would you prefer to place these reading materials, in a quiet corner or near a light source?"
+- good: "How do you usually organize electronic accessories — do they tend to stay in one spot?"
+- good: "Is there a specific area you always assign to reading materials like books or magazines?"
+- good: "Do personal care items generally stay together for you, or spread around based on use?"
+- good: "Should powered kitchen tools be kept in one place, or do some live near where they're used?"
+- good (with receptacle hint): "Do media devices usually end up in the media console for you?"
+- bad: "Where should media devices usually be placed?" — asks WHERE not HOW/WHY
+- bad: "Where do personal care items go?" — action-oriented phrasing
+- bad: "Would you like to group personal care items together?" — grouping question
 """.strip()
 
         user_prompt = f"""
@@ -348,10 +365,9 @@ Fields:
 - covered_objects = exact objects chosen only from that candidate's covered_objects
 - receptacle = optional exact receptacle name from the room if you have a plausible likely placement, otherwise null
 - priority = 0.0 to 1.0
-- question = one short natural question about where that kind of item usually goes
-- if receptacle is null, ask an open placement question
-- if receptacle is non-null, ask a short confirmation question about that receptacle
-- do not turn it into a grouping-preference question
+- question = one short question that elicits the user's organizing habit or principle for the hypothesis category
+- if receptacle is null, ask an open principle question ("How do you usually organize [category]?" / "Is there a spot you always assign to [category]?")
+- if receptacle is non-null, ask a soft confirmation ("Do [category] usually end up in [receptacle] for you?")
 """.strip()
 
         result = self.structured_model.invoke(
@@ -477,28 +493,27 @@ class ActionProposer:
 You are a proposer for Action-oriented questions in a household rearrangement task.
 
 Your job:
-Choose ONE unresolved seen object that is currently the best next target for an Action-oriented question.
+Choose ONE unresolved seen object that is the best next target for an Action-oriented question.
 
-Important:
-- This empirical pattern is always "action_oriented".
-- There are two internal action modes:
-  1) direct_grounding:
-     ask where a specific unresolved object should go
-  2) boundary_probe:
-     ask about a specific unresolved object in order to test whether an already known preference rule extends to it
-- boundary_probe is NOT a fourth question pattern. It is only a subtype of Action-oriented questioning.
+Object selection strategy — apply in order:
+1. boundary_probe candidate: if a confirmed_preference exists, pick an unresolved object that is semantically
+   similar to its covered objects. Asking about it tests whether the preference extends further and builds
+   richer analogy evidence for unseen objects.
+2. category anchor: if no confirmed_preference exists yet, pick an object that is representative of a
+   common household category (electronics, books, cleaning supplies, etc.) so the answer can serve as
+   an analogy anchor for other similar unresolved objects.
+3. fallback: any remaining unresolved object.
 
-Rules:
-- Output exactly one ActionIntent.
-- The chosen object must be an exact unresolved seen object.
-- Do not choose an already confirmed object.
-- The output must already include a natural user-facing question.
-- The question must explicitly ask about the placement or boundary status of the chosen object.
-- The question must mention the chosen object by name.
-- Do not ask about purchasing, planning, unrelated tasks, or any object other than the chosen object.
-- Be conservative and stable.
-- Prefer boundary_probe only when there is a plausible confirmed preference whose boundary can be tested with the object.
-- Use the guidance as a soft instruction for whether this turn should probe a boundary, clean up a concrete placement, or collect evidence that could support a future summary.
+Action modes:
+- direct_grounding: ask where the object should go (use when no related confirmed preference exists)
+- boundary_probe: ask whether the object follows an existing confirmed preference rule (use when a
+  plausible preference exists whose scope is uncertain)
+
+Question rules:
+- must mention the chosen object by name
+- for direct_grounding: "Where should the [object] go?" or equivalent
+- for boundary_probe: "Does the [object] also belong in [receptacle from confirmed preference]?"
+- one sentence, no hedging, no unrelated objects
 """.strip()
 
         recent_qa_history = state["qa_history"][-3:]
@@ -551,7 +566,7 @@ def _normalize_action_intent(
         return None
     if object_name not in state["unresolved_objects"]:
         return None
-    if object_name in _confirmed_action_map(state):
+    if object_name in {item["object_name"] for item in state["confirmed_actions"]}:
         return None
 
     action_mode = intent.action_mode
@@ -568,10 +583,10 @@ def _normalize_action_intent(
 
 
 # =========================================================
-# Preference-summary proposer
+# Preference-induction proposer
 # =========================================================
 
-class PreferenceSummaryProposer:
+class PreferenceInductionProposer:
     """
     Proposer for Preference-summary questions.
 
@@ -620,7 +635,7 @@ Avoid summaries that:
 - only describe one object unless no broader summary remains
 
 Rules:
-- This pattern is always "preference_summary".
+- This pattern is always "preference_induction".
 - Do not output action-oriented questions.
 - Do not output preference-eliciting questions.
 - Return at most {max_intents} intents.
@@ -651,7 +666,7 @@ Choose the most useful summary question, not just a plausible one.
 Use confirmed_actions as the main evidence source, and prefer a summary whose confirmation would improve future placement decisions.
 
 Each intent must include:
-- question_pattern = "preference_summary"
+- question_pattern = "preference_induction"
 - hypothesis = a concise summary rule to confirm
 - covered_objects = exact seen objects plausibly covered by the summary
 - receptacle = optional exact receptacle name if there is a clear likely placement to confirm, otherwise null
@@ -664,21 +679,25 @@ Each intent must include:
                 {"role": "user", "content": user_prompt},
             ]
         )
-        return _normalize_preference_summary_intents(
+        return _normalize_preference_induction_intents(
             intents=result.intents,
             state=state,
             max_intents=max_intents,
         )
 
 
-def _normalize_preference_summary_intents(
+def _normalize_preference_induction_intents(
     *,
     intents: List[PreferenceQuestionIntentModel],
     state: AgentState,
     max_intents: int,
 ) -> List[PreferenceQuestionIntent]:
     allowed_objects = set(state["seen_objects"])
-    existing_hypotheses = _existing_preference_texts(state)
+    existing_hypotheses = {
+        item.get("hypothesis", "").strip().lower()
+        for item in state["confirmed_preferences"] + state["negative_preferences"]
+        if item.get("hypothesis", "").strip()
+    }
     negative_preferences = {
         item.get("hypothesis", "").strip().lower()
         for item in state["negative_preferences"]
@@ -715,7 +734,7 @@ def _normalize_preference_summary_intents(
 
         normalized.append(
             PreferenceQuestionIntent(
-                question_pattern="preference_summary",
+                question_pattern="preference_induction",
                 hypothesis=hypothesis,
                 covered_objects=covered_objects,
                 receptacle=item.receptacle.strip() if item.receptacle and item.receptacle.strip() in state["receptacles"] else None,
@@ -754,10 +773,10 @@ def propose_action_intent(
     return proposer.propose(state=state)
 
 
-def propose_preference_summary_intents(
+def propose_preference_induction_intents(
     *,
     state: AgentState,
-    proposer: PreferenceSummaryProposer,
+    proposer: PreferenceInductionProposer,
     max_intents: int = 3,
 ) -> List[PreferenceQuestionIntent]:
     return proposer.propose(state=state, max_intents=max_intents)
@@ -836,7 +855,7 @@ def main() -> None:
         base_url=args.base_url,
         temperature=0.0,
     )
-    summary_proposer = PreferenceSummaryProposer(
+    induction_proposer = PreferenceInductionProposer(
         model=args.model,
         base_url=args.base_url,
         temperature=0.0,
@@ -861,7 +880,7 @@ def main() -> None:
         print()
 
     if args.mode in ("summary", "all"):
-        print("=== Preference-summary proposer ===")
+        print("=== Preference-induction proposer ===")
         # Mock a little evidence so summary proposer has something to infer from
         state["confirmed_actions"] = [
             {"object_name": state["seen_objects"][0], "receptacle": state["receptacles"][0]},
@@ -870,9 +889,9 @@ def main() -> None:
         print("=== Current State For Preference-summary ===")
         print(json.dumps(state, indent=2, ensure_ascii=False))
         print()
-        intents = propose_preference_summary_intents(
+        intents = propose_preference_induction_intents(
             state=state,
-            proposer=summary_proposer,
+            proposer=induction_proposer,
             max_intents=3,
         )
         for intent in intents:

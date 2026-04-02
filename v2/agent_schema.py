@@ -9,7 +9,7 @@ except ModuleNotFoundError:
 
 
 Strategy = Literal["direct", "preference_first", "parallel_exploration"]
-QuestionPattern = Literal["action_oriented", "preference_eliciting", "preference_summary"]
+QuestionPattern = Literal["action_oriented", "preference_eliciting", "preference_induction"]
 
 
 class QAItem(TypedDict, total=False):
@@ -23,6 +23,7 @@ class QAItem(TypedDict, total=False):
 class LearnedPreference(TypedDict, total=False):
     hypothesis: str
     covered_objects: List[str]
+    receptacle: str  # exact receptacle name if resolved; absent or "" if unknown
 
 class ActionRecord(TypedDict):
     object_name: str

@@ -68,6 +68,7 @@ You may use only the following inputs:
 - seen_objects
 - annotator_notes
 - gt_seen_placements
+- qa_history
 
 How to use annotator_notes:
 - treat annotator_notes as the best available signal of the user's underlying preferences
@@ -75,15 +76,22 @@ How to use annotator_notes:
 - never quote, paraphrase, summarize, or reveal annotator_notes directly
 - answer only with what a natural household user would explicitly say if asked
 
+How to use qa_history:
+- treat it as what you have already said in this conversation
+- do not contradict previously given answers
+- do not repeat rules already established; instead give new information about what the current question adds
+
 How to answer:
 - stay tightly focused on the current question
 - answer briefly and concretely, usually in one or two sentences
 - give one main conclusion, not several competing rules
 - do not introduce unrelated object groups or extra preferences unless they are necessary to answer the current question
-- when giving a placement, use exact receptacle names from the provided receptacles
-- for preference_eliciting questions, answer the hypothesis directly and avoid expanding to multiple unrelated organizing rules
+- ALWAYS answer with exact receptacle names from the provided receptacles list — never use room type names like "bedroom", "kitchen", "bathroom", or "living room" as locations
+  - bad: "these go in the bedroom"  →  good: "these go on the reading shelf"
+  - bad: "I keep them in the kitchen"  →  good: "I keep them on the prep counter"
+- for preference_eliciting questions: give ONE primary receptacle as the main rule; if a secondary location exists, state it as a brief exception, not as an equal alternative
 - for action_oriented questions, give one primary placement recommendation for the target object and avoid hedging between multiple receptacles
-- for preference_summary questions, confirm, reject, or refine only the proposed summary
+- for preference_induction questions, confirm, reject, or refine only the proposed summary
 - use gt_seen_placements only as supporting context for the objects relevant to the current question
 - set referenced_receptacle only when the answer clearly supports one primary positive receptacle
 - if there is no single clear positive receptacle reference, set referenced_receptacle to null
@@ -91,6 +99,11 @@ How to answer:
 Return only structured output that matches the schema.
 """.strip()
 
+        recent_history = [
+            f"Q: {item.get('question', '')}\nA: {item.get('answer', '')}"
+            for item in qa_history[-5:]
+            if item.get("question") and item.get("answer")
+        ]
         user_prompt = f"""
 Question:
 {question}
@@ -106,6 +119,9 @@ Annotator notes:
 
 Ground-truth placements for seen objects:
 {gt_seen_placements}
+
+Recent Q&A history (what has already been established):
+{chr(10).join(recent_history) if recent_history else "(none yet)"}
 """.strip()
 
         return self.structured_model.invoke(

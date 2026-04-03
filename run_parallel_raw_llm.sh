@@ -5,9 +5,9 @@ set -euo pipefail
 
 MODEL="${1:-qwen3}"
 BUDGET_LIST="${2:-1,2,3,4,5,6}"
-DATA="v2/data/scenarios_three_rooms_102.json"
-LOG_DIR="v2/logs"
-mkdir -p "$LOG_DIR" v2/plots
+DATA="data/scenarios_three_rooms_102.json"
+LOG_DIR="logs"
+mkdir -p "$LOG_DIR" plots
 
 PORTS=(11434 11435 11436 11437)
 GPU_PAIRS=("0,1" "2,3" "4,5" "6,7")
@@ -57,7 +57,7 @@ for i in "${!PORTS[@]}"; do
     port="${PORTS[$i]}"
     range="${INDEX_RANGES[$i]}"
     shard="$LOG_DIR/shard_$i.jsonl"
-    python -m v2.test_raw_llm \
+    python -m test_raw_llm \
         --data "$DATA" \
         --index-range "$range" \
         --budget-list "$BUDGET_LIST" \
@@ -91,8 +91,8 @@ SHARDS=()
 for i in 0 1 2 3; do
     SHARDS+=("$LOG_DIR/shard_$i.jsonl")
 done
-python -m v2.merge_raw_llm \
+python -m merge_raw_llm \
     --shards "${SHARDS[@]}" \
-    --output-plot "v2/plots/raw_llm_accuracy_curve.png"
+    --output-plot "plots/raw_llm_accuracy_curve.png"
 
-echo "[$(date +%T)] Done. Plot saved to v2/plots/raw_llm_accuracy_curve.png"
+echo "[$(date +%T)] Done. Plot saved to plots/raw_llm_accuracy_curve.png"

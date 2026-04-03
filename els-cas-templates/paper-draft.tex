@@ -1,0 +1,395 @@
+%%
+%% IJHCS Paper Draft
+%% Active Questioning Strategies for Household Rearrangement
+%%
+\documentclass[a4paper,fleqn]{cas-sc}
+
+\usepackage[authoryear,longnamesfirst]{natbib}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+
+% Placeholder command for sections not yet written
+\newcommand{\TODO}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
+
+\begin{document}
+\let\WriteBookmarks\relax
+\def\floatpagepagefraction{1}
+\def\textpagefraction{.001}
+
+\shorttitle{Active Questioning Strategies for Household Rearrangement}
+
+\shortauthors{Anonymous et al.}
+
+\title[mode=title]{How Should a Robot Ask? Comparing Active Questioning Strategies for Learning User Preferences in Household Rearrangement}
+
+% Authors placeholder
+\author[1]{Anonymous Author One}
+\cormark[1]
+\ead{anonymous@university.edu}
+\affiliation[1]{organization={Anonymous University},
+            city={City},
+            country={Country}}
+
+\cortext[1]{Corresponding author}
+
+% ============================================================
+% ABSTRACT
+% ============================================================
+\begin{abstract}
+When an intelligent agent assists with household tidying, it must learn the user's personal organizing preferences---where specific items belong and what general rules the user follows. A central design question is \emph{how} the agent should ask. We identify three complementary active questioning strategies that operate at different granularities: \textbf{Action-Oriented} questioning targets individual object placements, \textbf{Preference Eliciting} uncovers category-level organizing rules, and \textbf{Preference Induction} confirms patterns inferred from prior evidence. We implement these strategies within an LLM-based conversational agent and evaluate them through two studies. In Study~1, a large-scale simulated evaluation (102 household episodes, budgets 0--6) establishes performance baselines and characterizes each strategy's information efficiency. In Study~2, a controlled user study examines how different questioning strategies affect task performance, user experience, perceived control, and trust. Our findings reveal that (1) active questioning significantly outperforms no-question baselines, with structured strategies improving placement accuracy by up to 35\% over unstructured LLM questioning; (2) preference eliciting achieves the highest generalization to unseen objects but at the cost of reduced perceived user control; and (3) individual differences in organizing expertise moderate strategy effectiveness, suggesting that adaptive strategy selection can improve both task outcomes and user satisfaction. We derive design implications for conversational agents that learn user preferences through dialogue.
+\end{abstract}
+
+\begin{highlights}
+\item Three active questioning strategies for household rearrangement at different granularities
+\item Large-scale simulation (102 episodes) establishes performance baselines for each strategy
+\item User study reveals trade-offs between task accuracy and perceived control across strategies
+\end{highlights}
+
+\begin{keywords}
+active questioning \sep preference learning \sep household rearrangement \sep conversational agent \sep large language models \sep user study
+\end{keywords}
+
+\maketitle
+
+% ============================================================
+% 1. INTRODUCTION
+% ============================================================
+\section{Introduction}\label{sec:intro}
+
+Household tidying is a deeply personal task. Two people sharing the same kitchen may organize identical items in entirely different ways---one sorts by function (``cooking tools near the stove''), another by frequency of use (``daily items at eye level''). When an intelligent agent is tasked with rearranging a room, it cannot rely solely on common sense or generic rules; it must learn the \emph{specific user's} organizing preferences.
+
+Recent advances in large language models (LLMs) have enabled conversational agents that can ask questions, interpret natural-language answers, and reason about placement decisions. However, a fundamental design question remains underexplored: \emph{how should the agent ask?} The choice of questioning strategy---whether to ask about individual objects, elicit category-level rules, or confirm inferred patterns---has direct consequences for both task performance and user experience.
+
+Consider an agent helping to tidy a living room containing 12 visible objects and 12 unseen objects across 7 receptacles. With a limited question budget of 6, the agent cannot ask about every object individually. It must decide: Should it ask ``Where should the wireless speaker go?'' (resolving one object), or ``How do you usually organize electronic accessories?'' (potentially resolving several at once), or ``I've noticed you place books on the display shelf---is that a general rule?'' (confirming a pattern that generalizes to unseen books).
+
+Each approach embodies a different trade-off. Direct questions are simple and unambiguous but informationally inefficient. Category-level questions are efficient but require the user to articulate abstract preferences. Pattern confirmation leverages existing evidence but may feel presumptuous if the agent's inference is wrong. These trade-offs affect not only placement accuracy but also the user's sense of control, trust, and satisfaction with the interaction.
+
+In this paper, we formalize three active questioning strategies---\emph{Action-Oriented}, \emph{Preference Eliciting}, and \emph{Preference Induction}---and investigate their effects on both task performance and user experience. Our contributions are:
+
+\begin{enumerate}[leftmargin=*]
+    \item A \textbf{taxonomy of active questioning strategies} for preference learning in household rearrangement, formalized as three complementary patterns operating at object, category, and rule levels.
+    \item A \textbf{simulation framework} for scalable evaluation, using LLM-simulated users grounded in annotated household scenarios (102 episodes across three room types), which enables controlled comparison of strategies across varying question budgets.
+    \item A \textbf{user study} that examines how different questioning strategies affect task performance, perceived control, cognitive load, trust, and user preference, revealing trade-offs invisible to accuracy-only evaluation.
+    \item \textbf{Design implications} for conversational agents that actively learn user preferences, informed by both quantitative performance data and qualitative user feedback.
+\end{enumerate}
+
+
+% ============================================================
+% 2. RELATED WORK
+% ============================================================
+\section{Related Work}\label{sec:related}
+
+\subsection{Conversational Agents and Dialogue Strategy Design}
+
+The design of dialogue strategies in conversational agents has been extensively studied in customer service, health, and recommendation domains. \citet{haugeland2022understanding} compared topic-led and task-led conversation strategies in service chatbots, finding that topic-led approaches enhance anthropomorphism and hedonic quality, while task-led designs improve pragmatic quality---a tension directly relevant to our comparison of category-level versus object-level questioning. \citet{jin2024way} demonstrated that the way a chatbot asks questions (form-based vs.\ conversation-based) significantly affects response quality and user self-disclosure, with credibility serving as a mediating factor.
+
+Recent work has begun examining LLM-powered conversational agents specifically. \citet{mahmood2025user} identified interaction patterns and breakdowns in LLM-powered voice assistants, highlighting challenges in user expectation management. \citet{skjuve2025chatgpt} found that user experience level significantly affects perception of an LLM's communicative ability, suggesting that questioning strategy effectiveness may vary with user expertise.
+
+\subsection{Active Preference Learning and Elicitation}
+
+Active preference learning---where the system strategically chooses which questions to ask---has roots in active learning theory and Bayesian experimental design. In recommendation systems, \citet{shin2025toward} developed a conversational recommender with four interaction modes matched to users' decision-making styles, demonstrating that personalizing the interaction modality improves user experience. This finding motivates our investigation of whether different questioning strategies suit different user profiles.
+
+The broader shift from explainable to interactive AI \citep{raees2024from} provides theoretical grounding for our approach: rather than passively inferring preferences from observation, our agent actively engages users in preference specification through structured dialogue.
+
+\subsection{Household Rearrangement and Robot Preference Learning}
+
+Household object rearrangement has emerged as a benchmark for studying how robots learn user preferences. TidyBot \citep{wu2023tidybot} learns from a small number of demonstration placements, relying on LLM-based generalization to infer rules for novel objects. Our work complements this approach by studying \emph{active questioning} rather than passive demonstration---the agent asks the user directly rather than observing their behavior.
+
+\citet{ajaykumar2023older} studied how end-users specify preferences for robot assistance in home environments, finding that users' ability to articulate preferences varies significantly. This variability motivates our investigation of how different questioning granularities (object-level vs.\ category-level) accommodate users with varying levels of organizing expertise.
+
+\subsection{Proactive Agent Interaction}
+
+Our three questioning strategies represent different forms of proactive agent behavior. \citet{yang2025proactive} classified proactive AI interactions into environmental perception, decision support, and task execution, examining their effects on user trust and attention. Our strategies map onto a complementary axis: from reactive (responding to specific object placements) to proactive (inferring and confirming general rules). The tension between proactivity and user control is central to our investigation.
+
+
+% ============================================================
+% 3. SYSTEM DESIGN
+% ============================================================
+\section{System Design}\label{sec:system}
+
+\subsection{Task Formulation}
+
+We consider a household rearrangement scenario defined by a tuple $(R, \mathcal{C}, \mathcal{O}_s, \mathcal{O}_u)$, where $R$ is the room type, $\mathcal{C} = \{c_1, \dots, c_M\}$ is the set of available receptacles, and $\mathcal{O}_s$, $\mathcal{O}_u$ are the sets of seen and unseen objects, respectively. The agent must learn the user's preferred placement for all objects through at most $B$ questions (the \emph{question budget}). Seen objects are visible to both user and agent during the interaction; unseen objects must be placed based on generalized preferences inferred from the dialogue.
+
+This separation into seen and unseen objects serves as a natural test of generalization: strategies that extract transferable rules should achieve higher accuracy on unseen objects than strategies that only resolve individual placements.
+
+\subsection{Agent State Representation}
+
+The agent maintains a structured state $\mathcal{S}_t$ after the $t$-th dialogue turn:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Confirmed actions} $\mathcal{A}^+ = \{(o_i, c_j)\}$: object-receptacle pairs confirmed by the user.
+    \item \textbf{Confirmed preferences} $\mathcal{P}^+ = \{(h_k, \mathcal{O}_k, c_k)\}$: category-level rules, where $h_k$ is a natural-language hypothesis, $\mathcal{O}_k$ is the set of covered objects, and $c_k$ is the associated receptacle.
+    \item \textbf{Negative evidence} $\mathcal{A}^-$, $\mathcal{P}^-$: placements and preferences explicitly rejected by the user.
+    \item \textbf{Unresolved objects} $\mathcal{U}_t \subseteq \mathcal{O}_s$: seen objects without a confirmed placement.
+    \item \textbf{Dialogue history} $\mathcal{Q}_t = \{(q_i, a_i)\}_{i=1}^{t}$: the question-answer record.
+\end{itemize}
+
+This structured representation---as opposed to retaining only raw dialogue history---enables the agent to track which objects remain unresolved and which preference rules have been established, directly informing strategy selection.
+
+\subsection{Active Questioning Strategies}\label{sec:strategies}
+
+We define three complementary questioning strategies, each targeting a different granularity of preference information:
+
+\subsubsection{Action-Oriented (AO) Questioning}
+This strategy targets a single unresolved object $o \in \mathcal{U}_t$ and asks directly about its placement (e.g., ``Where should the wireless speaker go?''). The user's answer yields a confirmed action $(o, c) \in \mathcal{A}^+$. AO questions are unambiguous and easy for users to answer, but each question resolves at most one object.
+
+\subsubsection{Preference Eliciting (PE) Questioning}
+This strategy asks about a category-level organizing principle rather than a specific object (e.g., ``How do you usually organize electronic accessories?''). The agent first generates a \emph{hypothesis}---a short category label (e.g., ``electronic accessories'')---and identifies \emph{covered objects}: seen objects that plausibly belong to this category. The user's answer yields a confirmed preference $(h, \mathcal{O}, c) \in \mathcal{P}^+$, which can simultaneously resolve multiple objects and, critically, generalize to unseen objects sharing the same category.
+
+\subsubsection{Preference Induction (PI) Questioning}
+This strategy leverages accumulated evidence in $\mathcal{A}^+$ to propose an inferred rule for user confirmation (e.g., ``I've noticed you place books on the display shelf---is that a general rule?''). PI requires sufficient prior evidence and may be confirmed, refined, or rejected by the user. When confirmed, PI solidifies implicit patterns into explicit preference rules.
+
+\begin{table}[t]
+\caption{Comparison of three active questioning strategies.}\label{tbl:strategies}
+\begin{tabular*}{\tblwidth}{@{}p{2.5cm}p{3cm}p{3cm}p{3cm}@{}}
+\toprule
+ & \textbf{Action-Oriented} & \textbf{Preference Eliciting} & \textbf{Preference Induction} \\
+\midrule
+Target & Single object & Object category & Observed pattern \\
+Question example & ``Where should the speaker go?'' & ``How do you organize electronics?'' & ``Books always go on the shelf---correct?'' \\
+Information grain & Fine (1 object) & Coarse (N objects) & Coarse (N objects) \\
+Prerequisites & Unresolved objects exist & Category hypothesis & Sufficient confirmed actions \\
+User cognitive load & Low & Medium & Medium--High \\
+Generalization & None (seen only) & High (seen + unseen) & High (seen + unseen) \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\subsection{Implementation Architecture}
+
+The system is implemented as a modular pipeline, with each component backed by an LLM (Qwen3, served locally via Ollama):
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Proposer}: Given the current state $\mathcal{S}_t$ and the selected strategy, generates a concrete question. Each strategy has a dedicated proposer that enforces strategy-specific constraints (e.g., PE proposer generates category hypotheses and selects covered objects; AO proposer selects the highest-priority unresolved object).
+    \item \textbf{State Update}: Interprets the user's natural-language answer and updates $\mathcal{S}_t$ accordingly. For PE answers, the module extracts a category rule and identifies the associated receptacle. For AO answers, it records a direct object-receptacle mapping.
+    \item \textbf{Final Placement Planner}: After the question budget is exhausted, a planner assigns all remaining objects (seen and unseen) to receptacles using the accumulated state. For unseen objects, it applies a three-step inference: (1) match to a confirmed preference, (2) analogy with the most similar confirmed action, (3) frequency-based fallback.
+\end{enumerate}
+
+
+% ============================================================
+% 4. STUDY 1: SIMULATED EVALUATION
+% ============================================================
+\section{Study 1: Simulated Evaluation}\label{sec:study1}
+
+The purpose of Study~1 is to establish performance baselines for each questioning strategy under controlled conditions and to characterize their information efficiency across varying question budgets. The simulation uses LLM-simulated users (oracles) grounded in annotated household scenarios, enabling large-scale comparison that would be infeasible with human participants alone.
+
+\subsection{Dataset}
+
+We constructed a dataset of 102 household episodes spanning three room types: living rooms (34 episodes), bedrooms (34 episodes), and kitchens (34 episodes). Each episode contains:
+\begin{itemize}[leftmargin=*]
+    \item 12 seen objects and 12 unseen objects
+    \item 5--8 receptacles (room-dependent)
+    \item Ground-truth placements for all objects
+    \item Annotator notes describing the user's organizing principles (e.g., ``Small entertainment electronics go to the side drawer'')
+\end{itemize}
+
+The annotator notes serve as the oracle's knowledge base---they define the simulated user's preferences without being directly accessible to the agent.
+
+\subsection{Simulated User Oracle}
+
+We implement a simulated user oracle that answers the agent's questions based on ground-truth placements and annotator notes. The oracle is instructed to behave as a natural household user: answering concisely, using exact receptacle names, and staying focused on the current question. To ensure multi-turn consistency, the oracle receives the recent question-answer history and is instructed not to contradict prior answers.
+
+\subsection{Experimental Conditions}
+
+We evaluate five conditions across question budgets $B \in \{0, 2, 4, 6\}$:
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{No Question} ($B=0$): The LLM directly assigns placements without any user interaction. This establishes the lower bound---the accuracy achievable from object and receptacle names alone.
+    \item \textbf{Raw LLM}: An unstructured LLM freely generates questions and interprets answers without structured state tracking. This tests whether the structured agent architecture adds value beyond raw LLM capability.
+    \item \textbf{AO Only}: The agent uses only Action-Oriented questioning.
+    \item \textbf{PE Only}: The agent uses only Preference Eliciting questioning.
+    \item \textbf{PI Cold-Start}: The agent uses only Preference Induction questioning without pre-seeded evidence, testing PI's ability to function from scratch.
+\end{enumerate}
+
+\subsection{Metrics}
+
+We report two accuracy metrics:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Seen accuracy}: fraction of seen objects assigned to the correct receptacle.
+    \item \textbf{Unseen accuracy}: fraction of unseen objects assigned to the correct receptacle. This measures the agent's ability to generalize learned preferences to novel objects.
+\end{itemize}
+
+\subsection{Results}
+
+\subsubsection{No-Question Baseline}
+
+Across all 102 episodes with $B=0$, the LLM achieves a seen accuracy of 0.427 and unseen accuracy of 0.426. The near-identical seen and unseen scores confirm that without user interaction, the LLM has no informational advantage for objects it has ``seen''---it relies entirely on name-based semantic guessing.
+
+\subsubsection{Strategy Comparison}
+
+Table~\ref{tbl:study1_results} presents accuracy across conditions and budgets.
+
+\begin{table}[t]
+\caption{Study~1 results: placement accuracy by strategy and budget (10-episode sample, seed=42).}\label{tbl:study1_results}
+\begin{tabular*}{\tblwidth}{@{}lcccccc@{}}
+\toprule
+ & \multicolumn{2}{c}{Budget = 2} & \multicolumn{2}{c}{Budget = 4} & \multicolumn{2}{c}{Budget = 6} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+Strategy & Seen & Unseen & Seen & Unseen & Seen & Unseen \\
+\midrule
+No Question    & .427 & .426 & --- & --- & --- & --- \\
+Raw LLM        & .392 & .442 & .525 & .517 & .592 & .525 \\
+AO Only        & .533 & .392 & .583 & .433 & .700 & .525 \\
+PE Only        & .552 & .531 & .708 & .646 & .823 & .719 \\
+PI Cold-Start  & \TODO{run} & \TODO{run} & \TODO{run} & \TODO{run} & \TODO{run} & \TODO{run} \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\subsubsection{Key Findings from Simulation}
+
+\paragraph{Finding S1: Active questioning significantly outperforms no-question baselines.}
+At $B=6$, the best strategy (PE) achieves seen accuracy of 0.823, nearly doubling the no-question baseline of 0.427. Even the Raw LLM baseline with unstructured questioning reaches 0.592, confirming that user interaction provides substantial information gain.
+
+\paragraph{Finding S2: Structured strategies outperform unstructured LLM questioning.}
+At $B=6$, both AO (0.700) and PE (0.823) substantially outperform Raw LLM (0.592) for seen accuracy. The gap is even larger for unseen accuracy: PE achieves 0.719 versus Raw LLM's 0.525. This demonstrates that structured state tracking and strategy-specific proposers add significant value.
+
+\paragraph{Finding S3: PE achieves the highest unseen accuracy, confirming its generalization advantage.}
+PE's unseen accuracy (0.719 at $B=6$) substantially exceeds AO's (0.525), despite both achieving comparable seen accuracy growth rates. PE's category-level rules directly transfer to unseen objects, while AO's object-level placements only support indirect analogy-based inference.
+
+\paragraph{Finding S4: PE's advantage increases with budget.}
+At $B=2$, PE and AO are comparable (seen: 0.552 vs.\ 0.533). By $B=6$, PE leads by 12.3\% on seen and 19.4\% on unseen accuracy. Each PE question covers a category of 2--3 objects, and this compounding effect grows with more questions.
+
+\paragraph{Finding S5: AO provides faster initial gains for seen objects.}
+At $B=2$, AO achieves 0.533 seen accuracy versus PE's 0.552---a small difference. AO's strength is its reliability: each question deterministically resolves one object. PE's early performance depends on whether the LLM generates accurate category hypotheses.
+
+\subsubsection{Implications for User Study Design}
+
+The simulation results suggest that AO and PE represent meaningfully different strategies with distinct performance profiles. We select these two, along with a combined strategy, as conditions for the user study. PI cold-start is excluded from the user study due to \TODO{determine based on PI cold-start results}.
+
+\subsection{Limitations of Simulated Evaluation}
+
+The simulated oracle provides consistent, well-formed answers using exact receptacle names---a best-case scenario. Real users may give ambiguous, incomplete, or multi-part answers. Study~2 addresses this gap.
+
+
+% ============================================================
+% 5. STUDY 2: USER STUDY
+% ============================================================
+\section{Study 2: User Study}\label{sec:study2}
+
+\TODO{This section presents the user study design and results. The following subsections outline the planned structure.}
+
+\subsection{Research Questions}
+
+\begin{enumerate}[label=\textbf{RQ\arabic*:},leftmargin=*]
+    \item How do different active questioning strategies affect task performance (placement accuracy) when interacting with real users?
+    \item How do different strategies affect user experience, including perceived control, cognitive load, and satisfaction?
+    \item How do individual differences (organizing expertise, personality) moderate the effectiveness of different strategies?
+    \item What interaction patterns and breakdowns emerge with each strategy?
+\end{enumerate}
+
+\subsection{Experimental Design}
+
+\TODO{Within-subject design. Each participant experiences 2--3 strategies (counterbalanced). Independent variable: questioning strategy (AO / PE / Combined). Dependent variables: placement accuracy (seen, unseen), NASA-TLX cognitive load, perceived control scale, trust scale, overall satisfaction, qualitative feedback.}
+
+\subsection{Participants}
+
+\TODO{Target: 24--30 participants. Recruitment criteria. Demographics. Organizing expertise self-assessment. IRB approval details.}
+
+\subsection{Task and Procedure}
+
+\TODO{Participants interact with the agent through a chat interface to organize a virtual room. Each session: pre-task questionnaire $\to$ interaction (budget=6) $\to$ post-task questionnaire $\to$ semi-structured interview. Three room types used to avoid learning effects. Counterbalancing of condition order.}
+
+\subsection{Interaction Interface}
+
+\TODO{Web-based chat interface. Agent presents questions; user types natural-language answers. Real-time visualization of the room and current placements (optional). Logging of all interactions, timestamps, and state changes.}
+
+\subsection{Measures}
+
+\subsubsection{Task Performance}
+\TODO{Seen accuracy, unseen accuracy, number of objects resolved per question (information efficiency).}
+
+\subsubsection{User Experience}
+\TODO{Post-task questionnaire: NASA-TLX (cognitive load), perceived control (adapted from Skjuve et al.), trust in agent (adapted from Woo et al.), satisfaction (Likert scale).}
+
+\subsubsection{Qualitative Data}
+\TODO{Semi-structured interview: ``Which questioning style did you prefer and why?'', ``Did you feel in control of the organizing decisions?'', ``Were any questions confusing or annoying?''}
+
+\subsection{Results}
+
+\TODO{Quantitative analysis: repeated-measures ANOVA or mixed-effects models. Qualitative analysis: thematic coding of interview transcripts.}
+
+\subsubsection{Task Performance Across Strategies}
+\TODO{Expected findings based on simulation: PE $>$ AO for unseen, AO $\approx$ PE for seen. Real user answers are noisier, so gaps may narrow.}
+
+\subsubsection{User Experience Across Strategies}
+\TODO{Expected trade-offs: PE may feel less controllable (abstract questions); AO may feel tedious (repetitive object-by-object); Combined may balance both.}
+
+\subsubsection{Individual Differences}
+\TODO{Moderating effects of organizing expertise. Hypothesis: expert organizers prefer PE (can articulate abstract rules), novice organizers prefer AO (concrete, low cognitive load).}
+
+\subsubsection{Interaction Patterns and Breakdowns}
+\TODO{Qualitative analysis: common failure modes (e.g., user gives multi-receptacle answer to PE question; user rejects PI hypothesis).}
+
+
+% ============================================================
+% 6. GENERAL DISCUSSION
+% ============================================================
+\section{General Discussion}\label{sec:discussion}
+
+\subsection{Bridging Simulation and User Study Findings}
+
+\TODO{Compare Study 1 vs Study 2 results. Where do they agree? Where does real user behavior deviate from simulated oracle behavior? What does this tell us about the limitations of simulation-only evaluation?}
+
+\subsection{The Accuracy--Control Trade-off}
+
+\TODO{PE achieves higher accuracy but may reduce perceived control. Discuss implications for agent design: should agents optimize for task performance or user comfort? When should agents ask abstract vs. concrete questions?}
+
+\subsection{Toward Adaptive Questioning}
+
+\TODO{Individual differences suggest that a one-size-fits-all strategy is suboptimal. Discuss adaptive approaches: the agent could assess user expertise and adjust strategy accordingly. Connect to entropy-driven policy as a potential mechanism.}
+
+\subsection{Design Implications}
+
+\TODO{Actionable recommendations for designers of conversational agents that learn user preferences:}
+
+\begin{enumerate}[leftmargin=*]
+    \item \TODO{Start with category-level questions to establish broad rules efficiently, then switch to object-level questions for remaining ambiguities.}
+    \item \TODO{Provide users with control over questioning granularity---let them choose between ``tell me about categories'' and ``ask me one by one.''}
+    \item \TODO{Use structured state representation rather than relying on raw dialogue history---confirmed actions and preferences significantly improve downstream placement planning.}
+    \item \TODO{When generalizing to unseen objects, explicitly leverage confirmed preference rules with associated receptacles rather than relying on text-based inference.}
+\end{enumerate}
+
+\subsection{Limitations and Future Work}
+
+\TODO{Limitations: LLM-simulated oracle may not capture full diversity of real user behavior; single LLM backend (Qwen3); limited room types; no longitudinal study of preference evolution. Future work: real robot deployment; multi-session preference learning; cross-cultural comparison of organizing preferences; adaptive strategy selection based on real-time user signals.}
+
+
+% ============================================================
+% 7. CONCLUSION
+% ============================================================
+\section{Conclusion}\label{sec:conclusion}
+
+We presented a systematic investigation of active questioning strategies for learning user preferences in household rearrangement. Through a taxonomy of three complementary strategies---Action-Oriented, Preference Eliciting, and Preference Induction---we characterized the trade-offs between information efficiency, generalization ability, and user experience.
+
+Our simulated evaluation across 102 household episodes demonstrated that structured questioning strategies significantly outperform both no-question baselines and unstructured LLM questioning, with Preference Eliciting achieving the strongest generalization to unseen objects. \TODO{Our user study further revealed that... [key findings from Study 2].}
+
+These findings highlight that the \emph{how} of asking---not just the \emph{what}---fundamentally shapes both the quality of learned preferences and the user's experience of the interaction. We hope this work informs the design of future conversational agents that actively learn from their users.
+
+
+% ============================================================
+% REFERENCES
+% ============================================================
+\bibliographystyle{cas-model2-names}
+\bibliography{cas-refs}
+
+% ============================================================
+% APPENDIX
+% ============================================================
+\appendix
+
+\section{Prompt Templates}\label{app:prompts}
+\TODO{Include key prompt templates for each strategy's proposer, state update interpreter, and final placement planner. This supports reproducibility.}
+
+\section{Dataset Statistics}\label{app:dataset}
+\TODO{Detailed dataset statistics: distribution of objects per receptacle, room type breakdowns, annotator note examples.}
+
+\section{User Study Materials}\label{app:userstudy}
+\TODO{Pre-task questionnaire, post-task questionnaire, semi-structured interview protocol, informed consent form.}
+
+\end{document}

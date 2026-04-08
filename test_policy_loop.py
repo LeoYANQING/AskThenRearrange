@@ -18,8 +18,9 @@ from state_init import build_initial_state
 from state_update import StateUpdate
 
 
-QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:14b")
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
+from llm_factory import DEFAULT_MODEL, DEFAULT_BASE_URL
+QUESTION_MODEL = DEFAULT_MODEL
+OLLAMA_BASE_URL = DEFAULT_BASE_URL
 
 
 POLICY_LABELS = {
@@ -87,10 +88,10 @@ def _print_policy_step(
     )
 
 
-def _select_sample_indices(*, num_samples: int) -> List[int]:
+def _select_sample_indices(*, num_samples: int, start_index: int = 0) -> List[int]:
     if num_samples <= 0:
         raise ValueError(f"num_samples must be positive, got {num_samples}")
-    return list(range(num_samples))
+    return list(range(start_index, start_index + num_samples))
 
 
 def _parse_budget_list(value: str) -> List[int]:
@@ -177,8 +178,23 @@ def run_policy_loop(
             induction_proposer=induction_proposer,
         )
         if intent is None:
-            print(f"[Episode {episode.episode_id} | Question Step {step_idx}] no proposer intent available for {decision.question_pattern}")
-            break
+            if decision.question_pattern == "preference_induction":
+                # PI proposer couldn't form a hypothesis; fall back to AO for this step
+                print(f"[Episode {episode.episode_id} | Question Step {step_idx}] PI proposer returned None — falling back to action_oriented")
+                decision = QuestionDecision(
+                    question_pattern="action_oriented",
+                    guidance="No induction pattern available; ask a direct placement question to gather more evidence.",
+                )
+                intent = _propose_intent(
+                    state=state,
+                    decision=decision,
+                    eliciting_proposer=eliciting_proposer,
+                    action_proposer=action_proposer,
+                    induction_proposer=induction_proposer,
+                )
+            if intent is None:
+                print(f"[Episode {episode.episode_id} | Question Step {step_idx}] no proposer intent available for {decision.question_pattern}")
+                break
 
         question = intent.question if hasattr(intent, "question") else str(intent.get("question", ""))
         oracle_response = oracle.answer(
@@ -244,11 +260,19 @@ def run_policy_episode(
     base_url: str,
     verbose: bool,
     selection_method: SelectionMethod = "rule",
-) -> tuple[AgentState, Dict[str, Any]]:
+    eval_budgets: List[int] | None = None,
+) -> tuple[AgentState, Dict[str, Any]] | tuple[AgentState, Dict[int, Dict[str, Any]]]:
+    """Run a policy episode.
+
+    If eval_budgets is provided, run up to max(eval_budgets) steps and evaluate
+    at each budget checkpoint. Returns (final_state, {budget: evaluation}).
+    Otherwise runs to `budget` and returns (final_state, evaluation) as before.
+    """
+    max_budget = max(eval_budgets) if eval_budgets else budget
     state = build_initial_state(
         episode=episode,
         strategy="parallel_exploration",
-        budget_total=budget,
+        budget_total=max_budget,
     )
     controller = QuestionPolicyController(
         model=proposer_model,
@@ -292,23 +316,102 @@ def run_policy_episode(
         print(json.dumps(_state_snapshot(state), indent=2, ensure_ascii=False))
         print()
 
-    final_state = run_policy_loop(
-        episode=episode,
-        state=state,
-        mode=mode,
-        controller=controller,
-        eliciting_proposer=eliciting_proposer,
-        action_proposer=action_proposer,
-        induction_proposer=induction_proposer,
-        oracle=oracle,
-        updater=updater,
-    )
-    evaluation = evaluate_episode_state(
-        episode,
-        final_state,
-        planner=planner,
-    )
-    return final_state, evaluation
+    if eval_budgets is not None:
+        # Incremental mode: run step by step, evaluate at checkpoints
+        eval_set = set(eval_budgets)
+        results_by_budget: Dict[int, Dict[str, Any]] = {}
+        step_idx = 0
+        while len(state["qa_history"]) < max_budget:
+            step_idx += 1
+            decision = controller.plan_next_question(state=state, mode=mode)
+            if decision is None:
+                break
+            intent = _propose_intent(
+                state=state, decision=decision,
+                eliciting_proposer=eliciting_proposer,
+                action_proposer=action_proposer,
+                induction_proposer=induction_proposer,
+            )
+            if intent is None:
+                if decision.question_pattern == "preference_induction":
+                    decision = QuestionDecision(
+                        question_pattern="action_oriented",
+                        guidance="No induction pattern available; ask a direct placement question.",
+                    )
+                    intent = _propose_intent(
+                        state=state, decision=decision,
+                        eliciting_proposer=eliciting_proposer,
+                        action_proposer=action_proposer,
+                        induction_proposer=induction_proposer,
+                    )
+                if intent is None:
+                    break
+
+            question = intent.question if hasattr(intent, "question") else str(intent.get("question", ""))
+            oracle_response = oracle.answer(
+                question=question, room=state["room"],
+                receptacles=state["receptacles"],
+                seen_objects=state["seen_objects"],
+                annotator_notes=episode.annotator_notes,
+                gt_seen_placements=episode.seen_placements,
+                qa_history=state["qa_history"],
+            )
+            if decision.question_pattern == "preference_eliciting":
+                state = updater.update_state_from_preference_eliciting_answer(
+                    state=state, hypothesis=str(intent.get("hypothesis", "")),
+                    covered_objects=list(intent.get("covered_objects", [])),
+                    answer=oracle_response.answer, question=question,
+                    oracle_receptacle=oracle_response.referenced_receptacle,
+                )
+            elif decision.question_pattern == "action_oriented":
+                state = updater.update_state_from_action_answer(
+                    state=state, target=intent.object_name,
+                    answer=oracle_response.answer, question=intent.question,
+                    action_mode=intent.action_mode,
+                )
+            elif decision.question_pattern == "preference_induction":
+                state = updater.update_state_from_preference_induction_answer(
+                    state=state, hypothesis=str(intent.get("hypothesis", "")),
+                    covered_objects=list(intent.get("covered_objects", [])),
+                    answer=oracle_response.answer, question=question,
+                )
+
+            _print_policy_step(
+                mode=mode, episode=episode, step_idx=step_idx,
+                decision=decision, intent=intent,
+                oracle_response=oracle_response, state=state,
+            )
+
+            current_budget = len(state["qa_history"])
+            if current_budget in eval_set:
+                evaluation = evaluate_episode_state(episode, state, planner=planner)
+                evaluation["qa_history"] = list(state["qa_history"])
+                evaluation["confirmed_actions"] = list(state["confirmed_actions"])
+                evaluation["confirmed_preferences"] = list(state["confirmed_preferences"])
+                results_by_budget[current_budget] = evaluation
+
+        # Fill any remaining eval_budgets that weren't reached (loop ended early)
+        for b in eval_budgets:
+            if b not in results_by_budget:
+                evaluation = evaluate_episode_state(episode, state, planner=planner)
+                evaluation["qa_history"] = list(state["qa_history"])
+                evaluation["confirmed_actions"] = list(state["confirmed_actions"])
+                evaluation["confirmed_preferences"] = list(state["confirmed_preferences"])
+                results_by_budget[b] = evaluation
+
+        return state, results_by_budget
+    else:
+        # Original mode: run to budget, evaluate once
+        final_state = run_policy_loop(
+            episode=episode, state=state, mode=mode,
+            controller=controller,
+            eliciting_proposer=eliciting_proposer,
+            action_proposer=action_proposer,
+            induction_proposer=induction_proposer,
+            oracle=oracle, updater=updater,
+        )
+        evaluation = evaluate_episode_state(episode, final_state, planner=planner)
+        return final_state, evaluation
 
 
 
@@ -324,13 +427,15 @@ def run_ablation_experiment(
     base_url: str,
     log_path: Path | None = None,
     selection_method: SelectionMethod = "rule",
+    modes: List[PolicyMode] | None = None,
 ) -> Dict[str, List[Dict[str, Any]]]:
-    modes: List[PolicyMode] = [
-        "direct_querying",
-        "user_preference_first",
-        "parallel_exploration",
-        "hybrid_all",
-    ]
+    if modes is None:
+        modes = [
+            "direct_querying",
+            "user_preference_first",
+            "parallel_exploration",
+            "hybrid_all",
+        ]
     curves_by_mode: Dict[str, List[Dict[str, Any]]] = {}
 
     experiment_started_at = time.perf_counter()
@@ -346,31 +451,44 @@ def run_ablation_experiment(
             },
         )
 
-    for mode in modes:
-        mode_points: List[Dict[str, Any]] = []
-        for budget in budgets:
-            seen_scores: List[float] = []
-            unseen_scores: List[float] = []
-            episode_durations_sec: List[float] = []
-            for index in sample_indices:
-                episode = get_episode(data_path, index)
-                started_at = time.perf_counter()
-                _, evaluation = run_policy_episode(
-                    episode=episode,
-                    budget=budget,
-                    mode=mode,
-                    proposer_model=proposer_model,
-                    oracle_model=oracle_model,
-                    updater_model=updater_model,
-                    evaluation_model=evaluation_model,
-                    base_url=base_url,
-                    verbose=False,
-                    selection_method=selection_method,
-                )
-                elapsed_sec = time.perf_counter() - started_at
-                episode_durations_sec.append(elapsed_sec)
-                seen_scores.append(float(evaluation["seen_accuracy"]))
-                unseen_scores.append(float(evaluation["unseen_accuracy"]))
+    total_runs = len(modes) * len(sample_indices)
+    completed_runs = 0
+    experiment_start = time.perf_counter()
+
+    for mode_idx, mode in enumerate(modes):
+        print(f"\n[Ablation] Mode {mode_idx+1}/{len(modes)}: {mode}", flush=True)
+        budget_scores: Dict[int, Dict[str, List[float]]] = {
+            b: {"seen": [], "unseen": [], "elapsed": []} for b in budgets
+        }
+
+        for ep_idx, index in enumerate(sample_indices):
+            episode = get_episode(data_path, index)
+            started_at = time.perf_counter()
+            _, results_by_budget = run_policy_episode(
+                episode=episode,
+                budget=max(budgets),
+                mode=mode,
+                proposer_model=proposer_model,
+                oracle_model=oracle_model,
+                updater_model=updater_model,
+                evaluation_model=evaluation_model,
+                base_url=base_url,
+                verbose=False,
+                selection_method=selection_method,
+                eval_budgets=budgets,
+            )
+            elapsed_sec = time.perf_counter() - started_at
+            completed_runs += 1
+            total_elapsed = time.perf_counter() - experiment_start
+            eta = total_elapsed / completed_runs * (total_runs - completed_runs)
+            if (ep_idx + 1) % 10 == 0 or ep_idx == 0:
+                print(f"  [{completed_runs}/{total_runs}] ep{index} {elapsed_sec:.0f}s | total {total_elapsed:.0f}s | ETA {eta:.0f}s ({eta/60:.0f}min)", flush=True)
+
+            for b in budgets:
+                evaluation = results_by_budget[b]
+                budget_scores[b]["seen"].append(float(evaluation["seen_accuracy"]))
+                budget_scores[b]["unseen"].append(float(evaluation["unseen_accuracy"]))
+                budget_scores[b]["elapsed"].append(elapsed_sec / len(budgets))
 
                 if log_path is not None:
                     _append_jsonl(
@@ -378,7 +496,7 @@ def run_ablation_experiment(
                         {
                             "event": "episode_finished",
                             "mode": mode,
-                            "budget": budget,
+                            "budget": b,
                             "episode_index": index,
                             "episode_id": episode.episode_id,
                             "elapsed_sec": elapsed_sec,
@@ -387,11 +505,17 @@ def run_ablation_experiment(
                         },
                     )
 
+        mode_points: List[Dict[str, Any]] = []
+        for budget in budgets:
+            seen_scores = budget_scores[budget]["seen"]
+            unseen_scores = budget_scores[budget]["unseen"]
+            episode_durations_sec = budget_scores[budget]["elapsed"]
+
             seen_mean = sum(seen_scores) / len(seen_scores)
             unseen_mean = sum(unseen_scores) / len(unseen_scores)
             if len(seen_scores) > 1:
-                seen_var = sum((value - seen_mean) ** 2 for value in seen_scores) / (len(seen_scores) - 1)
-                unseen_var = sum((value - unseen_mean) ** 2 for value in unseen_scores) / (len(unseen_scores) - 1)
+                seen_var = sum((v - seen_mean) ** 2 for v in seen_scores) / (len(seen_scores) - 1)
+                unseen_var = sum((v - unseen_mean) ** 2 for v in unseen_scores) / (len(unseen_scores) - 1)
                 seen_stderr = math.sqrt(seen_var) / math.sqrt(len(seen_scores))
                 unseen_stderr = math.sqrt(unseen_var) / math.sqrt(len(unseen_scores))
             else:
@@ -453,6 +577,12 @@ def main() -> None:
     parser.add_argument("--output", type=str, default="")
     parser.add_argument("--ablation-log", type=str, default="")
     parser.add_argument("--budget-list", type=str, default="1,3,5")
+    parser.add_argument("--modes", type=str, default="",
+                        help="Comma-separated modes for --plot-ablation, e.g. 'direct_querying,user_preference_first'. Default: all 4.")
+    parser.add_argument("--start-index", type=int, default=0,
+                        help="Starting episode index (default 0). Use with --num-samples to select a contiguous range.")
+    parser.add_argument("--sample-indices", type=str, default="",
+                        help="Comma-separated explicit episode indices, e.g. '3,14,35,81,94'. Overrides --num-samples and --start-index.")
     parser.add_argument(
         "--selection-method",
         type=str,
@@ -463,16 +593,19 @@ def main() -> None:
     args = parser.parse_args()
 
     data_path = Path(args.data)
-    sample_indices = _select_sample_indices(num_samples=args.num_samples)
+    if args.sample_indices:
+        sample_indices = [int(i.strip()) for i in args.sample_indices.split(",") if i.strip()]
+    else:
+        sample_indices = _select_sample_indices(num_samples=args.num_samples, start_index=args.start_index)
     episode = get_episode(data_path, sample_indices[0])
     budgets = _parse_budget_list(args.budget_list)
 
     if args.plot_ablation:
-        sample_indices = _select_sample_indices(num_samples=args.num_samples)
         output_path = args.output or f"plots/policy_ablation_{len(sample_indices)}ep.png"
         log_path = Path(args.ablation_log) if args.ablation_log else Path(output_path).with_suffix(".jsonl")
         if log_path.exists():
             log_path.unlink()
+        ablation_modes = [m.strip() for m in args.modes.split(",") if m.strip()] if args.modes else None
         curves_by_mode = run_ablation_experiment(
             data_path=data_path,
             sample_indices=sample_indices,
@@ -484,6 +617,7 @@ def main() -> None:
             base_url=args.base_url,
             log_path=log_path,
             selection_method=args.selection_method,
+            modes=ablation_modes,
         )
         episode_word = "episode" if len(sample_indices) == 1 else "episodes"
         saved_path = plot_ablation_comparison(

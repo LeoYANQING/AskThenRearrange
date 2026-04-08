@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, List, Literal, Optional, TypedDict
 
-from langchain_ollama import ChatOllama
+from llm_factory import create_chat_model, DEFAULT_MODEL, DEFAULT_BASE_URL
 from pydantic import BaseModel, Field
 
 from agent_schema import (
@@ -17,8 +17,8 @@ from state_init import build_initial_state
 from state_update import StateUpdate
 
 
-QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
+# Model config now in llm_factory.py
+# Base URL config now in llm_factory.py
 DEFAULT_DATA_PATH = Path(__file__).resolve().parent / "data" / "scenarios_aug_tiny.json"
 
 
@@ -70,7 +70,7 @@ class BuiltPreferenceCandidateModel(BaseModel):
     )
     covered_objects: List[str] = Field(
         default_factory=list,
-        description="One to three exact seen object names that are clear anchor examples of the hypothesis.",
+        description="ALL exact unresolved object names that belong to this hypothesis category. Include every matching object.",
     )
 
 
@@ -126,18 +126,19 @@ class PreferenceElicitingProposer:
 
     def __init__(
         self,
-        model: str = QUESTION_MODEL,
-        base_url: str = OLLAMA_BASE_URL,
+        model: str = DEFAULT_MODEL,
+        base_url: str = DEFAULT_BASE_URL,
         temperature: float = 0.0,
     ) -> None:
         self.model_name = model
         self.base_url = base_url
         self.temperature = temperature
-        self.model: Any = ChatOllama(
+        self.model: Any = create_chat_model(
             model=model,
             base_url=base_url,
             temperature=temperature,
             reasoning=False,
+            timeout=120,
         )
         self.structured_model = self.model.with_structured_output(
             ElicitingQuestionIntentModel
@@ -184,27 +185,32 @@ Generate preference candidates for future preference-eliciting questions in a ho
 Return at most {max_candidates} structured candidates based on the unresolved objects.
 
 Field requirements:
-- hypothesis: a SHORT category label (2-5 words). It names a grouping of objects, NOT a placement.
-- covered_objects: several exact unresolved object names that are strong examples of the same hypothesis.
+- hypothesis: a descriptive category label (3-8 words) that names a grouping of objects by shared attributes. Include distinguishing attributes such as material (glass, ceramic, wooden), size (small, handheld, large), power source (plug-in, battery-powered, cordless), or usage context (bedside, cooking, reading). Do NOT include receptacle names, verbs, or placement instructions.
+- covered_objects: ALL exact unresolved object names that fit this hypothesis. Include every matching object, not just a few examples.
 
 CRITICAL hypothesis rules:
-- hypothesis must be a category label only — do NOT include receptacle names, verbs, or placement instructions
-- hypothesis must NOT contain words like "should", "belong", "go", "place", "put", "stored", or any room/receptacle name
-- if you know where items go, keep that knowledge to yourself — only name the category
+- hypothesis must describe a category using object attributes — NOT just a one-word type label
+- hypothesis must NOT contain receptacle names, verbs like "should", "belong", "go", "place", "put", "stored"
+- if you know where items go, keep that knowledge to yourself — only name the category with its attributes
 
 Style examples:
-- good: "bedside-use items"
-- good: "powered kitchen tools"
-- good: "reading materials"
-- good: "electronic accessories"
-- good: "toy and game storage"
+- good: "fragile glass and ceramic drinkware"
+- good: "small battery-powered handheld devices"
+- good: "plug-in bedside electronics"
+- good: "soft comfort textiles and throws"
+- good: "hardcover reading and reference books"
+- good: "small handheld prep tools"
+- bad: "electronics" — too vague, no distinguishing attributes
+- bad: "lighting tools" — too generic, misses power-source or size
 - bad: "electronics should be placed in the media console" — contains receptacle name and verb
 - bad: "books go on the display shelf" — contains receptacle and verb
 - bad: "storage items for the ottoman" — contains receptacle name
-- bad: "Should electronics be grouped together?" — question form
-- bad: "Electrical appliances vs non-electrical items" — comparison
-- bad: "Use frequency" — too vague
 """.strip()
+
+        covered_receptacles = sorted({
+            cp.get("receptacle") for cp in state["confirmed_preferences"] if cp.get("receptacle")
+        })
+        uncovered_receptacles = sorted({r for r in state["receptacles"] if r not in set(covered_receptacles)})
 
         user_prompt = f"""
 Room:
@@ -227,6 +233,9 @@ Confirmed preference hypotheses (already asked — do not repeat or rephrase the
 
 Negative preference hypotheses (rejected — do not repeat):
 {negative_hypotheses}
+
+Receptacles not yet covered by any confirmed preference: {uncovered_receptacles}
+Hint: prefer hypotheses whose covered_objects are likely to belong to one of the uncovered receptacles above.
 
 Return only structured candidates.
 Focus on unresolved objects and infer short, usable preference hypotheses.
@@ -279,7 +288,7 @@ The hypothesis may be based on grouping, function, use context, or another reali
             covered_objects = [
                 obj for obj in _dedupe_keep_order(list(item.covered_objects))
                 if obj in genuinely_unresolved_set
-            ][:3]
+            ]
             if not covered_objects:
                 continue
             # Object-overlap dedup: skip only if all covered_objects already appear in an accepted candidate
@@ -311,7 +320,24 @@ The hypothesis may be based on grouping, function, use context, or another reali
         if not candidates:
             return None
 
-        system_prompt = """
+        # Identify which candidates are receptacle-centric (empty covered_objects)
+        has_receptacle_centric = any(len(c.covered_objects) == 0 for c in candidates)
+
+        receptacle_centric_block = ""
+        if has_receptacle_centric:
+            receptacle_centric_block = """
+IMPORTANT — Receptacle-centric candidates:
+- Some candidates have empty covered_objects. These target receptacles not yet covered by any rule.
+- Prefer receptacle-centric candidates when available — they discover entirely unknown organizing rules.
+- Among multiple receptacle-centric candidates, pick the one most likely to cover the MOST unresolved objects.
+  Think about which receptacle would typically hold the largest variety of items in this room.
+- For receptacle-centric candidates, the question MUST be phrased as:
+  "What kinds of items do you typically keep in/on the [receptacle]?"
+- Set covered_objects to [] (empty) for receptacle-centric candidates.
+- Set receptacle to the exact receptacle name from the hypothesis.
+"""
+
+        system_prompt = f"""
 Choose preference-eliciting questions for a household rearrangement task.
 
 Rules:
@@ -321,7 +347,7 @@ Rules:
 - Keep covered_objects within the candidate's covered_objects.
 - Prefer candidates that can clarify more than one unresolved object.
 - Return exactly one best preference-eliciting intent.
-
+{receptacle_centric_block}
 Question goal:
 - The question must reveal the user's organizing HABIT or PRINCIPLE for that category — not just ask "where does it go".
 - The question MUST reference the hypothesis category name. Covered_objects may appear as clarifying examples only.
@@ -335,10 +361,17 @@ Style examples:
 - good: "Do personal care items generally stay together for you, or spread around based on use?"
 - good: "Should powered kitchen tools be kept in one place, or do some live near where they're used?"
 - good (with receptacle hint): "Do media devices usually end up in the media console for you?"
+- good (receptacle-centric): "What kinds of items do you typically keep in the storage ottoman?"
+- good (receptacle-centric): "What do you usually store on the display shelf?"
 - bad: "Where should media devices usually be placed?" — asks WHERE not HOW/WHY
 - bad: "Where do personal care items go?" — action-oriented phrasing
 - bad: "Would you like to group personal care items together?" — grouping question
 """.strip()
+
+        covered_receptacles_propose = sorted({
+            cp.get("receptacle") for cp in state["confirmed_preferences"] if cp.get("receptacle")
+        })
+        uncovered_receptacles_propose = sorted({r for r in state["receptacles"] if r not in set(covered_receptacles_propose)})
 
         user_prompt = f"""
 Preference candidates:
@@ -347,6 +380,8 @@ Preference candidates:
 Unresolved objects:
 {state["unresolved_objects"]}
 
+Receptacles not yet covered by any confirmed preference: {uncovered_receptacles_propose}
+
 Guidance:
 {guidance}
 
@@ -354,12 +389,13 @@ Return exactly one intent.
 
 Fields:
 - hypothesis = exactly one hypothesis from the given preference candidates
-- covered_objects = exact objects chosen only from that candidate's covered_objects
-- receptacle = optional exact receptacle name from the room if you have a plausible likely placement, otherwise null
+- covered_objects = exact objects chosen only from that candidate's covered_objects (use [] for receptacle-centric candidates with empty covered_objects)
+- receptacle = best-guess exact receptacle from the receptacles list based on common household knowledge.
+  STRONGLY PREFER providing a specific receptacle so the question can be a soft confirmation.
+  For receptacle-centric candidates, set this to the exact receptacle name from the hypothesis.
+  Only leave null if you genuinely cannot guess any plausible placement.
 - priority = 0.0 to 1.0
-- question = one short question that elicits the user's organizing habit or principle for the hypothesis category
-- if receptacle is null, ask an open principle question ("How do you usually organize [category]?" / "Is there a spot you always assign to [category]?")
-- if receptacle is non-null, ask a soft confirmation ("Do [category] usually end up in [receptacle] for you?")
+- question = one short natural question — refer to the style examples above for phrasing options
 """.strip()
 
         result = self.structured_model.invoke(
@@ -374,6 +410,36 @@ Fields:
             candidates=candidates,
         )
 
+    def _build_receptacle_centric_candidates(
+        self,
+        *,
+        state: AgentState,
+        max_candidates: int = 2,
+    ) -> List[BuiltPreferenceCandidateModel]:
+        """Generate candidates for gap receptacles (no seen objects, no preferences)."""
+        covered_recs = {cp.get("receptacle") for cp in state["confirmed_preferences"] if cp.get("receptacle")}
+        covered_recs |= {ca.get("receptacle") for ca in state["confirmed_actions"] if ca.get("receptacle")}
+        # Also count receptacles already asked about in qa_history
+        for qa in state["qa_history"]:
+            if qa.get("question_pattern") == "preference_eliciting":
+                target = qa.get("target", "")
+                for r in state["receptacles"]:
+                    if r.lower() in target.lower():
+                        covered_recs.add(r)
+        uncovered_recs = [r for r in state["receptacles"] if r not in covered_recs]
+        if not uncovered_recs:
+            return []
+
+        candidates = []
+        for r in uncovered_recs:
+            candidates.append(
+                BuiltPreferenceCandidateModel(
+                    hypothesis=f"items typically kept in the {r}",
+                    covered_objects=[],  # gap receptacle: no seen objects to list
+                )
+            )
+        return candidates
+
     def propose(
         self,
         *,
@@ -385,6 +451,17 @@ Fields:
             state=state,
             max_candidates=max_candidates,
         )
+
+        # Add receptacle-centric candidates for gap receptacles
+        rc_candidates = self._build_receptacle_centric_candidates(
+            state=state,
+            max_candidates=2,
+        )
+
+        # When gap receptacles exist, prioritize them by putting them first
+        if rc_candidates:
+            candidates = rc_candidates + candidates
+
         return self._propose_from_candidates(
             state=state,
             candidates=candidates,
@@ -409,6 +486,12 @@ def _normalize_preference_eliciting_intent(
         for item in candidates
         if item.hypothesis.strip()
     }
+    # Track which candidates are receptacle-centric (empty covered_objects)
+    receptacle_centric_hypotheses = {
+        item.hypothesis.strip().lower()
+        for item in candidates
+        if item.hypothesis.strip() and len(item.covered_objects) == 0
+    }
     if not open_hypotheses:
         return None
 
@@ -418,6 +501,8 @@ def _normalize_preference_eliciting_intent(
         return None
     if open_hypotheses and hypothesis.lower() not in open_hypotheses:
         return None
+
+    is_receptacle_centric = hypothesis.lower() in receptacle_centric_hypotheses
 
     covered_objects = [
         obj for obj in _dedupe_keep_order(list(intent.covered_objects))
@@ -429,14 +514,24 @@ def _normalize_preference_eliciting_intent(
             obj for obj in covered_objects
             if obj in candidate_objects
         ]
-    if not covered_objects:
+    receptacle = intent.receptacle.strip() if intent.receptacle and intent.receptacle.strip() in state["receptacles"] else None
+
+    # For receptacle-centric candidates, try to extract receptacle from hypothesis if LLM didn't set it
+    if is_receptacle_centric and not receptacle:
+        for r in state["receptacles"]:
+            if r.lower() in hypothesis.lower():
+                receptacle = r
+                break
+
+    # Allow receptacle-centric candidates (empty covered_objects) if receptacle is set
+    if not covered_objects and not receptacle:
         return None
 
     return PreferenceQuestionIntent(
         question_pattern="preference_eliciting",
         hypothesis=hypothesis,
         covered_objects=covered_objects,
-        receptacle=intent.receptacle.strip() if intent.receptacle and intent.receptacle.strip() in state["receptacles"] else None,
+        receptacle=receptacle,
         priority=_clip_priority(intent.priority),
         question=question,
     )
@@ -460,15 +555,16 @@ class ActionProposer:
 
     def __init__(
         self,
-        model: str = QUESTION_MODEL,
-        base_url: str = OLLAMA_BASE_URL,
+        model: str = DEFAULT_MODEL,
+        base_url: str = DEFAULT_BASE_URL,
         temperature: float = 0.0,
     ) -> None:
-        self.model: Any = ChatOllama(
+        self.model: Any = create_chat_model(
             model=model,
             base_url=base_url,
             temperature=temperature,
             reasoning=False,
+            timeout=120,
         )
         self.structured_model = self.model.with_structured_output(ActionIntent)
 
@@ -478,59 +574,67 @@ class ActionProposer:
         state: AgentState,
         guidance: str = "",
     ) -> Optional[ActionIntent]:
+        # If no unresolved objects, pick from seen objects not yet asked via AO
         if not state["unresolved_objects"]:
-            return None
+            asked = {qa.get("target", "") for qa in state["qa_history"] if qa.get("question_pattern") == "action_oriented"}
+            confirmed = {a.get("object_name", "") for a in state["confirmed_actions"]}
+            available = [o for o in state["seen_objects"] if o not in asked and o not in confirmed]
+            if not available:
+                # All seen objects already confirmed — pick any not yet AO-asked
+                available = [o for o in state["seen_objects"] if o not in asked]
+            if not available:
+                return None
+            # Create a working copy with available objects as "unresolved"
+            state = {**state, "unresolved_objects": available, "confirmed_actions": []}
+
+        # If guidance mentions boundary/ambiguous/similar, let LLM pick the best object.
+        # Otherwise use novelty-based selection.
+        strategic_guidance = any(
+            w in guidance.lower()
+            for w in ["ambiguous", "boundary", "similar", "same", "clustered"]
+        )
+
+        if strategic_guidance and len(state["unresolved_objects"]) > 1:
+            # Let the LLM choose which object to ask about, based on the guidance
+            target_object = self._strategic_select(state=state, guidance=guidance)
+        else:
+            # Default: novelty-based diversity
+            recent_asked = [
+                item.get("target", "") or item.get("object_name", "")
+                for item in state.get("qa_history", [])[-4:]
+                if item.get("question_pattern") == "action_oriented"
+            ]
+            recent_words = set(" ".join(recent_asked).lower().split()) if recent_asked else set()
+
+            def _novelty(obj: str) -> int:
+                obj_words = set(obj.lower().split())
+                return -len(obj_words & recent_words)
+
+            target_object = max(state["unresolved_objects"], key=_novelty)
 
         system_prompt = """
 You are a proposer for Action-oriented questions in a household rearrangement task.
 
 Your job:
-Choose ONE unresolved seen object that is the best next target for an Action-oriented question.
+Ask a direct placement question about the specified target object.
 
-Object selection strategy — apply in order:
-1. boundary_probe candidate: if a confirmed_preference exists, pick an unresolved object that is semantically
-   similar to its covered objects. Asking about it tests whether the preference extends further and builds
-   richer analogy evidence for unseen objects.
-2. category anchor: if no confirmed_preference exists yet, pick an object that is representative of a
-   common household category (electronics, books, cleaning supplies, etc.) so the answer can serve as
-   an analogy anchor for other similar unresolved objects.
-3. fallback: any remaining unresolved object.
-
-Action modes:
-- direct_grounding: ask where the object should go (use when no related confirmed preference exists)
-- boundary_probe: ask whether the object follows an existing confirmed preference rule (use when a
-  plausible preference exists whose scope is uncertain)
+Action mode: always use direct_grounding.
 
 Question rules:
-- must mention the chosen object by name
-- for direct_grounding: "Where should the [object] go?" or equivalent
-- for boundary_probe: "Does the [object] also belong in [receptacle from confirmed preference]?"
+- must mention the target object by name
+- ask "Where should the [object] go?" or equivalent
 - one sentence, no hedging, no unrelated objects
 """.strip()
 
-        recent_qa_history = state["qa_history"][-3:]
-
         user_prompt = f"""
-Unresolved seen objects:
-{state["unresolved_objects"]}
-
-Confirmed actions:
-{state["confirmed_actions"]}
-
-Confirmed preferences:
-{state["confirmed_preferences"]}
-
-Guidance:
-{guidance}
-
-Recent QA history:
-{recent_qa_history}
+Target object (you MUST ask about this exact object):
+{target_object}
 
 Return exactly one ActionIntent:
 - question_pattern = "action_oriented"
-- action_mode = "direct_grounding" or "boundary_probe"
-- object_name = one exact unresolved seen object
-- priority = 0.0 to 1.0
+- action_mode = "direct_grounding"
+- object_name = "{target_object}"
+- priority = 0.5
 - question = one concise natural Action-oriented question about that exact object's placement or boundary case
 """.strip()
 
@@ -544,6 +648,58 @@ Return exactly one ActionIntent:
             intent=result,
             state=state,
         )
+
+    def _strategic_select(
+        self,
+        *,
+        state: AgentState,
+        guidance: str = "",
+    ) -> str:
+        """Let LLM pick the best object to ask about based on guidance context.
+        Filters out objects that would likely go to already-covered receptacles."""
+        objs = state["unresolved_objects"]
+        cas = state["confirmed_actions"]
+        cps = state["confirmed_preferences"]
+
+        # Pre-filter: exclude objects whose name strongly suggests an already-covered receptacle
+        ca_recs = {a.get("receptacle", "") for a in cas}
+        cp_recs = {p.get("receptacle", "") for p in cps}
+        covered_recs = ca_recs | cp_recs
+
+        prompt = f"""Pick ONE object from the unresolved list to ask about next.
+
+Guidance: {guidance}
+
+Unresolved objects: {objs}
+
+Confirmed actions so far: {[(ca.get('object_name',''), ca.get('receptacle','')) for ca in cas]}
+
+Confirmed preferences: {[(cp.get('hypothesis',''), cp.get('receptacle','')) for cp in cps]}
+
+CRITICAL: Do NOT pick an object that obviously belongs to an already-covered receptacle: {sorted(covered_recs)}.
+Pick one that is AMBIGUOUS or likely goes to a DIFFERENT receptacle.
+
+Reply with ONLY the exact object name, nothing else."""
+
+        try:
+            llm = create_chat_model(
+                model=self.model_name,
+                base_url=self.base_url,
+                temperature=0.0,
+                reasoning=False,
+                timeout=60,
+            )
+            resp = llm.invoke(prompt)
+            text = (resp.content if hasattr(resp, "content") else str(resp)).strip().strip('"').strip("'")
+            for obj in objs:
+                if obj.lower() == text.lower():
+                    return obj
+            for obj in objs:
+                if text.lower() in obj.lower() or obj.lower() in text.lower():
+                    return obj
+        except Exception:
+            pass
+        return objs[0]
 
 
 def _normalize_action_intent(
@@ -588,15 +744,16 @@ class PreferenceInductionProposer:
 
     def __init__(
         self,
-        model: str = QUESTION_MODEL,
-        base_url: str = OLLAMA_BASE_URL,
+        model: str = DEFAULT_MODEL,
+        base_url: str = DEFAULT_BASE_URL,
         temperature: float = 0.0,
     ) -> None:
-        self.model: Any = ChatOllama(
+        self.model: Any = create_chat_model(
             model=model,
             base_url=base_url,
             temperature=temperature,
             reasoning=False,
+            timeout=120,
         )
         self.structured_model = self.model.with_structured_output(
             PreferenceQuestionIntentBatch
@@ -635,8 +792,17 @@ Rules:
 - Use the guidance as a soft instruction about what kind of summary is most useful to confirm next.
 """.strip()
 
+        covered_receptacles = sorted({
+            cp.get("receptacle") for cp in state["confirmed_preferences"]
+            if cp.get("receptacle")
+        })
+        uncovered_receptacles = sorted({
+            r for r in state["receptacles"]
+            if r not in set(covered_receptacles)
+        })
+
         user_prompt = f"""
-Confirmed actions:
+Confirmed actions (ALL accumulated evidence — use the full list, not just recent steps):
 {state["confirmed_actions"]}
 
 Seen objects:
@@ -645,8 +811,14 @@ Seen objects:
 Unresolved objects:
 {state["unresolved_objects"]}
 
-Confirmed preferences:
+Confirmed preferences (rules already established):
 {state["confirmed_preferences"]}
+
+Receptacles already covered by confirmed preferences:
+{covered_receptacles}
+
+Receptacles NOT yet covered — PRIORITIZE these for your hypothesis:
+{uncovered_receptacles}
 
 Rejected hypotheses:
 {state["negative_preferences"]}
@@ -654,12 +826,13 @@ Rejected hypotheses:
 Guidance:
 {guidance}
 
-Choose the most useful summary question, not just a plausible one.
-Use confirmed_actions as the main evidence source, and prefer a summary whose confirmation would improve future placement decisions.
+IMPORTANT: Do NOT generate a hypothesis that only addresses receptacles already in "covered".
+Look across ALL confirmed_actions to find a pattern that targets one of the uncovered receptacles.
+If multiple confirmed_actions point to the same uncovered receptacle, that is strong evidence for a hypothesis.
 
 Each intent must include:
 - question_pattern = "preference_induction"
-- hypothesis = a concise summary rule to confirm
+- hypothesis = a concise summary rule to confirm. Describe the object group using shared attributes (material, size, power source, usage context) rather than just a generic type label. Good: "small plug-in bedside electronics go to the nightstand drawer". Bad: "electronics go to the drawer".
 - covered_objects = exact seen objects plausibly covered by the summary
 - receptacle = optional exact receptacle name if there is a clear likely placement to confirm, otherwise null
 - priority = 0.0 to 1.0
@@ -815,12 +988,12 @@ def main() -> None:
     parser.add_argument(
         "--model",
         type=str,
-        default=QUESTION_MODEL,
+        default=DEFAULT_MODEL,
     )
     parser.add_argument(
         "--base-url",
         type=str,
-        default=OLLAMA_BASE_URL,
+        default=DEFAULT_BASE_URL,
     )
     args = parser.parse_args()
 

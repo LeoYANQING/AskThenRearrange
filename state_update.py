@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from typing import Any, Iterable, List, Literal, Optional
 
-from langchain_ollama import ChatOllama
+from llm_factory import create_chat_model, DEFAULT_MODEL, DEFAULT_BASE_URL
 from pydantic import BaseModel, Field
 
 from agent_schema import (
@@ -13,8 +13,8 @@ from agent_schema import (
     QuestionPattern,
 )
 
-QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
+# Model config now in llm_factory.py
+# Base URL config now in llm_factory.py
 
 
 class LearnedPreferenceModel(BaseModel):
@@ -100,21 +100,35 @@ class PreferenceInductionInterpretation(BaseModel):
     )
 
 
+def _invoke_with_retry(model: Any, messages: list, retries: int = 3) -> Any:
+    """Invoke a structured output model with retry on parse failures."""
+    last_exc = None
+    for attempt in range(retries):
+        try:
+            return model.invoke(messages)
+        except Exception as e:
+            last_exc = e
+            if attempt < retries - 1:
+                continue
+    raise last_exc  # type: ignore[misc]
+
+
 class StateUpdate:
     def __init__(
         self,
-        model: str = QUESTION_MODEL,
-        base_url: str = OLLAMA_BASE_URL,
+        model: str = DEFAULT_MODEL,
+        base_url: str = DEFAULT_BASE_URL,
         temperature: float = 0.0,
     ) -> None:
         self.model_name = model
         self.base_url = base_url
         self.temperature = temperature
-        self.model: Any = ChatOllama(
+        self.model: Any = create_chat_model(
             model=model,
             base_url=base_url,
             temperature=temperature,
             reasoning=False,
+            timeout=120,
         )
         self.action_model = self.model.with_structured_output(ActionAnswerInterpretation)
         self.preference_eliciting_model = self.model.with_structured_output(PreferenceElicitingStateUpdate)
@@ -182,12 +196,10 @@ Current confirmed_preferences:
 {state["confirmed_preferences"]}
 """.strip()
 
-        return self.action_model.invoke(
-            [
+        return _invoke_with_retry(self.action_model, [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
-            ]
-        )
+            ])
 
     def interpret_preference_induction_answer(
         self,
@@ -267,12 +279,10 @@ Current negative_preferences:
 {state["negative_preferences"]}
 """.strip()
 
-        return self.preference_induction_model.invoke(
-            [
+        return _invoke_with_retry(self.preference_induction_model, [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
-            ]
-        )
+            ])
 
     def interpret_preference_eliciting_answer(
         self,
@@ -341,12 +351,26 @@ Current confirmed_actions:
 {state["confirmed_actions"]}
 """.strip()
 
-        return self.preference_eliciting_model.invoke(
-            [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ]
-        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ]
+        try:
+            return _invoke_with_retry(self.preference_eliciting_model, messages)
+        except Exception:
+            # Fallback: extract a category rule from the answer text directly
+            receptacle = ""
+            for r in state["receptacles"]:
+                if r.lower() in answer.lower():
+                    receptacle = r
+                    break
+            return PreferenceElicitingStateUpdate(
+                category_rule=answer.strip() if receptacle else "",
+                category_rule_covered_objects=[
+                    obj for obj in covered_objects if obj in state["seen_objects"]
+                ],
+                category_rule_receptacle=receptacle,
+            )
 
     def apply_preference_induction_interpretation(
         self,
@@ -552,7 +576,9 @@ Current confirmed_actions:
                     covered_objects=update.category_rule_covered_objects,
                 ),
                 seen_objects=state["seen_objects"],
-                fallback_covered_objects=covered_objects or [],
+                # No fallback to proposer's covered_objects — the state-update LLM
+                # determines which objects the rule covers based on the oracle's answer.
+                # Proposer groupings are speculative and often wrong.
                 receptacle=receptacle,
             )
             if normalized is not None:

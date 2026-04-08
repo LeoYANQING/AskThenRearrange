@@ -6,15 +6,15 @@ from typing import Any, Dict, List
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator, FormatStrFormatter
-from langchain_ollama import ChatOllama
+from llm_factory import create_chat_model, DEFAULT_MODEL, DEFAULT_BASE_URL
 from pydantic import BaseModel, Field
 
 from agent_schema import AgentState
 from data import Episode, PlacementMap
 
 
-QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
+# Model config now in llm_factory.py
+# Base URL config now in llm_factory.py
 
 
 class FinalPlacementPlan(BaseModel):
@@ -24,15 +24,16 @@ class FinalPlacementPlan(BaseModel):
 class FinalPlacementPlanner:
     def __init__(
         self,
-        model: str = QUESTION_MODEL,
-        base_url: str = OLLAMA_BASE_URL,
+        model: str = DEFAULT_MODEL,
+        base_url: str = DEFAULT_BASE_URL,
         temperature: float = 0.0,
     ) -> None:
-        self.model: Any = ChatOllama(
+        self.model: Any = create_chat_model(
             model=model,
             base_url=base_url,
             temperature=temperature,
             reasoning=False,
+            timeout=120,
         )
         self.structured_model = self.model.with_structured_output(FinalPlacementPlan)
 
@@ -52,11 +53,15 @@ You complete the final seen-object placement plan for a household rearrangement 
 
 Your job: assign one receptacle to each remaining unresolved seen object.
 
+CRITICAL — evidence always overrides your general knowledge:
+- This user's household has specific rules captured in confirmed_actions and confirmed_preferences.
+- Do NOT use general common sense (e.g. "clothes go in wardrobes", "reading items go on shelves") when confirmed evidence contradicts it.
+- The confirmed evidence is ground truth for THIS household.
+
 How to use the evidence:
-- confirmed_actions of semantically similar objects are the strongest signal — prefer these for analogy
-- confirmed_preferences provide category-level context; a preference's "receptacle" field (if present) tells you where that category goes
-- only apply a confirmed_preference to a target object if the object clearly belongs to that preference's category
-- do not let a broad category rule override a more specific analogy from confirmed_actions
+1. confirmed_preferences (highest priority for category members): if a target object fits a preference's category, assign it to that preference's receptacle — even if common sense would suggest elsewhere.
+2. confirmed_actions analogy (second priority): find the most semantically similar confirmed object by function or use context, not just by name keywords. Apply its receptacle.
+3. Only fall back to general reasoning if no confirmed evidence applies at all.
 
 Rules:
 - return only exact target object names as keys
@@ -68,33 +73,40 @@ Rules:
             system_prompt = """
 You complete the final unseen-object placement plan for a household rearrangement agent.
 
-Unseen objects are objects the user has not yet seen or handled. They belong in the same household
-and should be organized following the same principles the user expressed for the seen objects.
+Unseen objects belong in the same household and must follow the same rules the user expressed for seen objects.
 
-Inference strategy — apply in order for each unseen object:
+CRITICAL — evidence always overrides your general knowledge:
+- Do NOT use general common sense (e.g. "clothes go in wardrobes") when confirmed evidence says otherwise.
+- This household's rules are captured in confirmed_actions and confirmed_preferences — trust them absolutely.
 
-Step 1 — confirmed_preferences match:
-  For each unseen object, read every confirmed_preference.
-  Each preference has a "hypothesis" (category description) and optionally a "receptacle" field (exact place).
-  If the object's type, function, or use context fits the hypothesis category:
-    - If "receptacle" is present and non-empty, assign the object to that receptacle directly.
-    - If "receptacle" is absent or empty, infer the receptacle from the hypothesis text.
-  Example: preference {hypothesis: "reading materials", receptacle: "display shelf"} → assign any book-like unseen object to display shelf.
+Inference strategy — apply strictly in order for each unseen object:
 
-Step 2 — confirmed_actions analogy:
-  If no confirmed_preference matches clearly, find the most semantically similar seen object in confirmed_actions.
-  Apply the same receptacle as that similar seen object.
-  Example: seen "plastic toy bin → decorative basket" → unseen "plastic puzzle case" is similar → decorative basket.
+Step 1 — confirmed_preferences match (HIGHEST PRIORITY):
+  Read every confirmed_preference. Each has a "hypothesis" (category description) and a "receptacle".
+  Match by shared attributes: material, size, power source, or usage context.
+
+  CRITICAL — when multiple preferences could match an object:
+  - Compare the DISTINGUISHING words in each preference hypothesis.
+  - Example: "large flat items for viewing/reading" vs "small books and puzzles for play/relaxation"
+    → a "sudoku booklet" is SMALL and for PLAY → matches "small books for play" → center table, NOT display shelf
+    → a "hardcover art book" is LARGE and for VIEWING → matches "large items for viewing" → display shelf
+  - Focus on the adjectives (large/small, soft/hard, portable/plug-in) to break ties.
+  - Focus on the PURPOSE (for reading vs for play, for storage vs for display, for comfort vs for organization).
+  - If a preference says "miscellaneous items, loose accessories" — this is a CATCH-ALL; objects that don't clearly fit any other preference go here.
+
+Step 2 — confirmed_actions analogy (use attributes and function, not name keywords):
+  Find the most similar seen object in confirmed_actions by material, size, power source, or usage context.
+  Use the same receptacle.
+  Example: unseen "bamboo spatula" shares material (wood) and function (prep tool) with seen "wooden cutting board" → same receptacle.
 
 Step 3 — receptacle frequency fallback:
-  If still uncertain, assign the receptacle that appears most frequently in confirmed_actions for that object type.
+  Only if neither Step 1 nor Step 2 applies, assign the most frequent receptacle for that object type.
 
 Rules:
 - return only exact target object names as keys
 - return only exact receptacle names from the provided receptacles list
 - do not choose any object -> receptacle pair listed in negative_actions
 - make a complete plan for all target_objects
-- prefer a specific confirmed rule over a generic guess
 """.strip()
 
         if scope == "seen":
@@ -138,18 +150,42 @@ Target unseen objects (assign each to one receptacle by generalizing the rules a
 {target_objects}
 """.strip()
 
-        result = self.structured_model.invoke(
-            [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ]
-        )
-        return _normalize_planned_placements(
-            result.placements,
-            target_objects=target_objects,
-            receptacles=state["receptacles"],
-            negative_actions=state["negative_actions"],
-        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ]
+        # Retry on JSON parse failures (common with some models)
+        last_exc = None
+        for attempt in range(3):
+            try:
+                result = self.structured_model.invoke(messages)
+                return _normalize_planned_placements(
+                    result.placements,
+                    target_objects=target_objects,
+                    receptacles=state["receptacles"],
+                    negative_actions=state["negative_actions"],
+                )
+            except Exception as e:
+                last_exc = e
+                if attempt < 2:
+                    continue
+        # Final fallback: try unstructured model and parse Python dict
+        try:
+            import ast
+            raw = self.model.invoke(messages)
+            text = raw.content if hasattr(raw, "content") else str(raw)
+            # Try to parse as Python dict (model sometimes returns single-quoted JSON)
+            placements = ast.literal_eval(text.strip())
+            if isinstance(placements, dict):
+                return _normalize_planned_placements(
+                    placements,
+                    target_objects=target_objects,
+                    receptacles=state["receptacles"],
+                    negative_actions=state["negative_actions"],
+                )
+        except Exception:
+            pass
+        raise last_exc  # type: ignore[misc]
 
 
 def _normalize_planned_placements(

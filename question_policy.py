@@ -3,15 +3,15 @@ from __future__ import annotations
 import os
 from typing import Any, List, Literal, Optional
 
-from langchain_ollama import ChatOllama
+from llm_factory import create_chat_model, DEFAULT_MODEL, DEFAULT_BASE_URL
 from pydantic import BaseModel, Field
 
 from agent_schema import AgentState, QuestionPattern
 from belief_estimator import BeliefEstimator, max_entropy, shannon_entropy
 
 
-QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
+# Model config now in llm_factory.py
+# Base URL config now in llm_factory.py
 
 PolicyMode = Literal[
     "direct_querying",
@@ -45,13 +45,13 @@ class QuestionPolicyController:
 
     def __init__(
         self,
-        model: str = QUESTION_MODEL,
-        base_url: str = OLLAMA_BASE_URL,
+        model: str = DEFAULT_MODEL,
+        base_url: str = DEFAULT_BASE_URL,
         temperature: float = 0.0,
         selection_method: SelectionMethod = "rule",
     ) -> None:
         self.selection_method = selection_method
-        self.model: Any = ChatOllama(
+        self.model: Any = create_chat_model(
             model=model,
             base_url=base_url,
             temperature=temperature,
@@ -118,15 +118,47 @@ class QuestionPolicyController:
         state: AgentState,
         allowed_patterns: List[QuestionPattern],
     ) -> QuestionDecision:
-        # Use preference_eliciting while there are ≥2 unresolved objects not yet
-        # covered by any confirmed preference; otherwise fall back to action_oriented.
         covered_by_prefs: set = set()
         for p in _confirmed_preferences(state):
             covered_by_prefs.update(p.get("covered_objects", []))
         uncovered = [
             obj for obj in state["unresolved_objects"] if obj not in covered_by_prefs
         ]
-        if "preference_eliciting" in allowed_patterns and len(uncovered) >= 2:
+
+        covered_recs = {p.get("receptacle") for p in _confirmed_preferences(state) if p.get("receptacle")}
+        covered_recs |= {a.get("receptacle") for a in state["confirmed_actions"] if a.get("receptacle")}
+        uncovered_recs = [r for r in state["receptacles"] if r not in covered_recs]
+
+        # Count how many PE and AO questions have been asked
+        pe_count = sum(1 for qa in state["qa_history"] if qa.get("question_pattern") == "preference_eliciting")
+        ao_count = sum(1 for qa in state["qa_history"] if qa.get("question_pattern") == "action_oriented")
+        total = len(state["qa_history"])
+        num_cps = len(state["confirmed_preferences"])
+
+        # Strategy: PE first to cover all receptacles, then AO to probe boundaries
+        # Only switch to AO boundary probe when all receptacles have at least a CP or CA
+        if not uncovered_recs and num_cps >= 2 and "action_oriented" in allowed_patterns and len(uncovered) >= 1:
+            cp_summaries = []
+            for cp in state["confirmed_preferences"]:
+                h = cp.get("hypothesis", "")
+                r = cp.get("receptacle", "")
+                if h and r:
+                    cp_summaries.append(f'"{h}" → {r}')
+            cp_text = "; ".join(cp_summaries)
+            ca_recs = sorted({a.get("receptacle") for a in state["confirmed_actions"] if a.get("receptacle")})
+            return QuestionDecision(
+                question_pattern="action_oriented",
+                guidance=(
+                    f"All receptacles are covered. Learned rules: {cp_text}. "
+                    f"Now ask about an unresolved object that is AMBIGUOUS — "
+                    f"it could fit more than one rule or sits at the boundary between categories. "
+                    f"Receptacles with confirmed actions: {ca_recs}. "
+                    f"Prefer an object likely to go to a receptacle NOT in {ca_recs}."
+                ),
+            )
+
+        # Otherwise: PE if there are uncovered objects/receptacles
+        if "preference_eliciting" in allowed_patterns and (len(uncovered) >= 2 or uncovered_recs):
             pattern: QuestionPattern = "preference_eliciting"
         else:
             pattern = "action_oriented"
@@ -143,23 +175,83 @@ class QuestionPolicyController:
         state: AgentState,
         allowed_patterns: List[QuestionPattern],
     ) -> QuestionDecision:
-        # Trigger preference_induction once ≥3 confirmed actions are not yet
-        # covered by any confirmed preference; otherwise keep collecting via action_oriented.
-        summarized: set = set()
-        for p in _confirmed_preferences(state):
-            summarized.update(p.get("covered_objects", []))
-        unsummarized_count = sum(
-            1 for obj in _confirmed_action_objects(state) if obj not in summarized
-        )
-        if "preference_induction" in allowed_patterns and unsummarized_count >= 3:
-            pattern: QuestionPattern = "preference_induction"
+        # PAR = AO + PI only (no PE). AO collects evidence, PI induces rules.
+        CONSOLIDATE_AFTER = 2
+
+        # Receptacle coverage analysis
+        cp_recs = {cp.get("receptacle") for cp in state["confirmed_preferences"] if cp.get("receptacle")}
+        ca_recs_count: dict = {}
+        for ca in state["confirmed_actions"]:
+            r = ca.get("receptacle", "")
+            if r:
+                ca_recs_count[r] = ca_recs_count.get(r, 0) + 1
+        all_covered = cp_recs | set(ca_recs_count.keys())
+        uncovered = sorted(r for r in state["receptacles"] if r not in all_covered)
+        # Receptacles with only 1 CA and no CP — weak coverage, need more AO evidence
+        weak_recs = sorted(r for r in state["receptacles"] if r not in cp_recs and ca_recs_count.get(r, 0) <= 1)
+
+        # Count consecutive AO turns since last PI
+        since_last_pi = 0
+        for item in reversed(state["qa_history"]):
+            if item.get("question_pattern") == "preference_induction":
+                break
+            since_last_pi += 1
+
+        # PI: after CONSOLIDATE_AFTER consecutive AOs, try to induce a rule
+        # BUT only for receptacles that actually have ≥2 CAs (evidence-backed induction)
+        if since_last_pi >= CONSOLIDATE_AFTER and "preference_induction" in allowed_patterns:
+            # Find receptacles with enough AO evidence but no CP yet
+            recs_with_evidence = sorted(
+                r for r, count in ca_recs_count.items()
+                if count >= 2 and r not in cp_recs
+            )
+            if recs_with_evidence:
+                # Show the actual CA evidence to ground the PI
+                evidence_summary = []
+                for r in recs_with_evidence[:2]:
+                    objs = [ca["object_name"] for ca in state["confirmed_actions"] if ca.get("receptacle") == r]
+                    evidence_summary.append(f"{r}: {objs}")
+                pi_guidance = (
+                    f"Induce a BROAD placement rule from these confirmed actions: {evidence_summary}. "
+                    f"The rule should describe the GENERAL CATEGORY of items at that receptacle, "
+                    f"not just repeat the specific objects. Make it broad enough to cover similar unseen items."
+                )
+                return QuestionDecision(
+                    question_pattern="preference_induction",
+                    guidance=pi_guidance,
+                )
+            # No receptacle has enough evidence for PI — do another AO instead
+            # (fall through to AO below)
+
+        # AO strategy: explore uncovered/weak receptacles, avoid receptacles with CP
+        already_covered = sorted(cp_recs)
+        if uncovered:
+            ao_guidance = (
+                f"Receptacles with NO evidence yet: {uncovered}. "
+                f"Receptacles to AVOID (already have rules): {already_covered}. "
+                f"Pick an unresolved object most likely to belong to one of the uncovered receptacles. "
+                f"Do NOT pick an object that obviously belongs to {already_covered}."
+            )
+        elif weak_recs:
+            ao_guidance = (
+                f"Receptacles needing more evidence (≤1 CA, no rule yet): {weak_recs}. "
+                f"Receptacles to AVOID (already have rules): {already_covered}. "
+                f"Pick an unresolved object likely to belong to one of the weak receptacles. "
+                f"A second data point at {weak_recs} enables rule induction."
+            )
         else:
-            pattern = "action_oriented"
+            # All receptacles have some coverage — find ones with CP but few CAs
+            thin_recs = sorted(r for r in state["receptacles"] if ca_recs_count.get(r, 0) <= 1)
+            if thin_recs:
+                ao_guidance = (
+                    f"All receptacles have rules, but these have thin evidence (≤1 CA): {thin_recs}. "
+                    f"Pick an object likely to belong to one of these to strengthen the evidence."
+                )
+            else:
+                ao_guidance = "All receptacles well covered. Pick any remaining unresolved object."
         return QuestionDecision(
-            question_pattern=pattern,
-            guidance=self._default_guidance(
-                question_pattern=pattern, mode="parallel_exploration"
-            ),
+            question_pattern="action_oriented",
+            guidance=ao_guidance,
         )
 
     def _rule_hybrid_all(
@@ -424,8 +516,14 @@ class QuestionPolicyController:
         state: AgentState,
         mode: PolicyMode,
     ) -> List[QuestionPattern]:
-        can_eliciting = bool(state["unresolved_objects"])
-        can_action = bool(state["unresolved_objects"])
+        has_unresolved = bool(state["unresolved_objects"])
+        # Allow PE even without unresolved objects (receptacle-centric questions don't need them)
+        covered_recs = {p.get("receptacle") for p in _confirmed_preferences(state) if p.get("receptacle")}
+        covered_recs |= {a.get("receptacle") for a in state["confirmed_actions"] if a.get("receptacle")}
+        has_uncovered_recs = any(r not in covered_recs for r in state["receptacles"])
+        can_eliciting = has_unresolved or has_uncovered_recs
+        # Allow AO even when unresolved is empty — can still ask boundary probes about seen objects
+        can_action = True
         can_induction = self._induction_is_available(state=state)
 
         if mode == "direct_querying":
@@ -440,6 +538,7 @@ class QuestionPolicyController:
             return allowed
 
         if mode == "parallel_exploration":
+            # PAR = AO + PI only (no PE)
             allowed: List[QuestionPattern] = []
             if can_action:
                 allowed.append("action_oriented")
@@ -585,7 +684,7 @@ Current state:
             if mode == "user_preference_first":
                 return "Ask an action question that checks the boundary of an already known preference or cleans up a remaining concrete placement."
             if mode == "parallel_exploration":
-                return "Ask an action question that collects object-level evidence likely to support a future summary rule."
+                return "Ask an action question to collect one more concrete placement — building toward the evidence needed for the next induction step."
             return "Ask an action question that resolves one unresolved object's placement clearly."
         if question_pattern == "preference_eliciting":
             return "Ask about the most useful unresolved high-level preference that can affect multiple visible objects."

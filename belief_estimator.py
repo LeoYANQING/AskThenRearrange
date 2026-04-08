@@ -4,14 +4,14 @@ import math
 import os
 from typing import Any, Dict, List, Optional
 
-from langchain_ollama import ChatOllama
+from llm_factory import create_chat_model, DEFAULT_MODEL, DEFAULT_BASE_URL
 from pydantic import BaseModel, Field
 
 from agent_schema import AgentState
 
 
-QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
+# Model config now in llm_factory.py
+# Base URL config now in llm_factory.py
 
 
 # ---------------------------------------------------------------------------
@@ -23,18 +23,18 @@ class ObjectBelief(BaseModel):
 
     object_name: str = Field(description="Exact object name from the unresolved list.")
     top_receptacles: List[str] = Field(
-        description="Top 3 most likely receptacles from the available list, ordered by probability.",
+        description="The single most likely receptacle from the available list.",
         min_length=1,
-        max_length=5,
+        max_length=1,
     )
     probabilities: List[float] = Field(
         description=(
-            "Probability for each entry in top_receptacles. "
-            "Values between 0 and 1, summing to at most 1.0. "
-            "The remainder is spread across all other receptacles."
+            "Confidence probability for the top receptacle. "
+            "Value between 0 and 1. "
+            "The remainder is spread uniformly across all other receptacles."
         ),
         min_length=1,
-        max_length=5,
+        max_length=1,
     )
 
 
@@ -87,15 +87,16 @@ class BeliefEstimator:
 
     def __init__(
         self,
-        model: str = QUESTION_MODEL,
-        base_url: str = OLLAMA_BASE_URL,
+        model: str = DEFAULT_MODEL,
+        base_url: str = DEFAULT_BASE_URL,
         temperature: float = 0.0,
     ) -> None:
-        self.llm: Any = ChatOllama(
+        self.llm: Any = create_chat_model(
             model=model,
             base_url=base_url,
             temperature=temperature,
             reasoning=False,
+            timeout=120,
         )
         self.structured_llm = self.llm.with_structured_output(BeliefEstimate)
 
@@ -159,8 +160,8 @@ estimate the most likely receptacle for each unresolved object.
 
 For EACH unresolved object, output:
 - object_name: the exact name from the unresolved list
-- top_receptacles: the 3 most likely receptacles (from the available receptacles list), ordered by likelihood
-- probabilities: a probability for each, summing to at most 1.0
+- top_receptacles: the single most likely receptacle (from the available receptacles list)
+- probabilities: a single confidence probability for that receptacle
 
 Calibration rules — you MUST vary probabilities based on your actual confidence:
 - OBVIOUS placement (e.g. "hardcover novel" → bookshelf): top probability 0.70–0.90

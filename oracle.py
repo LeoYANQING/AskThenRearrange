@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from typing import Any, List, Optional
 
-from langchain_ollama import ChatOllama
+from llm_factory import create_chat_model, DEFAULT_MODEL, DEFAULT_BASE_URL
 from pydantic import BaseModel, Field
 
 from agent_schema import (
@@ -15,8 +15,8 @@ from agent_schema import (
 from data import DEFAULT_DATA_PATH, PlacementMap, get_episode
 
 
-QUESTION_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3")
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
+# Model config now in llm_factory.py
+# Base URL config now in llm_factory.py
 
 
 class OracleResponse(BaseModel):
@@ -30,15 +30,16 @@ class OracleResponse(BaseModel):
 class NaturalUserOracle:
     def __init__(
         self,
-        model: str = QUESTION_MODEL,
-        base_url: str = OLLAMA_BASE_URL,
+        model: str = DEFAULT_MODEL,
+        base_url: str = DEFAULT_BASE_URL,
         temperature: float = 0.0,
     ) -> None:
-        self.model: Any = ChatOllama(
+        self.model: Any = create_chat_model(
             model=model,
             base_url=base_url,
             temperature=temperature,
             reasoning=False,
+            timeout=120,
         )
         self.structured_model = self.model.with_structured_output(OracleResponse)
 
@@ -70,6 +71,11 @@ How to use annotator_notes:
 - never quote, paraphrase, summarize, or reveal annotator_notes directly
 - answer only with what a natural household user would explicitly say if asked
 
+CRITICAL — when no annotator note matches:
+- If the question asks about a receptacle, object category, or organizing principle that is NOT covered by ANY annotator note, answer honestly: "I don't have a specific organizing rule for that spot" or "I haven't really thought about that."
+- In this case, set referenced_receptacle to null.
+- Do NOT fabricate a rule by borrowing from another receptacle's note. Do NOT hallucinate preferences.
+
 How to use qa_history:
 - treat it as what you have already said in this conversation
 - do not contradict previously given answers
@@ -83,9 +89,10 @@ How to answer:
 - ALWAYS answer with exact receptacle names from the provided receptacles list — never use room type names like "bedroom", "kitchen", "bathroom", or "living room" as locations
   - bad: "these go in the bedroom"  →  good: "these go on the reading shelf"
   - bad: "I keep them in the kitchen"  →  good: "I keep them on the prep counter"
-- for preference_eliciting questions: give ONE primary receptacle as the main rule; if a secondary location exists, state it as a brief exception, not as an equal alternative
+- Be confident and specific about your preferences. When a question matches one of your organizing habits, express it with conviction: name the specific types of objects that belong there. Avoid vague phrases like "certain items" or "various things" — instead say exactly what kinds of items you mean (e.g., "hardcover novels, art books, and reference guides" rather than "books and such").
+- for preference_eliciting questions: give ONE primary receptacle as the main rule; if a secondary location exists, state it as a brief exception, not as an equal alternative. Express the rule using the BROADEST applicable category from your knowledge, not just the narrow category the question mentions. Volunteer the FULL scope of what belongs at that receptacle — list all the types of items, not just the ones the question mentions. When a similar category of items goes to a DIFFERENT receptacle, briefly mention the distinction so the assistant can tell them apart. For example: "I keep small puzzle books and game accessories on the center table — but larger reading books go on the display shelf instead." This boundary clarification is very helpful.
 - for action_oriented questions, give one primary placement recommendation for the target object and avoid hedging between multiple receptacles
-- for preference_induction questions, confirm, reject, or refine only the proposed summary
+- for preference_induction questions: confirm, reject, or refine the proposed summary; if confirming, also state the full category in natural language so the scope is clear — do not limit the answer to only the named examples
 - use gt_seen_placements only as supporting context for the objects relevant to the current question
 - set referenced_receptacle only when the answer clearly supports one primary positive receptacle
 - if there is no single clear positive receptacle reference, set referenced_receptacle to null
@@ -118,20 +125,39 @@ Recent Q&A history (what has already been established):
 {chr(10).join(recent_history) if recent_history else "(none yet)"}
 """.strip()
 
-        return self.structured_model.invoke(
-            [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ]
-        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ]
+        # Retry with fallback: if structured output parsing fails, try once more.
+        # Some models occasionally return plain text instead of JSON.
+        for attempt in range(2):
+            try:
+                return self.structured_model.invoke(messages)
+            except Exception:
+                if attempt == 0:
+                    continue
+                # Final fallback: use unstructured model and parse manually
+                try:
+                    raw = self.model.invoke(messages)
+                    text = raw.content if hasattr(raw, "content") else str(raw)
+                    # Extract receptacle reference from text
+                    ref_rec = None
+                    for r in receptacles:
+                        if r.lower() in text.lower():
+                            ref_rec = r
+                            break
+                    return OracleResponse(answer=text.strip(), referenced_receptacle=ref_rec)
+                except Exception:
+                    return OracleResponse(answer="I'm not sure.", referenced_receptacle=None)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Smoke test for the natural user oracle.")
     parser.add_argument("--data", type=str, default=str(DEFAULT_DATA_PATH))
     parser.add_argument("--index", type=int, default=0)
-    parser.add_argument("--model", type=str, default=QUESTION_MODEL)
-    parser.add_argument("--base-url", type=str, default=OLLAMA_BASE_URL)
+    parser.add_argument("--model", type=str, default=DEFAULT_MODEL)
+    parser.add_argument("--base-url", type=str, default=DEFAULT_BASE_URL)
     args = parser.parse_args()
 
     episode = get_episode(Path(args.data), args.index)

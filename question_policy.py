@@ -260,36 +260,83 @@ class QuestionPolicyController:
         state: AgentState,
         allowed_patterns: List[QuestionPattern],
     ) -> QuestionDecision:
-        # Merge user_preference_first + parallel_exploration rules:
-        # 1st priority: preference_eliciting if uncovered ≥ 2
+        # Adaptive policy: PE first, but monitor CP quality and fall back to AO/PI
+        # when PE responses are weak.
+
         covered_by_prefs: set = set()
         for p in _confirmed_preferences(state):
             covered_by_prefs.update(p.get("covered_objects", []))
         uncovered = [
             obj for obj in state["unresolved_objects"] if obj not in covered_by_prefs
         ]
-        if "preference_eliciting" in allowed_patterns and len(uncovered) >= 2:
+
+        cp_recs = {p.get("receptacle") for p in _confirmed_preferences(state) if p.get("receptacle")}
+        ca_recs = {a.get("receptacle") for a in state["confirmed_actions"] if a.get("receptacle")}
+        uncovered_recs = [r for r in state["receptacles"] if r not in cp_recs and r not in ca_recs]
+
+        # Check quality of the most recent PE: did it produce a CP with enough coverage?
+        last_pe_weak = False
+        if state["qa_history"]:
+            last_qa = state["qa_history"][-1]
+            if last_qa.get("question_pattern") == "preference_eliciting":
+                # Find the CP that was just added (most recent one)
+                if state["confirmed_preferences"]:
+                    latest_cp = state["confirmed_preferences"][-1]
+                    cp_covered = len(latest_cp.get("covered_objects", []))
+                    cp_has_receptacle = bool(latest_cp.get("receptacle"))
+                    # Weak CP: covers ≤1 object or has no receptacle
+                    if cp_covered <= 1 or not cp_has_receptacle:
+                        last_pe_weak = True
+                else:
+                    # PE was asked but no CP was produced at all
+                    last_pe_weak = True
+
+        # If last PE was weak, fall back to AO to collect concrete evidence
+        if last_pe_weak and "action_oriented" in allowed_patterns:
+            weak_rec = state["qa_history"][-1].get("target", "") if state["qa_history"] else ""
+            return QuestionDecision(
+                question_pattern="action_oriented",
+                guidance=(
+                    f"The previous preference question produced a weak or unclear rule. "
+                    f"Ask a direct placement question to collect concrete evidence. "
+                    f"Pick an object that might clarify the organizing principle."
+                ),
+            )
+
+        # After 2+ AO steps without PI, try to consolidate via PI
+        since_last_consolidation = 0
+        for item in reversed(state["qa_history"]):
+            if item.get("question_pattern") in ("preference_eliciting", "preference_induction"):
+                break
+            since_last_consolidation += 1
+
+        if since_last_consolidation >= 2 and "preference_induction" in allowed_patterns:
+            # Check if there are unsummarized CAs to induce from
+            summarized: set = set()
+            for p in _confirmed_preferences(state):
+                summarized.update(p.get("covered_objects", []))
+            unsummarized_count = sum(
+                1 for obj in _confirmed_action_objects(state) if obj not in summarized
+            )
+            if unsummarized_count >= 2:
+                return QuestionDecision(
+                    question_pattern="preference_induction",
+                    guidance=(
+                        "Consolidate recent action evidence into a preference rule. "
+                        "Focus on confirmed actions not yet covered by any preference."
+                    ),
+                )
+
+        # Default: PE if uncovered receptacles or objects remain
+        if "preference_eliciting" in allowed_patterns and (len(uncovered) >= 2 or uncovered_recs):
             return QuestionDecision(
                 question_pattern="preference_eliciting",
                 guidance=self._default_guidance(
                     question_pattern="preference_eliciting", mode="hybrid_all"
                 ),
             )
-        # 2nd priority: preference_induction if unsummarized ≥ 3
-        summarized: set = set()
-        for p in _confirmed_preferences(state):
-            summarized.update(p.get("covered_objects", []))
-        unsummarized_count = sum(
-            1 for obj in _confirmed_action_objects(state) if obj not in summarized
-        )
-        if "preference_induction" in allowed_patterns and unsummarized_count >= 3:
-            return QuestionDecision(
-                question_pattern="preference_induction",
-                guidance=self._default_guidance(
-                    question_pattern="preference_induction", mode="hybrid_all"
-                ),
-            )
-        # Fallback: action_oriented
+
+        # All covered: AO boundary probe
         return QuestionDecision(
             question_pattern="action_oriented",
             guidance=self._default_guidance(

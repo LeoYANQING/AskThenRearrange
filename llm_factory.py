@@ -21,7 +21,7 @@ LLM_BACKEND = os.environ.get("LLM_BACKEND", "ollama")
 LLM_MODEL = os.environ.get("LLM_MODEL", os.environ.get("OLLAMA_MODEL", "qwen3"))
 LLM_BASE_URL = os.environ.get(
     "LLM_BASE_URL",
-    os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434"),
+    os.environ.get("OLLAMA_HOST", "http://110.42.252.68:8080"),
 )
 LLM_API_KEY = os.environ.get("LLM_API_KEY", os.environ.get("OPENAI_API_KEY", ""))
 

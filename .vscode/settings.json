@@ -5,5 +5,35 @@
         "/opt/ros/humble/local/lib/python3.10/dist-packages"
     ],
     "python-envs.defaultEnvManager": "ms-python.python:conda",
-    "python-envs.defaultPackageManager": "ms-python.python:conda"
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+
+    "latex-workshop.latex.tools": [
+        {
+            "name": "pdflatex",
+            "command": "pdflatex",
+            "args": ["-synctex=1", "-interaction=nonstopmode", "-file-line-error", "%DOC%"],
+            "env": {}
+        },
+        {
+            "name": "bibtex",
+            "command": "bibtex",
+            "args": ["%DOCFILE%"],
+            "env": {}
+        }
+    ],
+    "latex-workshop.latex.outDir": "%DIR%",
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "pdflatex → bibtex → pdflatex × 2",
+            "tools": ["pdflatex", "bibtex", "pdflatex", "pdflatex"]
+        },
+        {
+            "name": "pdflatex",
+            "tools": ["pdflatex"]
+        }
+    ],
+    "latex-workshop.latex.rootFile.doNotPrompt": true,
+    "latex-workshop.latex.autoBuild.run": "onSave",
+    "latex-workshop.linting.chktex.enabled": false,
+    "latex-workshop.linting.run": "never"
 }

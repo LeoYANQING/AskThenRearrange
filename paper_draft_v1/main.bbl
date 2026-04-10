@@ -1,0 +1,740 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{56}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{} and \showURL{}.  The latter two
+%%% do not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showURL}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showURL #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[Adamson et~al\mbox{.}(2021)]%
+        {adamson2021we}
+\bibfield{author}{\bibinfo{person}{Timothy Adamson}, \bibinfo{person}{Debasmita
+  Ghose}, \bibinfo{person}{Shannon~C Yasuda}, \bibinfo{person}{Lucas Jehu~Silva
+  Shepard}, \bibinfo{person}{Michal~A Lewkowicz}, \bibinfo{person}{Joyce Duan},
+  {and} \bibinfo{person}{Brian Scassellati}.} \bibinfo{year}{2021}\natexlab{}.
+\newblock \showarticletitle{Why we should build robots that both teach and
+  learn}. In \bibinfo{booktitle}{\emph{Proceedings of the 2021 ACM/IEEE
+  International Conference on Human-Robot Interaction}}.
+  \bibinfo{pages}{187--196}.
+\newblock
+
+
+\bibitem[Andukuri et~al\mbox{.}(2024)]%
+        {4andukuri2024star}
+\bibfield{author}{\bibinfo{person}{Chinmaya Andukuri},
+  \bibinfo{person}{Jan-Philipp Fr{\"a}nken}, \bibinfo{person}{Tobias
+  Gerstenberg}, {and} \bibinfo{person}{Noah~D Goodman}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Star-gate: Teaching language models to ask
+  clarifying questions}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2403.19154}}
+  (\bibinfo{year}{2024}).
+\newblock
+
+
+\bibitem[Balza et~al\mbox{.}(2022)]%
+        {balza2022effective}
+\bibfield{author}{\bibinfo{person}{Joanna~S Balza}, \bibinfo{person}{Rachel
+  Cusatis}, \bibinfo{person}{Siobhan~M McDonnell}, \bibinfo{person}{Mir~A
+  Basir}, {and} \bibinfo{person}{Kathryn~E Flynn}.}
+  \bibinfo{year}{2022}\natexlab{}.
+\newblock \showarticletitle{Effective questionnaire design: how to use
+  cognitive interviews to refine questionnaire items}.
+\newblock \bibinfo{journal}{\emph{Journal of neonatal-perinatal medicine}}
+  \bibinfo{volume}{15}, \bibinfo{number}{2} (\bibinfo{year}{2022}),
+  \bibinfo{pages}{345--349}.
+\newblock
+
+
+\bibitem[B{\i}y{\i}k et~al\mbox{.}(2019a)]%
+        {biyik2019asking}
+\bibfield{author}{\bibinfo{person}{Erdem B{\i}y{\i}k},
+  \bibinfo{person}{Malayandi Palan}, \bibinfo{person}{Nicholas~C Landolfi},
+  \bibinfo{person}{Dylan~P Losey}, {and} \bibinfo{person}{Dorsa Sadigh}.}
+  \bibinfo{year}{2019}\natexlab{a}.
+\newblock \showarticletitle{Asking easy questions: A user-friendly approach to
+  active reward learning}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1910.04365}}
+  (\bibinfo{year}{2019}).
+\newblock
+
+
+\bibitem[B{\i}y{\i}k et~al\mbox{.}(2019b)]%
+        {12biyik2019asking}
+\bibfield{author}{\bibinfo{person}{Erdem B{\i}y{\i}k},
+  \bibinfo{person}{Malayandi Palan}, \bibinfo{person}{Nicholas~C Landolfi},
+  \bibinfo{person}{Dylan~P Losey}, {and} \bibinfo{person}{Dorsa Sadigh}.}
+  \bibinfo{year}{2019}\natexlab{b}.
+\newblock \showarticletitle{Asking easy questions: A user-friendly approach to
+  active reward learning}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1910.04365}}
+  (\bibinfo{year}{2019}).
+\newblock
+
+
+\bibitem[Cakmak and Thomaz(2012)]%
+        {cakmak2012designing}
+\bibfield{author}{\bibinfo{person}{Maya Cakmak} {and} \bibinfo{person}{Andrea~L
+  Thomaz}.} \bibinfo{year}{2012}\natexlab{}.
+\newblock \showarticletitle{Designing robot learners that ask good questions}.
+  In \bibinfo{booktitle}{\emph{Proceedings of the seventh annual ACM/IEEE
+  international conference on Human-Robot Interaction}}.
+  \bibinfo{pages}{17--24}.
+\newblock
+
+
+\bibitem[Carter et~al\mbox{.}(2022)]%
+        {9carter2022you}
+\bibfield{author}{\bibinfo{person}{Elizabeth~J Carter},
+  \bibinfo{person}{Laura~M Hiatt}, {and} \bibinfo{person}{Stephanie
+  Rosenthal}.} \bibinfo{year}{2022}\natexlab{}.
+\newblock \showarticletitle{You're delaying my task?! The Impact of Task Order
+  and Motive on Perceptions of a Robot}. In \bibinfo{booktitle}{\emph{2022 17th
+  ACM/IEEE International Conference on Human-Robot Interaction (HRI)}}. IEEE,
+  \bibinfo{pages}{304--312}.
+\newblock
+
+
+\bibitem[Dai et~al\mbox{.}(2024)]%
+        {dai2024think}
+\bibfield{author}{\bibinfo{person}{Yinpei Dai}, \bibinfo{person}{Run Peng},
+  \bibinfo{person}{Sikai Li}, {and} \bibinfo{person}{Joyce Chai}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Think, act, and ask: Open-world interactive
+  personalized robot navigation}. In \bibinfo{booktitle}{\emph{2024 IEEE
+  international conference on robotics and automation (ICRA)}}. IEEE,
+  \bibinfo{pages}{3296--3303}.
+\newblock
+
+
+\bibitem[DeJonckheere and Vaughn(2019)]%
+        {dejonckheere2019semistructured}
+\bibfield{author}{\bibinfo{person}{Melissa DeJonckheere} {and}
+  \bibinfo{person}{Lisa~M Vaughn}.} \bibinfo{year}{2019}\natexlab{}.
+\newblock \showarticletitle{Semistructured interviewing in primary care
+  research: a balance of relationship and rigour}.
+\newblock \bibinfo{journal}{\emph{Family medicine and community health}}
+  \bibinfo{volume}{7}, \bibinfo{number}{2} (\bibinfo{year}{2019}),
+  \bibinfo{pages}{e000057}.
+\newblock
+
+
+\bibitem[Driess et~al\mbox{.}(2023)]%
+        {driess2023palm}
+\bibfield{author}{\bibinfo{person}{Danny Driess}, \bibinfo{person}{Fei Xia},
+  \bibinfo{person}{Mehdi~SM Sajjadi}, \bibinfo{person}{Corey Lynch},
+  \bibinfo{person}{Aakanksha Chowdhery}, \bibinfo{person}{Ayzaan Wahid},
+  \bibinfo{person}{Jonathan Tompson}, \bibinfo{person}{Quan Vuong},
+  \bibinfo{person}{Tianhe Yu}, \bibinfo{person}{Wenlong Huang},
+  {et~al\mbox{.}}} \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Palm-e: An embodied multimodal language model}.
+\newblock  (\bibinfo{year}{2023}).
+\newblock
+
+
+\bibitem[Gonzalez-Pacheco et~al\mbox{.}(2018)]%
+        {13gonzalez2018analyzing}
+\bibfield{author}{\bibinfo{person}{Victor Gonzalez-Pacheco},
+  \bibinfo{person}{Maria Malfaz}, \bibinfo{person}{Alvaro Castro-Gonzalez},
+  \bibinfo{person}{Jos{\'e}~Carlos Castillo}, \bibinfo{person}{F Alonso}, {and}
+  \bibinfo{person}{Miguel~Angel Salichs}.} \bibinfo{year}{2018}\natexlab{}.
+\newblock \showarticletitle{Analyzing the impact of different feature queries
+  in active learning for social robots}.
+\newblock \bibinfo{journal}{\emph{International Journal of Social Robotics}}
+  \bibinfo{volume}{10}, \bibinfo{number}{2} (\bibinfo{year}{2018}),
+  \bibinfo{pages}{251--264}.
+\newblock
+
+
+\bibitem[Habibian et~al\mbox{.}(2022)]%
+        {habibian2022here}
+\bibfield{author}{\bibinfo{person}{Soheil Habibian}, \bibinfo{person}{Ananth
+  Jonnavittula}, {and} \bibinfo{person}{Dylan~P Losey}.}
+  \bibinfo{year}{2022}\natexlab{}.
+\newblock \showarticletitle{Here’s what I’ve learned: Asking questions that
+  reveal reward learning}.
+\newblock \bibinfo{journal}{\emph{ACM Transactions on Human-Robot Interaction
+  (THRI)}} \bibinfo{volume}{11}, \bibinfo{number}{4} (\bibinfo{year}{2022}),
+  \bibinfo{pages}{1--28}.
+\newblock
+
+
+\bibitem[Hu et~al\mbox{.}(2024)]%
+        {hu2024designing}
+\bibfield{author}{\bibinfo{person}{Jiaxiong Hu}, \bibinfo{person}{Jingya Guo},
+  \bibinfo{person}{Ningjing Tang}, \bibinfo{person}{Xiaojuan Ma},
+  \bibinfo{person}{Yuan Yao}, \bibinfo{person}{Changyuan Yang}, {and}
+  \bibinfo{person}{Yingqing Xu}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Designing the conversational agent: asking
+  follow-up questions for information elicitation}.
+\newblock \bibinfo{journal}{\emph{Proceedings of the ACM on Human-Computer
+  Interaction}} \bibinfo{volume}{8}, \bibinfo{number}{CSCW1}
+  (\bibinfo{year}{2024}), \bibinfo{pages}{1--30}.
+\newblock
+
+
+\bibitem[Hu et~al\mbox{.}(2025)]%
+        {hu2025task}
+\bibfield{author}{\bibinfo{person}{Yuanda Hu}, \bibinfo{person}{Hou Jiani},
+  \bibinfo{person}{Zhang Junyu}, \bibinfo{person}{Yate Ge},
+  \bibinfo{person}{Xiaohua Sun}, {and} \bibinfo{person}{Weiwei Guo}.}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Task Matters: Investigating Human Questioning
+  Behavior in Different Household Service for Learning by Asking Robots}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2504.13916}}
+  (\bibinfo{year}{2025}).
+\newblock
+
+
+\bibitem[Huang et~al\mbox{.}(2023)]%
+        {huang2023instruct2act}
+\bibfield{author}{\bibinfo{person}{Siyuan Huang}, \bibinfo{person}{Zhengkai
+  Jiang}, \bibinfo{person}{Hao Dong}, \bibinfo{person}{Yu Qiao},
+  \bibinfo{person}{Peng Gao}, {and} \bibinfo{person}{Hongsheng Li}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Instruct2act: Mapping multi-modality instructions
+  to robotic actions with large language model}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2305.11176}}
+  (\bibinfo{year}{2023}).
+\newblock
+
+
+\bibitem[Hunt et~al\mbox{.}(2024)]%
+        {hunt2024survey}
+\bibfield{author}{\bibinfo{person}{William Hunt}, \bibinfo{person}{Sarvapali~D
+  Ramchurn}, {and} \bibinfo{person}{Mohammad~D Soorati}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{A survey of language-based communication in
+  robotics}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2406.04086}}
+  (\bibinfo{year}{2024}).
+\newblock
+
+
+\bibitem[Hussein et~al\mbox{.}(2017)]%
+        {hussein2017imitation}
+\bibfield{author}{\bibinfo{person}{Ahmed Hussein},
+  \bibinfo{person}{Mohamed~Medhat Gaber}, \bibinfo{person}{Eyad Elyan}, {and}
+  \bibinfo{person}{Chrisina Jayne}.} \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Imitation learning: A survey of learning methods}.
+\newblock \bibinfo{journal}{\emph{ACM Computing Surveys (CSUR)}}
+  \bibinfo{volume}{50}, \bibinfo{number}{2} (\bibinfo{year}{2017}),
+  \bibinfo{pages}{1--35}.
+\newblock
+
+
+\bibitem[Kosch et~al\mbox{.}(2023)]%
+        {kosch2023survey}
+\bibfield{author}{\bibinfo{person}{Thomas Kosch}, \bibinfo{person}{Jakob
+  Karolus}, \bibinfo{person}{Johannes Zagermann}, \bibinfo{person}{Harald
+  Reiterer}, \bibinfo{person}{Albrecht Schmidt}, {and}
+  \bibinfo{person}{Pawe{\l}~W Wo{\'z}niak}.} \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{A survey on measuring cognitive workload in
+  human-computer interaction}.
+\newblock \bibinfo{journal}{\emph{Comput. Surveys}} \bibinfo{volume}{55},
+  \bibinfo{number}{13s} (\bibinfo{year}{2023}), \bibinfo{pages}{1--39}.
+\newblock
+
+
+\bibitem[Kwan et~al\mbox{.}(2023)]%
+        {kwan2023survey}
+\bibfield{author}{\bibinfo{person}{Wai-Chung Kwan}, \bibinfo{person}{Hong-Ru
+  Wang}, \bibinfo{person}{Hui-Min Wang}, {and} \bibinfo{person}{Kam-Fai Wong}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{A survey on recent advances and challenges in
+  reinforcement learning methods for task-oriented dialogue policy learning}.
+\newblock \bibinfo{journal}{\emph{Machine Intelligence Research}}
+  \bibinfo{volume}{20}, \bibinfo{number}{3} (\bibinfo{year}{2023}),
+  \bibinfo{pages}{318--334}.
+\newblock
+
+
+\bibitem[Lawley and Maclellan(2024)]%
+        {lawley2024val}
+\bibfield{author}{\bibinfo{person}{Lane Lawley} {and}
+  \bibinfo{person}{Christopher Maclellan}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Val: Interactive task learning with gpt dialog
+  parsing}. In \bibinfo{booktitle}{\emph{Proceedings of the 2024 CHI Conference
+  on Human Factors in Computing Systems}}. \bibinfo{pages}{1--18}.
+\newblock
+
+
+\bibitem[Leusmann et~al\mbox{.}(2025a)]%
+        {8leusmann2025investigating}
+\bibfield{author}{\bibinfo{person}{Jan Leusmann}, \bibinfo{person}{Anna
+  Belardinelli}, \bibinfo{person}{Luke Haliburton}, \bibinfo{person}{Stephan
+  Hasler}, \bibinfo{person}{Albrecht Schmidt}, \bibinfo{person}{Sven Mayer},
+  \bibinfo{person}{Michael Gienger}, {and} \bibinfo{person}{Chao Wang}.}
+  \bibinfo{year}{2025}\natexlab{a}.
+\newblock \showarticletitle{Investigating LLM-Driven Curiosity in Human-Robot
+  Interaction}. In \bibinfo{booktitle}{\emph{Proceedings of the 2025 CHI
+  Conference on Human Factors in Computing Systems}}. \bibinfo{pages}{1--16}.
+\newblock
+
+
+\bibitem[Leusmann et~al\mbox{.}(2025b)]%
+        {10leusmann2025developing}
+\bibfield{author}{\bibinfo{person}{Jan Leusmann}, \bibinfo{person}{Steeven
+  Villa}, \bibinfo{person}{Burak Berberoglu}, \bibinfo{person}{Chao Wang},
+  {and} \bibinfo{person}{Sven Mayer}.} \bibinfo{year}{2025}\natexlab{b}.
+\newblock \showarticletitle{Developing and Validating the Perceived System
+  Curiosity Scale (PSC): Measuring Users' Perceived Curiosity of Systems}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 2025 CHI Conference on Human
+  Factors in Computing Systems}}. \bibinfo{pages}{1--18}.
+\newblock
+
+
+\bibitem[Luo et~al\mbox{.}(2019)]%
+        {luo2019learning}
+\bibfield{author}{\bibinfo{person}{Liangchen Luo}, \bibinfo{person}{Wenhao
+  Huang}, \bibinfo{person}{Qi Zeng}, \bibinfo{person}{Zaiqing Nie}, {and}
+  \bibinfo{person}{Xu Sun}.} \bibinfo{year}{2019}\natexlab{}.
+\newblock \showarticletitle{Learning personalized end-to-end goal-oriented
+  dialog}. In \bibinfo{booktitle}{\emph{Proceedings of the AAAI Conference on
+  Artificial Intelligence}}, Vol.~\bibinfo{volume}{33}.
+  \bibinfo{pages}{6794--6801}.
+\newblock
+
+
+\bibitem[Ma et~al\mbox{.}(2024)]%
+        {ma2024survey}
+\bibfield{author}{\bibinfo{person}{Yueen Ma}, \bibinfo{person}{Zixing Song},
+  \bibinfo{person}{Yuzheng Zhuang}, \bibinfo{person}{Jianye Hao}, {and}
+  \bibinfo{person}{Irwin King}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{A survey on vision-language-action models for
+  embodied ai}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2405.14093}}
+  (\bibinfo{year}{2024}).
+\newblock
+
+
+\bibitem[Mutlu et~al\mbox{.}(2009)]%
+        {mutlu2009footing}
+\bibfield{author}{\bibinfo{person}{Bilge Mutlu}, \bibinfo{person}{Toshiyuki
+  Shiwa}, \bibinfo{person}{Takayuki Kanda}, \bibinfo{person}{Hiroshi Ishiguro},
+  {and} \bibinfo{person}{Norihiro Hagita}.} \bibinfo{year}{2009}\natexlab{}.
+\newblock \showarticletitle{Footing in human-robot conversations: how robots
+  might shape participant roles using gaze cues}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 4th ACM/IEEE international
+  conference on Human robot interaction}}. \bibinfo{pages}{61--68}.
+\newblock
+
+
+\bibitem[Nasiriany et~al\mbox{.}(2024)]%
+        {nasiriany2024robocasa}
+\bibfield{author}{\bibinfo{person}{Soroush Nasiriany}, \bibinfo{person}{Abhiram
+  Maddukuri}, \bibinfo{person}{Lance Zhang}, \bibinfo{person}{Adeet Parikh},
+  \bibinfo{person}{Aaron Lo}, \bibinfo{person}{Abhishek Joshi},
+  \bibinfo{person}{Ajay Mandlekar}, {and} \bibinfo{person}{Yuke Zhu}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Robocasa: Large-scale simulation of everyday tasks
+  for generalist robots}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2406.02523}}
+  (\bibinfo{year}{2024}).
+\newblock
+
+
+\bibitem[Oviatt(2006)]%
+        {oviatt2006human}
+\bibfield{author}{\bibinfo{person}{Sharon Oviatt}.}
+  \bibinfo{year}{2006}\natexlab{}.
+\newblock \showarticletitle{Human-centered design meets cognitive load theory:
+  designing interfaces that help people think}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 14th ACM international
+  conference on Multimedia}}. \bibinfo{pages}{871--880}.
+\newblock
+
+
+\bibitem[Padmakumar et~al\mbox{.}(2022)]%
+        {6padmakumar2022teach}
+\bibfield{author}{\bibinfo{person}{Aishwarya Padmakumar},
+  \bibinfo{person}{Jesse Thomason}, \bibinfo{person}{Ayush Shrivastava},
+  \bibinfo{person}{Patrick Lange}, \bibinfo{person}{Anjali Narayan-Chen},
+  \bibinfo{person}{Spandana Gella}, \bibinfo{person}{Robinson Piramuthu},
+  \bibinfo{person}{Gokhan Tur}, {and} \bibinfo{person}{Dilek Hakkani-Tur}.}
+  \bibinfo{year}{2022}\natexlab{}.
+\newblock \showarticletitle{Teach: Task-driven embodied agents that chat}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the AAAI Conference on Artificial
+  Intelligence}}, Vol.~\bibinfo{volume}{36}. \bibinfo{pages}{2017--2025}.
+\newblock
+
+
+\bibitem[Racca and Kyrki(2018)]%
+        {racca2018active}
+\bibfield{author}{\bibinfo{person}{Mattia Racca} {and} \bibinfo{person}{Ville
+  Kyrki}.} \bibinfo{year}{2018}\natexlab{}.
+\newblock \showarticletitle{Active robot learning for temporal task models}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 2018 ACM/IEEE International
+  Conference on Human-Robot Interaction}}. \bibinfo{pages}{123--131}.
+\newblock
+
+
+\bibitem[Ramrakhya et~al\mbox{.}(2025)]%
+        {5ramrakhya2025grounding}
+\bibfield{author}{\bibinfo{person}{Ram Ramrakhya}, \bibinfo{person}{Matthew
+  Chang}, \bibinfo{person}{Xavier Puig}, \bibinfo{person}{Ruta Desai},
+  \bibinfo{person}{Zsolt Kira}, {and} \bibinfo{person}{Roozbeh Mottaghi}.}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Grounding Multimodal LLMs to Embodied Agents that
+  Ask for Help with Reinforcement Learning}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2504.00907}}
+  (\bibinfo{year}{2025}).
+\newblock
+
+
+\bibitem[Redfield and Rousseau(1981)]%
+        {redfield1981meta}
+\bibfield{author}{\bibinfo{person}{Doris~L Redfield} {and}
+  \bibinfo{person}{Elaine~Waldman Rousseau}.} \bibinfo{year}{1981}\natexlab{}.
+\newblock \showarticletitle{A meta-analysis of experimental research on teacher
+  questioning behavior}.
+\newblock \bibinfo{journal}{\emph{Review of educational research}}
+  \bibinfo{volume}{51}, \bibinfo{number}{2} (\bibinfo{year}{1981}),
+  \bibinfo{pages}{237--245}.
+\newblock
+
+
+\bibitem[Reimann et~al\mbox{.}(2024)]%
+        {reimann2024survey}
+\bibfield{author}{\bibinfo{person}{Merle~M Reimann}, \bibinfo{person}{Florian~A
+  Kunneman}, \bibinfo{person}{Catharine Oertel}, {and} \bibinfo{person}{Koen~V
+  Hindriks}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{A survey on dialogue management in human-robot
+  interaction}.
+\newblock \bibinfo{journal}{\emph{ACM Transactions on Human-Robot Interaction}}
+  \bibinfo{volume}{13}, \bibinfo{number}{2} (\bibinfo{year}{2024}),
+  \bibinfo{pages}{1--22}.
+\newblock
+
+
+\bibitem[Ren et~al\mbox{.}(2023)]%
+        {3ren2023robots}
+\bibfield{author}{\bibinfo{person}{Allen~Z Ren}, \bibinfo{person}{Anushri
+  Dixit}, \bibinfo{person}{Alexandra Bodrova}, \bibinfo{person}{Sumeet Singh},
+  \bibinfo{person}{Stephen Tu}, \bibinfo{person}{Noah Brown},
+  \bibinfo{person}{Peng Xu}, \bibinfo{person}{Leila Takayama},
+  \bibinfo{person}{Fei Xia}, \bibinfo{person}{Jake Varley}, {et~al\mbox{.}}}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Robots that ask for help: Uncertainty alignment for
+  large language model planners}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2307.01928}}
+  (\bibinfo{year}{2023}).
+\newblock
+
+
+\bibitem[Robinson(2023)]%
+        {robinson2023probing}
+\bibfield{author}{\bibinfo{person}{Oliver~C Robinson}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Probing in qualitative research interviews: Theory
+  and practice}.
+\newblock \bibinfo{journal}{\emph{Qualitative Research in Psychology}}
+  \bibinfo{volume}{20}, \bibinfo{number}{3} (\bibinfo{year}{2023}),
+  \bibinfo{pages}{382--397}.
+\newblock
+
+
+\bibitem[Schmidt and Braunger(2018)]%
+        {schmidt2018survey}
+\bibfield{author}{\bibinfo{person}{Maria Schmidt} {and}
+  \bibinfo{person}{Patricia Braunger}.} \bibinfo{year}{2018}\natexlab{}.
+\newblock \showarticletitle{A survey on different means of personalized dialog
+  output for an adaptive personal assistant}. In
+  \bibinfo{booktitle}{\emph{Adjunct publication of the 26th conference on user
+  modeling, adaptation and personalization}}. \bibinfo{pages}{75--81}.
+\newblock
+
+
+\bibitem[Scialom and Staiano(2019)]%
+        {11scialom2019ask}
+\bibfield{author}{\bibinfo{person}{Thomas Scialom} {and}
+  \bibinfo{person}{Jacopo Staiano}.} \bibinfo{year}{2019}\natexlab{}.
+\newblock \showarticletitle{Ask to learn: A study on curiosity-driven question
+  generation}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1911.03350}}
+  (\bibinfo{year}{2019}).
+\newblock
+
+
+\bibitem[She et~al\mbox{.}(2014)]%
+        {she2014teaching}
+\bibfield{author}{\bibinfo{person}{Lanbo She}, \bibinfo{person}{Yu Cheng},
+  \bibinfo{person}{Joyce~Y Chai}, \bibinfo{person}{Yunyi Jia},
+  \bibinfo{person}{Shaohua Yang}, {and} \bibinfo{person}{Ning Xi}.}
+  \bibinfo{year}{2014}\natexlab{}.
+\newblock \showarticletitle{Teaching robots new actions through natural
+  language instructions}. In \bibinfo{booktitle}{\emph{The 23rd IEEE
+  International Symposium on Robot and Human Interactive Communication}}. IEEE,
+  \bibinfo{pages}{868--873}.
+\newblock
+
+
+\bibitem[Shen et~al\mbox{.}(2019)]%
+        {shen2019learning}
+\bibfield{author}{\bibinfo{person}{Tingke Shen}, \bibinfo{person}{Amlan Kar},
+  {and} \bibinfo{person}{Sanja Fidler}.} \bibinfo{year}{2019}\natexlab{}.
+\newblock \showarticletitle{Learning to caption images through a lifetime by
+  asking questions}. In \bibinfo{booktitle}{\emph{Proceedings of the IEEE/CVF
+  International Conference on Computer Vision}}. \bibinfo{pages}{10393--10402}.
+\newblock
+
+
+\bibitem[Shen et~al\mbox{.}(2025)]%
+        {shen2025elba}
+\bibfield{author}{\bibinfo{person}{Ying Shen}, \bibinfo{person}{Daniel
+  Bi{\'s}}, \bibinfo{person}{Cynthia Lu}, {and} \bibinfo{person}{Ismini
+  Lourentzou}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{ELBA: Learning by Asking for Embodied Visual
+  Navigation and Task Completion}. In \bibinfo{booktitle}{\emph{2025 IEEE/CVF
+  Winter Conference on Applications of Computer Vision (WACV)}}. IEEE,
+  \bibinfo{pages}{5177--5186}.
+\newblock
+
+
+\bibitem[Shin et~al\mbox{.}(2023a)]%
+        {shin2023uncertainty}
+\bibfield{author}{\bibinfo{person}{Minjung Shin}, \bibinfo{person}{Minsu Jang},
+  \bibinfo{person}{Miyoung Cho}, {and} \bibinfo{person}{Jeh-Kwang Ryu}.}
+  \bibinfo{year}{2023}\natexlab{a}.
+\newblock \showarticletitle{Uncertainty-resolving questions for social robots}.
+  In \bibinfo{booktitle}{\emph{Companion of the 2023 acm/ieee international
+  conference on human-robot interaction}}. \bibinfo{pages}{226--230}.
+\newblock
+
+
+\bibitem[Shin et~al\mbox{.}(2023b)]%
+        {10.1145/3568294.3580077}
+\bibfield{author}{\bibinfo{person}{Minjung Shin}, \bibinfo{person}{Minsu Jang},
+  \bibinfo{person}{Miyoung Cho}, {and} \bibinfo{person}{Jeh-Kwang Ryu}.}
+  \bibinfo{year}{2023}\natexlab{b}.
+\newblock \showarticletitle{Uncertainty-Resolving Questions for Social Robots}.
+  In \bibinfo{booktitle}{\emph{Companion of the 2023 ACM/IEEE International
+  Conference on Human-Robot Interaction}} (Stockholm, Sweden)
+  \emph{(\bibinfo{series}{HRI '23})}. \bibinfo{publisher}{Association for
+  Computing Machinery}, \bibinfo{address}{New York, NY, USA},
+  \bibinfo{pages}{226–230}.
+\newblock
+\showISBNx{9781450399708}
+\href{https://doi.org/10.1145/3568294.3580077}{doi:\nolinkurl{10.1145/3568294.3580077}}
+
+
+\bibitem[Shrestha et~al\mbox{.}(2024)]%
+        {shrestha2024natsgd}
+\bibfield{author}{\bibinfo{person}{Snehesh Shrestha}, \bibinfo{person}{Yantian
+  Zha}, \bibinfo{person}{Saketh Banagiri}, \bibinfo{person}{Ge Gao},
+  \bibinfo{person}{Yiannis Aloimonos}, {and} \bibinfo{person}{Cornelia
+  Fermuller}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Natsgd: A dataset with speech, gestures, and
+  demonstrations for robot learning in natural human-robot interaction}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2403.02274}}
+  (\bibinfo{year}{2024}).
+\newblock
+
+
+\bibitem[Singh et~al\mbox{.}(2022)]%
+        {singh2022ask4help}
+\bibfield{author}{\bibinfo{person}{Kunal~Pratap Singh}, \bibinfo{person}{Luca
+  Weihs}, \bibinfo{person}{Alvaro Herrasti}, \bibinfo{person}{Jonghyun Choi},
+  \bibinfo{person}{Aniruddha Kembhavi}, {and} \bibinfo{person}{Roozbeh
+  Mottaghi}.} \bibinfo{year}{2022}\natexlab{}.
+\newblock \showarticletitle{Ask4help: Learning to leverage an expert for
+  embodied tasks}.
+\newblock \bibinfo{journal}{\emph{Advances in Neural Information Processing
+  Systems}}  \bibinfo{volume}{35} (\bibinfo{year}{2022}),
+  \bibinfo{pages}{16221--16232}.
+\newblock
+
+
+\bibitem[Stivers(2010)]%
+        {stivers2010overview}
+\bibfield{author}{\bibinfo{person}{Tanya Stivers}.}
+  \bibinfo{year}{2010}\natexlab{}.
+\newblock \showarticletitle{An overview of the question--response system in
+  American English conversation}.
+\newblock \bibinfo{journal}{\emph{Journal of Pragmatics}} \bibinfo{volume}{42},
+  \bibinfo{number}{10} (\bibinfo{year}{2010}), \bibinfo{pages}{2772--2781}.
+\newblock
+
+
+\bibitem[Tie et~al\mbox{.}(2025)]%
+        {tie2025manual2skill}
+\bibfield{author}{\bibinfo{person}{Chenrui Tie}, \bibinfo{person}{Shengxiang
+  Sun}, \bibinfo{person}{Jinxuan Zhu}, \bibinfo{person}{Yiwei Liu},
+  \bibinfo{person}{Jingxiang Guo}, \bibinfo{person}{Yue Hu},
+  \bibinfo{person}{Haonan Chen}, \bibinfo{person}{Junting Chen},
+  \bibinfo{person}{Ruihai Wu}, {and} \bibinfo{person}{Lin Shao}.}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Manual2skill: Learning to read manuals and acquire
+  robotic skills for furniture assembly using vision-language models}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2502.10090}}
+  (\bibinfo{year}{2025}).
+\newblock
+
+
+\bibitem[Tofade et~al\mbox{.}(2013)]%
+        {tofade2013best}
+\bibfield{author}{\bibinfo{person}{Toyin Tofade}, \bibinfo{person}{Jamie
+  Elsner}, {and} \bibinfo{person}{Stuart~T Haines}.}
+  \bibinfo{year}{2013}\natexlab{}.
+\newblock \showarticletitle{Best practice strategies for effective use of
+  questions as a teaching tool}.
+\newblock \bibinfo{journal}{\emph{American journal of pharmaceutical
+  education}} \bibinfo{volume}{77}, \bibinfo{number}{7} (\bibinfo{year}{2013}),
+  \bibinfo{pages}{155}.
+\newblock
+
+
+\bibitem[Tsuji et~al\mbox{.}(2025)]%
+        {tsuji2025survey}
+\bibfield{author}{\bibinfo{person}{Toshiaki Tsuji}, \bibinfo{person}{Yasuhiro
+  Kato}, \bibinfo{person}{Gokhan Solak}, \bibinfo{person}{Heng Zhang},
+  \bibinfo{person}{Tadej Petri{\v{c}}}, \bibinfo{person}{Francesco Nori}, {and}
+  \bibinfo{person}{Arash Ajoudani}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{A Survey on Imitation Learning for Contact-Rich
+  Tasks in Robotics}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2506.13498}}
+  (\bibinfo{year}{2025}).
+\newblock
+
+
+\bibitem[Tyshka and Louie(2023)]%
+        {tyshka2023interactive}
+\bibfield{author}{\bibinfo{person}{Alexander Tyshka} {and}
+  \bibinfo{person}{Wing-Yue~Geoffrey Louie}.} \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Interactive Task Learning for Social Robots: A
+  Pilot Study}. In \bibinfo{booktitle}{\emph{2023 IEEE/RSJ International
+  Conference on Intelligent Robots and Systems (IROS)}}. IEEE,
+  \bibinfo{pages}{1--7}.
+\newblock
+
+
+\bibitem[Uehara and Harada(2024)]%
+        {7uehara2024learning}
+\bibfield{author}{\bibinfo{person}{Kohei Uehara} {and} \bibinfo{person}{Tatsuya
+  Harada}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Learning by Asking Questions for Knowledge-Based
+  Novel Object Recognition}.
+\newblock \bibinfo{journal}{\emph{International Journal of Computer Vision}}
+  \bibinfo{volume}{132}, \bibinfo{number}{6} (\bibinfo{year}{2024}),
+  \bibinfo{pages}{2290--2309}.
+\newblock
+
+
+\bibitem[Wake et~al\mbox{.}(2024)]%
+        {wake2024gpt}
+\bibfield{author}{\bibinfo{person}{Naoki Wake}, \bibinfo{person}{Atsushi
+  Kanehira}, \bibinfo{person}{Kazuhiro Sasabuchi}, \bibinfo{person}{Jun
+  Takamatsu}, {and} \bibinfo{person}{Katsushi Ikeuchi}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Gpt-4v (ision) for robotics: Multimodal task
+  planning from human demonstration}.
+\newblock \bibinfo{journal}{\emph{IEEE Robotics and Automation Letters}}
+  (\bibinfo{year}{2024}).
+\newblock
+
+
+\bibitem[Wilson(1999)]%
+        {wilson1999models}
+\bibfield{author}{\bibinfo{person}{Tom~D Wilson}.}
+  \bibinfo{year}{1999}\natexlab{}.
+\newblock \showarticletitle{Models in information behaviour research}.
+\newblock \bibinfo{journal}{\emph{Journal of documentation}}
+  \bibinfo{volume}{55}, \bibinfo{number}{3} (\bibinfo{year}{1999}),
+  \bibinfo{pages}{249--270}.
+\newblock
+
+
+\bibitem[Wu et~al\mbox{.}(2023)]%
+        {wu2023tidybot}
+\bibfield{author}{\bibinfo{person}{Jimmy Wu}, \bibinfo{person}{Rika Antonova},
+  \bibinfo{person}{Adam Kan}, \bibinfo{person}{Marion Lepert},
+  \bibinfo{person}{Andy Zeng}, \bibinfo{person}{Shuran Song},
+  \bibinfo{person}{Jeannette Bohg}, \bibinfo{person}{Szymon Rusinkiewicz},
+  {and} \bibinfo{person}{Thomas Funkhouser}.} \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Tidybot: Personalized robot assistance with large
+  language models}.
+\newblock \bibinfo{journal}{\emph{Autonomous Robots}} \bibinfo{volume}{47},
+  \bibinfo{number}{8} (\bibinfo{year}{2023}), \bibinfo{pages}{1087--1102}.
+\newblock
+
+
+\bibitem[Zeng et~al\mbox{.}(2023)]%
+        {zeng2023large}
+\bibfield{author}{\bibinfo{person}{Fanlong Zeng}, \bibinfo{person}{Wensheng
+  Gan}, \bibinfo{person}{Yongheng Wang}, \bibinfo{person}{Ning Liu}, {and}
+  \bibinfo{person}{Philip~S Yu}.} \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Large language models for robotics: A survey}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2311.07226}}
+  (\bibinfo{year}{2023}).
+\newblock
+
+
+\bibitem[Zheng et~al\mbox{.}(2019)]%
+        {zheng2019personalized}
+\bibfield{author}{\bibinfo{person}{Yinhe Zheng}, \bibinfo{person}{Guanyi Chen},
+  \bibinfo{person}{Minlie Huang}, \bibinfo{person}{Song Liu}, {and}
+  \bibinfo{person}{Xuan Zhu}.} \bibinfo{year}{2019}\natexlab{}.
+\newblock \showarticletitle{Personalized dialogue generation with diversified
+  traits}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1901.09672}}
+  (\bibinfo{year}{2019}).
+\newblock
+
+
+\bibitem[Zhong et~al\mbox{.}(2021)]%
+        {zhong2021gap}
+\bibfield{author}{\bibinfo{person}{Junpei Zhong}, \bibinfo{person}{Chaofan
+  Ling}, \bibinfo{person}{Angelo Cangelosi}, \bibinfo{person}{Ahmad Lotfi},
+  {and} \bibinfo{person}{Xiaofeng Liu}.} \bibinfo{year}{2021}\natexlab{}.
+\newblock \showarticletitle{On the gap between domestic robotic applications
+  and computational intelligence}.
+\newblock \bibinfo{journal}{\emph{Electronics}} \bibinfo{volume}{10},
+  \bibinfo{number}{7} (\bibinfo{year}{2021}), \bibinfo{pages}{793}.
+\newblock
+
+
+\bibitem[Zitkovich et~al\mbox{.}(2023)]%
+        {zitkovich2023rt}
+\bibfield{author}{\bibinfo{person}{Brianna Zitkovich}, \bibinfo{person}{Tianhe
+  Yu}, \bibinfo{person}{Sichun Xu}, \bibinfo{person}{Peng Xu},
+  \bibinfo{person}{Ted Xiao}, \bibinfo{person}{Fei Xia},
+  \bibinfo{person}{Jialin Wu}, \bibinfo{person}{Paul Wohlhart},
+  \bibinfo{person}{Stefan Welker}, \bibinfo{person}{Ayzaan Wahid},
+  {et~al\mbox{.}}} \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Rt-2: Vision-language-action models transfer web
+  knowledge to robotic control}. In \bibinfo{booktitle}{\emph{Conference on
+  Robot Learning}}. PMLR, \bibinfo{pages}{2165--2183}.
+\newblock
+
+
+\end{thebibliography}

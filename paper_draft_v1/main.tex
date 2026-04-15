@@ -563,67 +563,11 @@ Based on this labeling, we compared distributions across tasks. In the 14 \texti
 \rev{A Fisher's exact test confirmed that the distribution of dominant patterns differed significantly between the two tasks ($p = $~\textbf{TODO}), indicating that task structure influences which questioning pattern participants adopt. The refrigerator task---which centers on achieving a desired \textit{final state}---favored the top-down User-Preference-First pattern, while the cocktail task---which emphasizes \textit{procedural steps}---favored the iterative Parallel Exploration pattern. Direct Querying appeared at a low but consistent rate (14.3\%) in both tasks. These results confirm that all three patterns are empirically grounded and that their relative prevalence is modulated by task characteristics.}
 % TODO: Fill in Fisher's exact test p-value from the 3x2 contingency table.
 
+\subsection{From Patterns to Strategies}
 
-\section{System Design}
-\label{sec:system-design}
-{\revstart
+The HHI study shows that people do not ask questions randomly. Instead, they organize questions around three recurring dialogue-level patterns: \textit{Direct Querying}, \textit{User-Preference-First}, and \textit{Parallel Exploration}. To operationalize these observations in a robotic system, we translate the HHI findings into two levels of design abstraction.
 
-\subsection{From Questioning Patterns to Questioning Strategies}
-
-Our HHI study (Section~3) revealed that people organize questions at three distinct levels of abstraction: Action-Oriented (AO) queries that resolve individual placements, Preference-Eliciting (PE) queries that probe for general organizing rules, and Preference-Summarizing (PS) queries that consolidate previously gathered information. We treat these as \textit{questioning design patterns}---reusable interaction building blocks that capture recurring solutions to the problem of acquiring user preferences through dialogue.
-
-Translating these design patterns into a computational system requires two steps. First, we formalize them as composable modules (Section~\ref{sec:question-patterns}). In this step, we refine PS into \textit{Preference-Induction} (PI): whereas PS in HHI passively restates information the learner already heard, PI actively proposes a testable hypothesis inferred from accumulated evidence and asks the user to confirm, refine, or reject it---a more effective mechanism for robotic dialogue where implicit inference is unavailable. The resulting three design patterns---AO, PE, and PI---serve as the atomic building blocks of our framework (Table~\ref{tab:patterns}).
-
-Second, we compose these patterns into four \textit{questioning strategies} (Section~\ref{sec:strategies}) that define which patterns are available and how they are scheduled across the question budget (Table~\ref{tab:strategies}). Three strategies directly correspond to the dialogue-level behaviors observed in HHI (DQ~$\leftrightarrow$~Direct Querying, UPF~$\leftrightarrow$~User-Preference-First, PAR~$\leftrightarrow$~Parallel Exploration); a fourth---Hybrid-All (HYB)---adaptively selects among all patterns, serving as an upper-bound reference.
-
-A key design decision is the use of a \textit{structured preference state} rather than retaining only raw dialogue history. While an end-to-end LLM could in principle read the entire conversation and produce placements, structured intermediate representations improve consistency and controllability in multi-turn reasoning~\cite{tyshka2023interactive}. Our structured state explicitly separates confirmed object placements, category-level organizing rules, and negative evidence, enabling the final placement planner to apply evidence hierarchically. We empirically validate this choice through a \textit{Raw LLM} baseline that operates on unstructured dialogue history alone (Section~\ref{sec:baselines}).
-
-
-\subsection{Task Formulation}
-\label{sec:task-formulation}
-
-We consider a household rearrangement scenario defined by a tuple $(R, \mathcal{C}, \mathcal{O}_s, \mathcal{O}_u)$, where $R$ is the room type, $\mathcal{C} = \{c_1, \dots, c_M\}$ is the set of available receptacles (shelves, drawers, cabinets, etc.), and $\mathcal{O}_s$, $\mathcal{O}_u$ are the sets of \textit{seen} and \textit{unseen} objects, respectively. Seen objects are visible during the interaction; unseen objects must be placed based on preferences generalized from the dialogue. The agent may ask at most $B$ questions (the \emph{question budget}) before placing all objects.
-
-This seen/unseen split provides a principled measure of generalization: a strategy that extracts transferable category-level rules should outperform one that only resolves individual placements on unseen objects, even when the two strategies perform similarly on seen objects.
-
-
-\subsection{Structured Preference State}
-\label{sec:structured-state}
-
-Rather than retaining only raw dialogue history, the agent maintains a structured state $\mathcal{S}_t$ that separates different types of learned preference information:
-
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Confirmed actions} $\mathcal{A}^+ = \{(o_i, c_j)\}$: specific object--receptacle pairs confirmed by the user (e.g., \textit{``the reading light goes on the nightstand’’}).
-    \item \textbf{Confirmed preferences} $\mathcal{P}^+ = \{(h_k, O_k, c_k)\}$: category-level organizing rules, each consisting of a natural-language hypothesis $h_k$ describing the category (e.g., \textit{``fragile glass and ceramic drinkware’’}), a set of covered objects $O_k \subseteq \mathcal{O}_s$, and optionally a target receptacle $c_k$.
-    \item \textbf{Negative actions} $\mathcal{A}^-$: object--receptacle pairs explicitly rejected.
-    \item \textbf{Negative preferences} $\mathcal{P}^-$: category-level hypotheses rejected by the user.
-    \item \textbf{Unresolved objects} $\mathcal{U}_t = \mathcal{O}_s \setminus \{o : (o, \cdot) \in \mathcal{A}^+\}$: seen objects not yet assigned to a receptacle.
-\end{itemize}
-
-This structured representation serves two purposes. First, it enables the \textit{strategy controller} to reason about what information is still missing (e.g., which receptacles lack any confirmed preference) and select the most informative questioning pattern accordingly. Second, it provides the \textit{final placement planner} with hierarchical evidence for placement inference: confirmed preferences take priority over action-based analogy, which in turn takes priority over general commonsense.
-
-
-\subsection{Three Questioning Design Patterns}
-\label{sec:question-patterns}
-
-We formalize the three intent categories from our HHI study as three \textit{questioning design patterns}, each implemented as an independent LLM-based proposer module:
-
-\subsubsection{Action-Oriented (AO)}
-AO questions directly ask about the placement of a single specific object (e.g., \textit{``Where should the reading light go?’’}). Each AO question resolves one object’s placement, yielding a confirmed action $(o_i, c_j)$. This corresponds to the \textit{Direct Querying} pattern observed in HHI, where learners proceed item-by-item without attempting to elicit broader rules.
-
-The AO proposer selects a target object from the unresolved set $\mathcal{U}_t$, prioritizing objects that belong to receptacles not yet covered by any confirmed preference or action, and avoiding repetition with recent questions.
-
-\subsubsection{Preference-Eliciting (PE)}
-PE questions ask about the user’s organizing \textit{habits or principles} for a category of objects (e.g., \textit{``How do you usually organize electronic accessories---do they tend to stay in one spot?’’}). A successful PE exchange yields a confirmed preference $(h_k, O_k, c_k)$ that can generalize to multiple seen and unseen objects simultaneously.
-
-The PE proposer first builds candidate hypotheses by grouping unresolved objects into potential categories based on shared attributes (material, size, usage context). It then selects the most informative candidate---prioritizing categories that cover uncovered receptacles---and generates a natural-language question. This corresponds to the \textit{User-Preference-First} pattern, where learners establish general rules before addressing specific items.
-
-\subsubsection{Preference-Induction (PI)}
-PI questions propose a rule \textit{inferred from previously confirmed actions} and ask the user to confirm, refine, or reject it (e.g., \textit{``I noticed you placed the remote and speaker both in the media drawer---do you generally keep handheld electronics there?’’}). Unlike PE, which probes for rules top-down, PI works bottom-up: it consolidates accumulated evidence into a testable hypothesis.
-
-The PI proposer examines confirmed actions $\mathcal{A}^+$ to find receptacles with multiple confirmed objects, then generates a category-level hypothesis that explains these placements. This corresponds to the \textit{Parallel Exploration} pattern, where learners interleave concrete actions with periodic induction of broader rules.
-
-Table~\ref{tab:patterns} summarizes the three questioning patterns with their descriptions and examples.
+First, we derive three \textit{questioning design patterns} from the intent-level analysis: Action-Oriented (AO), Preference-Eliciting (PE), and Preference-Induction (PI). AO and PE directly correspond to the action-oriented and preference-eliciting intents observed in HHI. For the third pattern, we refine HHI's \textit{Preference-Summarizing} (PS) into \textit{Preference-Induction} (PI): instead of merely restating what has already been said, the robot actively proposes a testable hypothesis inferred from accumulated evidence and asks the user to confirm, refine, or reject it. This refinement makes the pattern more suitable for robotic dialogue, where implicit inference must be made explicit. Table~\ref{tab:patterns} summarizes these three design patterns and their roles in our framework.
 
 \begin{table}[t]
 \centering
@@ -648,15 +592,18 @@ Table~\ref{tab:patterns} summarizes the three questioning patterns with their de
 \end{tabularx}
 \end{table}
 
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{img/pattern-cards.png}
+  \caption{The three questioning design patterns formalized in \textsc{PrefQuest}. Each card shows the target abstraction level, an example question, a representative user response, and the structured state field updated by that pattern. AO targets individual object placements (A\textsuperscript{+}); PE targets category-level organizing rules (P\textsuperscript{+}); PI tests a system-inferred hypothesis and yields confirmed or rejected preferences (P\textsuperscript{+}/P\textsuperscript{$-$}).}
+  \label{fig:pattern-cards}
+\end{figure*}
 
-\subsection{Questioning Strategies}
-\label{sec:strategies}
-
-A \textit{questioning strategy} determines which questioning patterns are available and in what order they are deployed across the budget. We define four strategies that systematically vary the composition and scheduling of AO, PE, and PI (Table~\ref{tab:strategies}):
+Second, we compose these design patterns into four \textit{questioning strategies} that determine how patterns are scheduled across a limited question budget. Three strategies directly reflect the dominant HHI patterns: Direct Querying (DQ), User-Preference-First (UPF), and Parallel Exploration (PAR). We additionally define Hybrid-All (HYB), which combines all three design patterns as an adaptive reference condition. Table~\ref{tab:strategies} summarizes the strategy space and illustrates how each strategy unfolds over a short dialogue.
 
 \begin{table*}[t]
 \centering
-\caption{\rev{Four questioning strategies, their questioning pattern composition, and example dialogue sequences generated by the system. The first three correspond to HHI patterns (Section~3); HYB is an adaptive combination. AO = Action-Oriented, PE = Preference-Eliciting, PI = Preference-Induction.}}
+\caption{\rev{Four questioning strategies, their questioning pattern composition, and example dialogue sequences generated by the system. The first three correspond to HHI patterns; HYB is an adaptive combination. AO = Action-Oriented, PE = Preference-Eliciting, PI = Preference-Induction.}}
 \label{tab:strategies}
 \begin{tabularx}{\textwidth}{@{} l c >{\raggedright\arraybackslash}p{4.2cm} >{\raggedright\arraybackslash}X @{}}
 \toprule
@@ -677,6 +624,77 @@ HYB & PE+AO+PI & Adaptive: PE when gaps remain; AO when last PE was weak; PI whe
 \end{tabularx}
 \end{table*}
 
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{img/strategy-timeline.png}
+  \caption{Budget allocation across four questioning strategies at $B{=}5$. Each cell represents one dialogue turn, colored by the questioning pattern used. DQ applies only AO throughout; UPF begins with PE to elicit category rules before switching to AO; PAR interleaves AO with PI after evidence accumulates; HYB selects adaptively among all three patterns. The annotation panel shows the resulting state $\mathcal{A}^+$/$\mathcal{P}^+$ after five turns for UPF versus DQ, illustrating why UPF generalizes better to unseen objects: it accumulates transferable category rules ($\mathcal{P}^+$) rather than only object-specific actions ($\mathcal{A}^+$).}
+  \label{fig:strategy-timeline}
+\end{figure*}
+
+\section{System Design}
+\label{sec:system-design}
+{\revstart
+
+\subsection{Problem Formulation}
+\label{sec:task-formulation}
+
+We formulate household rearrangement as a budgeted preference-learning problem in which the agent must learn a user's organizing preferences through dialogue before acting. A task instance is defined by a tuple $(R, \mathcal{C}, \mathcal{O}_s, \mathcal{O}_u)$, where $R$ is the room type, $\mathcal{C} = \{c_1, \dots, c_M\}$ is the set of available receptacles (shelves, drawers, cabinets, etc.), and $\mathcal{O}_s$, $\mathcal{O}_u$ are the sets of \textit{seen} and \textit{unseen} objects, respectively. Seen objects are available during the interaction and can therefore be queried about directly. Unseen objects are never discussed explicitly during questioning and must instead be placed by generalizing from whatever preferences have been learned. The agent may ask at most $B$ questions before producing placements for all objects.
+
+This framing highlights the central constraint of our problem: the agent has only a limited number of opportunities to ask for clarification, yet it must recover preferences that are often abstract, tacit, and only partially articulable. At each turn $t \in \{1, \dots, B\}$, the system observes the current preference state $\mathcal{S}_t$ and selects a question $q_t$ according to the active questioning strategy. The user response $a_t$ is converted into structured evidence, yielding an updated state $\mathcal{S}_{t+1}$. After the question budget is exhausted, the system outputs a placement function $\hat{y}: \mathcal{O}_s \cup \mathcal{O}_u \rightarrow \mathcal{C}$ for all seen and unseen objects. The key challenge is therefore not only \textit{what} to ask, but also \textit{at what level of abstraction} to ask it.
+
+Treating question budget as a first-class constraint makes the core trade-off explicit: some strategies favor reliable object-level evidence, whereas others aim to recover more transferable category-level preferences. We evaluate this trade-off with separate accuracy metrics for seen and unseen objects:
+
+\begin{equation}
+\mathrm{Acc}_{\mathrm{seen}}=\frac{1}{|\mathcal{O}_s|}\sum_{o \in \mathcal{O}_s} \mathbf{1}\!\left[\hat{y}(o)=y(o)\right],
+\end{equation}
+
+\begin{equation}
+\mathrm{Acc}_{\mathrm{unseen}}=\frac{1}{|\mathcal{O}_u|}\sum_{o \in \mathcal{O}_u} \mathbf{1}\!\left[\hat{y}(o)=y(o)\right],
+\end{equation}
+
+where $y(o)$ is the ground-truth receptacle for object $o$ and $\mathbf{1}[\cdot]$ is the indicator function. $\mathrm{Acc}_{\mathrm{seen}}$ measures how well the system resolves objects that are available during interaction, whereas $\mathrm{Acc}_{\mathrm{unseen}}$ measures generalization to novel objects and is therefore our primary metric.
+
+\subsection{PrefQuest: A Framework for Proactive Preference Learning Through Questioning}
+
+Building on the HHI-derived questioning patterns and strategies summarized in Tables~\ref{tab:patterns} and~\ref{tab:strategies}, we present \textsc{PrefQuest}, a framework for proactive preference learning in household rearrangement. \textsc{PrefQuest} is designed to learn user-specific organizing preferences under a limited question budget while preserving a clear separation between proactive interaction and downstream inference.
+
+\textsc{PrefQuest} captures our central design claim: preference learning in household rearrangement should be driven by proactive questioning rather than by passive interpretation of raw dialogue alone. To operationalize this idea, the framework combines two components. First, it maintains a structured preference representation that explicitly separates object-level evidence, category-level rules, and negative feedback, allowing the system to reason over accumulated preference information rather than raw dialogue alone. Second, it treats questioning strategy as a controllable proactive layer by selecting among Action-Oriented, Preference-Eliciting, and Preference-Induction question patterns. Together, these components let us vary how the system asks while keeping the placement inference pipeline fixed, making performance differences attributable to the questioning design rather than to unrelated implementation changes.
+
+\subsubsection{Framework Overview}
+
+Figure~\ref{fig:system-architecture} illustrates the overall interaction loop. At each dialogue turn, the system receives the current room configuration, the active questioning strategy, and the accumulated preference state. A strategy controller first decides which questioning pattern should be used at that turn. The corresponding proposer then generates a natural-language question, the user provides a response, and a state update module converts that response into structured evidence. Once the question budget is exhausted, a final placement module assigns receptacles to all remaining seen and unseen objects on the basis of the accumulated evidence. The Structured Preference State is the central hub connecting all components: it stores what has been learned so far, guides the next question selection, and provides the evidence base for final placement inference.
+
+\subsubsection{Preference State Representation}
+\label{sec:structured-state}
+
+Rather than relying only on raw dialogue history, the agent maintains a structured state $\mathcal{S}_t$ that separates different kinds of learned preference information:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Confirmed actions} $\mathcal{A}^+ = \{(o_i, c_j)\}$: specific object--receptacle pairs confirmed by the user (e.g., \textit{``the reading light goes on the nightstand’’}).
+    \item \textbf{Confirmed preferences} $\mathcal{P}^+ = \{(h_k, O_k, c_k)\}$: category-level organizing rules, each consisting of a natural-language hypothesis $h_k$ describing the category (e.g., \textit{``fragile glass and ceramic drinkware’’}), a set of covered objects $O_k \subseteq \mathcal{O}_s$, and optionally a target receptacle $c_k$.
+    \item \textbf{Negative actions} $\mathcal{A}^-$: object--receptacle pairs explicitly rejected.
+    \item \textbf{Negative preferences} $\mathcal{P}^-$: category-level hypotheses rejected by the user.
+    \item \textbf{Unresolved objects} $\mathcal{U}_t = \mathcal{O}_s \setminus \{o : (o, \cdot) \in \mathcal{A}^+\}$: seen objects not yet assigned to a receptacle.
+\end{itemize}
+
+This representation serves two complementary purposes. First, it enables the \textit{strategy controller} to reason about what information is still missing, for example which receptacles lack any confirmed preference, and to select the most informative questioning pattern accordingly. Second, it gives the \textit{final placement planner} hierarchical evidence for inference: confirmed preferences take priority over action-based analogy, which in turn takes priority over general commonsense.
+
+\subsubsection{Question Pattern Implementation}
+\label{sec:question-patterns}
+
+We formalize the three intent categories from our HHI study as three \textit{questioning design patterns}, each implemented as an independent LLM-based proposer module. Each module takes the current state $\mathcal{S}_t$ as input and returns a candidate question together with the object or hypothesis it is intended to probe. Concretely, the three pattern modules are:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Action-Oriented (AO).} AO asks about the placement of a single specific object (e.g., \textit{``Where should the reading light go?’’}). Each AO turn is intended to resolve one object and typically yields a confirmed action $(o_i, c_j)$. The AO proposer selects a target object from the unresolved set $\mathcal{U}_t$, prioritizing objects associated with receptacles that are not yet covered by any confirmed preference or action while avoiding repeated queries. This corresponds to the \textit{Direct Querying} pattern observed in HHI.
+    \item \textbf{Preference-Eliciting (PE).} PE asks directly about the user’s organizing habits or principles for a category of objects (e.g., \textit{``How do you usually organize electronic accessories---do they tend to stay in one spot?’’}). A successful PE turn yields a confirmed preference $(h_k, O_k, c_k)$ that can support multiple seen and unseen placements. The PE proposer constructs candidate hypotheses by grouping unresolved objects according to shared attributes such as material, size, or usage context, then selects the most informative category, prioritizing hypotheses that cover currently uncovered receptacles. This corresponds to the \textit{User-Preference-First} pattern observed in HHI.
+    \item \textbf{Preference-Induction (PI).} PI proposes a rule inferred from previously confirmed actions and asks the user to confirm, refine, or reject it (e.g., \textit{``I noticed you placed the remote and speaker both in the media drawer---do you generally keep handheld electronics there?’’}). A successful PI turn yields either a confirmed or refined category-level preference, or a rejected hypothesis. The PI proposer examines confirmed actions $\mathcal{A}^+$, identifies receptacles supported by multiple confirmed objects, and generates a category-level explanation that can be tested with the user. This corresponds to the \textit{Parallel Exploration} pattern observed in HHI.
+\end{itemize}
+
+\subsubsection{Strategy Execution}
+\label{sec:strategies}
+
+A \textit{questioning strategy} determines which questioning patterns are available and in what order they are deployed across the budget. We define four strategies that systematically vary the composition and scheduling of AO, PE, and PI (Table~\ref{tab:strategies}):
+
 \paragraph{Direct Querying (DQ).} DQ uses only AO questions throughout the entire budget. Each question resolves one object’s placement, yielding $B$ confirmed actions after $B$ questions. DQ serves as a strong baseline: it makes no attempt to learn generalizable rules, but it accumulates maximal concrete evidence for the placement planner’s semantic analogy step.
 
 \paragraph{User-Preference-First (UPF).} UPF begins with PE questions to discover category-level organizing rules, prioritizing receptacles that lack any confirmed preference or action. Once all receptacles have at least one confirmed rule, the strategy switches to AO questions that probe \textit{boundary cases}---objects whose category membership is ambiguous given the current rules. This top-down approach mirrors the human pattern of establishing global principles before addressing specific items.
@@ -685,10 +703,9 @@ HYB & PE+AO+PI & Adaptive: PE when gaps remain; AO when last PE was weak; PI whe
 
 \paragraph{Hybrid-All (HYB).} HYB has access to all three questioning patterns and selects adaptively. After each PE question, the system evaluates whether the resulting preference is ``strong’’ (covers $\geq$2 objects and resolves to a specific receptacle). If the preference is weak, the system falls back to AO to collect concrete evidence. When unsummarized confirmed actions accumulate ($\geq$2 actions on a receptacle without a corresponding rule), the system triggers PI for consolidation.
 
-The scheduling logic is implemented as deterministic, rule-based heuristics in the strategy controller, ensuring reproducibility across experiments. An entropy-driven selection method based on Expected Entropy Reduction (EER) is also available as an alternative.
+The scheduling logic is implemented as deterministic, rule-based heuristics in the strategy controller to ensure reproducibility across experiments. At each dialogue turn, the controller selects a questioning pattern according to the active strategy, invokes the corresponding proposer, and issues one natural-language question to the user.
 
-
-\subsection{State Update}
+\subsubsection{State Update}
 \label{sec:state-update}
 
 After each question--answer exchange, the \textit{State Update} module interprets the user’s natural-language answer and updates the structured state $\mathcal{S}_t$. The interpretation follows one of three paths, determined by the question pattern:
@@ -699,10 +716,9 @@ After each question--answer exchange, the \textit{State Update} module interpret
     \item \textbf{PI answer interpretation:} The LLM determines whether the user \textit{confirmed}, \textit{refined}, or \textit{rejected} the proposed hypothesis. Confirmed or refined hypotheses are added to $\mathcal{P}^+$; rejected hypotheses are recorded in $\mathcal{P}^-$. A special \textit{rule-with-exception} case handles partial confirmation where one object deviates from the general rule.
 \end{itemize}
 
-After each update, the set of unresolved objects $\mathcal{U}_t$ is recomputed by removing objects that appear in confirmed actions. All interpretations are generated by a single LLM call with pattern-specific system prompts that enforce structured output, and the results are validated against the current state to prevent contradictions.
+After each update, the set of unresolved objects $\mathcal{U}_t$ is recomputed by removing objects that appear in confirmed actions. All interpretations are generated through a single LLM call with pattern-specific prompts that enforce structured output, and the resulting updates are validated against the current state to prevent contradictions.
 
-
-\subsection{Final Placement Planner}
+\subsubsection{Placement Inference}
 \label{sec:final-planner}
 
 After the question budget is exhausted, the \textit{Final Placement Planner} assigns receptacles to all remaining objects in two stages:
@@ -711,395 +727,181 @@ After the question budget is exhausted, the \textit{Final Placement Planner} ass
 
 \paragraph{Unseen object placement.} For each unseen object $o \in \mathcal{O}_u$, the planner follows the same priority but with emphasis on attribute-based matching: material, size, power source, and usage context determine which confirmed preference best fits the unseen object. When multiple preferences could match, the planner uses distinguishing attributes (e.g., \textit{small} vs. \textit{large}, \textit{for play} vs. \textit{for reading}) to select the most specific match.
 
-This two-stage design ensures that confirmed evidence always overrides general commonsense knowledge, which is critical for personalized household tasks where user preferences may diverge from common organizational norms.
+This two-stage design ensures that confirmed evidence always overrides general commonsense knowledge, which is critical in personalized household tasks where individual preferences may diverge from normative organizational expectations.
+
+\subsection{Implementation}
+
+The framework is model-agnostic, but the current interactive system instantiates its LLM-based modules with GPT-5. In particular, GPT-5 is used for pattern-specific question generation, answer interpretation during state updates, and final placement inference, with module-specific prompts and structured output constraints to maintain consistency across turns. Strategy selection itself remains rule-based rather than learned, which keeps the control logic transparent and reproducible.
+
+We intentionally separate this implementation layer from the experimental model choices reported in Section~\ref{sec:study1}. The simulation-based evaluation compares questioning strategies under controlled oracle conditions and therefore reports the specific backbone used in each experimental condition, whereas this section describes the architecture and implementation of the interactive system itself.
 
 
-\subsection{Baselines}
-\label{sec:baselines}
-
-To isolate the contribution of the structured questioning framework, we introduce two baselines:
-
-\paragraph{No Question.} The agent receives the task specification (room, receptacles, objects) but asks zero questions ($B=0$). The Final Placement Planner operates on the initial state with empty evidence, relying entirely on the LLM’s commonsense knowledge. This baseline establishes the lower bound of what can be achieved without any user interaction.
-
-\paragraph{Raw LLM.} The agent asks up to $B$ questions using an unconstrained LLM---without any questioning strategy, structured state representation, or pattern-specific proposers. Questions are generated freely based on the task context and conversation history. After the budget is exhausted, a separate LLM reads the raw conversation history and produces placement decisions directly, without structured intermediate state. This baseline isolates the contribution of the entire strategy framework (strategy scheduling + structured state + evidence-based planner) by comparing it against a pure end-to-end LLM approach.
-
-% TODO: Add new system architecture figure to replace old QUEST diagram
-% \begin{figure*}[t]
-%   \centering
-%   \includegraphics[width=\textwidth]{img/system-v2.png}
-%   \caption{Overview of the revised system architecture. The dialogue loop consists of: (1) the Policy Controller selects a question pattern based on the current structured state and strategy; (2) a pattern-specific Proposer generates the question; (3) the user (or simulated Oracle) answers; (4) the State Update module extracts structured evidence from the answer; (5) after the budget is exhausted, the Final Placement Planner assigns all remaining objects using the accumulated evidence.}
-%   \label{fig:system-architecture}
-% \end{figure*}
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{img/system-v2.png}
+  \caption{Overview of the \textsc{PrefQuest} framework. At each dialogue turn, the Strategy Controller selects a questioning pattern (AO, PE, or PI) based on the current Structured Preference State. The corresponding Proposer generates a natural-language question; the Oracle (or real user) responds; the State Updater extracts structured evidence and updates $\mathcal{A}^+$, $\mathcal{P}^+$, $\mathcal{A}^-$, $\mathcal{P}^-$, and $\mathcal{U}$. After the budget is exhausted, the Final Placement Planner uses the accumulated state to assign receptacles to all seen and unseen objects. The dashed gray path (Raw LLM) shows the baseline that bypasses the Structured Preference State and maps QA history directly to placements, degrading generalization on unseen objects.}
+  \label{fig:system-architecture}
+\end{figure*}
 \revend}
 
-\section{Study 1: Characterizing Strategy Performance Through Simulation}
+\section{Simulation-Based Evaluation of Questioning Strategies}
 \label{sec:study1}
 {\revstart
 
-Study~1 aims to establish controlled performance baselines for each strategy and to characterize how their accuracy profiles differ across question budgets. By using LLM-simulated users (oracles), we can run experiments at a scale that would be infeasible with human participants, enabling systematic comparison across 102 household episodes and multiple budget values.
-
-\subsection{Dataset}
-
-We constructed a dataset of 102 household episodes spanning three room types: living rooms (34 episodes), bedrooms (34 episodes), and kitchens (34 episodes). Each episode contains 12 seen objects, 15--22 unseen objects (mean~19.1), and 5 receptacles. The asymmetric split---more unseen than seen---provides a rigorous test of generalization: strategies must extrapolate from limited evidence to a larger set of novel objects.
-
-Each episode includes annotator-authored natural-language notes describing the user’s organizing principles (e.g., \textit{``Handheld media-control and portable entertainment devices go to the media drawer’’}). These notes serve as ground truth for the simulated oracle’s responses but are never directly revealed to the agent. Critically, every receptacle has at least one seen object assigned to it, ensuring that all strategies have a fair opportunity to discover evidence for every receptacle through their respective questioning patterns.
-
-\subsection{Oracle Design}
-
-We employ an LLM-based \textit{Natural User Oracle} that simulates a cooperative household member. Given a question, the oracle generates a natural-language answer grounded in the episode’s annotator notes and ground-truth placements. Unlike a simple lookup table, the oracle produces varied, realistic responses that may include partial information, category-level rules, or exceptions---mirroring the complexity of real human answers.
-
-The oracle is constrained to: (1)~never directly quote or paraphrase the annotator notes; (2)~use exact receptacle names from the provided list; (3)~maintain consistency with previous answers in the dialogue history; and (4)~honestly state when no specific organizing rule applies.
+This simulation-based evaluation aims to establish controlled performance baselines for each strategy and to characterize how their accuracy profiles differ across question budgets. By using LLM-simulated users (oracles), we can run experiments at a scale that would be infeasible with human participants, enabling systematic comparison across 102 household episodes and multiple budget values.
 
 \subsection{Experimental Setup}
 
-\paragraph{Conditions.} We evaluate six conditions: four questioning strategies (DQ, UPF, PAR, HYB) and two baselines (No Question, Raw LLM). All conditions use the same dataset, oracle, and evaluation procedure.
+\subsubsection{Dataset}
 
-\paragraph{Budget.} Each strategy is evaluated at budget checkpoints $B \in \{1, 2, \dots, 10\}$. For efficiency, each episode is run once up to $B_{\max}=10$, with the structured state evaluated at each checkpoint. The No Question baseline corresponds to $B=0$.
+We constructed a dataset of 102 household episodes spanning three room types: living rooms (34 episodes), bedrooms (34 episodes), and kitchens (34 episodes). Each episode contains 12 seen objects, 15--22 unseen objects (mean~19.1), and 5 receptacles. The asymmetric split---more unseen than seen---provides a rigorous test of generalization: strategies must extrapolate from limited evidence to a larger set of novel objects.
 
-\paragraph{Models.} The primary model is Qwen3-8B served via Ollama (102 episodes, all conditions). For cross-model validation, we additionally run experiments with GPT-5-Chat via the OpenAI-compatible API.
-% TODO: Add gpt-5-chat full results when available.
+Each episode includes annotator-authored natural-language notes describing the user’s organizing principles (e.g., \textit{``Handheld media-control and portable entertainment devices go to the media drawer’’}). These notes serve as ground truth for the simulated oracle’s responses but are never directly revealed to the agent. Critically, every receptacle has at least one seen object assigned to it, ensuring that all strategies have a fair opportunity to discover evidence for every receptacle.
 
-\paragraph{Metrics.} For each episode and budget, we compute:
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Seen accuracy}: fraction of seen objects assigned to their ground-truth receptacle.
-    \item \textbf{Unseen accuracy}: fraction of unseen objects assigned to their ground-truth receptacle.
-\end{itemize}
-We report mean accuracy $\pm$ standard error across 102 episodes. Unseen accuracy is the primary metric of interest, as it directly measures the agent’s ability to generalize learned preferences to novel objects.
+\subsubsection{LLM-Based Oracle}
 
-\subsection{Hypotheses}
+We employ an LLM-based \textit{Natural User Oracle} that simulates a cooperative household member. Given a question, the oracle generates a natural-language answer grounded in the episode’s annotator notes and ground-truth placements. Unlike a simple lookup table, the oracle produces varied, realistic responses that may include partial information, category-level rules, or exceptions---mirroring the complexity of real human answers. The oracle is constrained to: (1)~never directly quote or paraphrase the annotator notes; (2)~use exact receptacle names from the provided list; (3)~maintain consistency with previous answers in the dialogue history; and (4)~honestly state when no specific organizing rule applies.
 
-\begin{itemize}[leftmargin=*]
-    \item \textbf{H1}: All strategies improve seen accuracy monotonically with budget.
-    \item \textbf{H2}: PE-based strategies (UPF, HYB) achieve significantly higher unseen accuracy than AO-only (DQ) at moderate budgets ($B \geq 3$), because category-level rules generalize to unseen objects.
-    \item \textbf{H3}: PI-based strategy (PAR) does not significantly outperform DQ on unseen accuracy, because bottom-up induction requires multiple AO turns before a rule can be proposed, reducing budget efficiency.
-    \item \textbf{H4}: HYB does not significantly outperform UPF, indicating that adaptive pattern selection provides no advantage over the simpler PE-first heuristic.
-    \item \textbf{H5}: All strategies significantly outperform the No Question baseline on both metrics.
-    \item \textbf{H6}: Strategy-based approaches outperform Raw LLM on unseen accuracy, validating the value of structured preference state over end-to-end LLM reasoning.
-\end{itemize}
+\subsubsection{Conditions and Evaluation Metrics}
+
+We evaluate six conditions: four questioning strategies (DQ, UPF, PAR, HYB) and two baselines. The \textit{No Question} baseline ($B=0$) relies entirely on the LLM’s commonsense knowledge without any user interaction, establishing the lower performance bound. The \textit{Raw LLM} baseline asks up to $B$ questions via an unconstrained LLM---without any questioning strategy, structured state representation, or pattern-specific proposers---and produces placements by reading the raw conversation history directly. This baseline isolates the contribution of the full PrefQuest framework (strategy scheduling + structured state + evidence-based planner) against a pure end-to-end LLM approach.
+
+Each strategy is evaluated at budget checkpoints $B \in \{1, 2, \dots, 10\}$. For efficiency, each episode is run once up to $B_{\max}=10$, with the structured state evaluated at each checkpoint. The primary model is Qwen3-8B served via Ollama (102 episodes, all conditions); GPT-5-Chat is used for cross-model validation.
+
+For each episode and budget, we compute \textbf{seen accuracy} (fraction of seen objects assigned to their ground-truth receptacle) and \textbf{unseen accuracy} (fraction of unseen objects correctly placed). We report mean accuracy $\pm$ standard error across 102 episodes. Unseen accuracy is the primary metric of interest, as it directly measures generalization of learned preferences to novel objects.
 
 \subsection{Results}
 
-\subsubsection{Overall Performance}
+\subsubsection{Effect of Questioning Strategy on Placement Accuracy}
 
 Table~\ref{tab:study1-results} presents the main results at selected budget checkpoints. Figure~\ref{fig:ablation-curves} shows the full accuracy curves across all budgets.
 
 \begin{table*}[t]
 \centering
-\caption{Seen and unseen accuracy (mean $\pm$ SE) across 102 episodes for each condition at selected budgets. Model: Qwen3-8B.}
+\caption{Placement accuracy (\%, mean $\pm$ SE) at selected budget checkpoints, evaluated with GPT-5-Chat. Strategy conditions: $n=50$ episodes; No Question baseline: $n=102$ episodes. Bold indicates the highest unseen accuracy among the four strategies at each budget. Full Qwen3{-}8B results are reported in Appendix~\ref{app:qwen3}.}
 \label{tab:study1-results}
-\begin{tabular}{l cc cc cc cc}
+\begin{tabular}{l cc cc cc cc cc}
 \toprule
- & \multicolumn{2}{c}{$B=0$} & \multicolumn{2}{c}{$B=3$} & \multicolumn{2}{c}{$B=5$} & \multicolumn{2}{c}{$B=10$} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
-\textbf{Condition} & Seen & Unseen & Seen & Unseen & Seen & Unseen & Seen & Unseen \\
+ & \multicolumn{2}{c}{$B=0$} & \multicolumn{2}{c}{$B=1$} & \multicolumn{2}{c}{$B=3$} & \multicolumn{2}{c}{$B=5$} & \multicolumn{2}{c}{$B=10$} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
+\textbf{Condition} & Seen & Unseen & Seen & Unseen & Seen & Unseen & Seen & Unseen & Seen & Unseen \\
 \midrule
-No Question & .501 & .507 & --- & --- & --- & --- & --- & --- \\
-% TODO: Raw LLM results pending
-Raw LLM & --- & --- & --- & --- & --- & --- & --- & --- \\
+No Question & 68.9{\scriptsize$\pm$2.0} & 67.5{\scriptsize$\pm$2.1} & --- & --- & --- & --- & --- & --- & --- & --- \\
+Raw LLM     & --- & --- & 59.7{\scriptsize$\pm$2.4} & 58.7{\scriptsize$\pm$2.4} & 66.8{\scriptsize$\pm$2.5} & 64.0{\scriptsize$\pm$2.4} & 72.3{\scriptsize$\pm$2.5} & 69.2{\scriptsize$\pm$2.4} & 81.2{\scriptsize$\pm$1.6} & 78.2{\scriptsize$\pm$1.6} \\
 \midrule
-DQ  & --- & --- & .667{\scriptsize$\pm$.015} & .553{\scriptsize$\pm$.014} & .753{\scriptsize$\pm$.012} & .587{\scriptsize$\pm$.014} & .931{\scriptsize$\pm$.006} & .631{\scriptsize$\pm$.013} \\
-UPF & --- & --- & .616{\scriptsize$\pm$.016} & .560{\scriptsize$\pm$.013} & .792{\scriptsize$\pm$.017} & \textbf{.698}{\scriptsize$\pm$.014} & .874{\scriptsize$\pm$.016} & \textbf{.715}{\scriptsize$\pm$.013} \\
-PAR & --- & --- & .650{\scriptsize$\pm$.015} & .548{\scriptsize$\pm$.015} & .721{\scriptsize$\pm$.013} & .572{\scriptsize$\pm$.015} & .858{\scriptsize$\pm$.009} & .615{\scriptsize$\pm$.014} \\
-HYB & --- & --- & .620{\scriptsize$\pm$.018} & .574{\scriptsize$\pm$.014} & .771{\scriptsize$\pm$.019} & .682{\scriptsize$\pm$.016} & .835{\scriptsize$\pm$.018} & .695{\scriptsize$\pm$.015} \\
+DQ          & --- & --- & 67.0{\scriptsize$\pm$2.3} & 64.7{\scriptsize$\pm$2.7} & 73.5{\scriptsize$\pm$2.4} & 69.1{\scriptsize$\pm$2.6} & 79.7{\scriptsize$\pm$2.0} & 72.7{\scriptsize$\pm$2.1} & 94.0{\scriptsize$\pm$0.9} & 79.8{\scriptsize$\pm$2.4} \\
+UPF         & --- & --- & 64.5{\scriptsize$\pm$2.7} & \textbf{67.7}{\scriptsize$\pm$2.2} & 70.0{\scriptsize$\pm$2.2} & 71.1{\scriptsize$\pm$2.0} & 79.8{\scriptsize$\pm$1.9} & \textbf{85.2}{\scriptsize$\pm$1.6} & 89.0{\scriptsize$\pm$1.5} & 87.1{\scriptsize$\pm$2.3} \\
+PAR         & --- & --- & 65.5{\scriptsize$\pm$2.7} & 63.2{\scriptsize$\pm$2.7} & 74.0{\scriptsize$\pm$2.2} & 69.7{\scriptsize$\pm$2.2} & 76.8{\scriptsize$\pm$2.1} & 71.0{\scriptsize$\pm$2.2} & 86.8{\scriptsize$\pm$1.2} & 77.4{\scriptsize$\pm$1.9} \\
+HYB         & --- & --- & 62.2{\scriptsize$\pm$2.7} & 68.3{\scriptsize$\pm$2.2} & 68.3{\scriptsize$\pm$2.5} & \textbf{70.9}{\scriptsize$\pm$2.5} & 79.8{\scriptsize$\pm$1.8} & 81.8{\scriptsize$\pm$2.4} & 89.3{\scriptsize$\pm$1.3} & \textbf{87.4}{\scriptsize$\pm$1.6} \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
-% TODO: Replace with final version including Raw LLM + gpt-5-chat
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=0.9\textwidth]{../plots/qwen3_ablation_with_no_question.png}
-  \caption{Seen (left) and unseen (right) accuracy as a function of question budget for four strategies and the No Question baseline (dashed line). Model: Qwen3-8B, 102 episodes. Error bands show $\pm$1 SE.}
+  \includegraphics[width=0.9\textwidth]{img/ablation_gpt5chat_ep0-49_with_no_question_matched_nature.png}
+  \caption{Seen (left) and unseen (right) accuracy as a function of question budget for four questioning strategies and the No Question baseline (dashed line). Model: GPT-5-Chat, $n=50$ episodes. Error bands show $\pm$1 SE. Qwen3-8B results are provided in Appendix~\ref{app:qwen3}.}
   \label{fig:ablation-curves}
 \end{figure*}
 
-\subsubsection{Hypothesis Testing}
+All four strategies improve seen accuracy monotonically with budget. DQ achieves the steepest seen-accuracy gain (from .670 at $B=1$ to .940 at $B=10$), as expected from a strategy that resolves one object per question.
 
-\textbf{H1 (Monotonic improvement).} All four strategies show monotonically increasing seen accuracy with budget, confirming H1. DQ achieves the steepest seen-accuracy gain (from .534 at $B=1$ to .931 at $B=10$), as expected from a strategy that directly resolves one object per question.
+The key finding concerns unseen accuracy. UPF achieves .852 unseen accuracy at $B=5$ versus DQ’s .727---a gap of +12.5 percentage points. This advantage emerges at $B \geq 3$ (.711 vs.\ .691) and remains stable through $B=10$ (.871 vs.\ .798, +7.3pp). HYB shows a similar pattern (.818 at $B=5$), indicating that PE-based strategies produce transferable category-level rules that generalize to unseen objects.
+% TODO: Add statistical test (paired t-test or Wilcoxon) with p-values for UPF vs.\ DQ and HYB vs.\ DQ at B=5 and B=10.
 
-\textbf{H2 (PE-based $>$ DQ on unseen).} UPF achieves .698 unseen accuracy at $B=5$ versus DQ’s .587---a gap of +11.1 percentage points. This advantage emerges at $B \geq 3$ and remains stable through $B=10$ (.715 vs .631, +8.4pp). HYB shows a similar pattern (.682 at $B=5$), confirming that PE-based strategies produce transferable category rules that generalize to unseen objects.
-% TODO: Add statistical test (paired t-test or Wilcoxon) with p-values.
+In contrast, PAR achieves .710 unseen accuracy at $B=5$, marginally below DQ’s .727, and .774 at $B=10$, below DQ’s .798. Bottom-up induction via PI is structurally less budget-efficient than top-down elicitation via PE: PI requires multiple prior AO turns to accumulate evidence before a rule can be proposed, leaving little budget for generalization. HYB achieves .818 unseen accuracy at $B=5$ versus UPF’s .852, and .874 vs.\ .871 at $B=10$; the differences are small and not statistically significant, indicating that adaptive pattern selection provides no meaningful advantage over the simpler PE-first heuristic.
+% TODO: Add statistical test for HYB vs.\ UPF.
 
-\textbf{H3 (PAR $\approx$ DQ on unseen).} PAR achieves .572 unseen accuracy at $B=5$, only marginally above DQ’s .587. At $B=10$, PAR (.615) remains below DQ (.631). This confirms H3: bottom-up induction via PI is structurally less budget-efficient than top-down elicitation via PE, because PI requires multiple AO turns to accumulate evidence before a rule can be proposed.
+All strategies at $B \geq 1$ exceed the No Question baseline (.689 seen / .675 unseen) on seen accuracy, and at $B \geq 3$ on unseen accuracy, confirming that user interaction consistently improves placement performance. Results under Qwen3-8B (102 episodes) are consistent in direction and are reported in Appendix~\ref{app:qwen3}.
 
-\textbf{H4 (HYB $\approx$ UPF).} HYB achieves .682 unseen accuracy at $B=5$ versus UPF’s .698, and .695 vs .715 at $B=10$. The differences are small and not statistically significant, confirming H4: adaptive pattern selection does not provide a meaningful advantage over the simpler PE-first heuristic.
-% TODO: Add statistical test.
+\subsubsection{Value of Structured Preference State}
 
-\textbf{H5 (All $>$ No Question).} The No Question baseline achieves .501 seen and .507 unseen accuracy. All strategies at $B \geq 1$ exceed this baseline on seen accuracy, and at $B \geq 3$ on unseen accuracy, confirming H5.
+Table~\ref{tab:study1-results} also includes the Raw LLM baseline, which asks up to $B$ questions via an unconstrained LLM but produces placements by reading raw dialogue history directly, without any structured preference state or evidence-based planner. At $B=5$, Raw LLM achieves 69.2\% unseen accuracy---below UPF (85.2\%) by 16.0 percentage points and below HYB (81.8\%) by 12.6 percentage points. At $B=10$, Raw LLM reaches 78.2\%, still below all four structured strategies. Notably, Raw LLM at $B=10$ performs comparably to DQ at $B=5$ (72.7\%), suggesting that doubling the question budget only partially compensates for the absence of structured state.
 
-\textbf{H6 (Strategy $>$ Raw LLM).}
-% TODO: Fill in when Raw LLM results are available.
-\textit{Results pending completion of Raw LLM experiments.}
+These results isolate the contribution of the PrefQuest framework beyond the underlying LLM: the structured preference state ($\mathcal{A}^+$, $\mathcal{P}^+$, $\mathcal{A}^-$) and evidence-based placement planner together produce a consistent accuracy advantage, particularly for unseen objects where category-level rules must be retained and applied hierarchically. An unconstrained LLM reading raw dialogue is susceptible to information loss and lacks the explicit evidence hierarchy needed to generalize reliably.
+% TODO: Add statistical test for UPF vs.\ Raw LLM at B=5 and B=10.
 
-\subsubsection{Cross-Model Validation}
-
-To verify that the observed patterns are not model-specific, we replicated the No Question baseline with GPT-5-Chat. The No Question baseline with GPT-5-Chat achieves .689 seen and .675 unseen accuracy---substantially higher than Qwen3’s .501/.507, reflecting the stronger commonsense reasoning of the larger model. However, the relative ordering of strategies is expected to remain consistent.
-% TODO: Add full GPT-5-Chat ablation results when available.
-
-\subsection{Summary of Findings}
-
-Study~1 establishes three key findings: (1)~PE-based strategies (UPF, HYB) achieve substantially higher unseen accuracy than AO-only or PI-based strategies, demonstrating that top-down preference elicitation produces more transferable organizing rules; (2)~bottom-up induction (PAR) offers no significant advantage over direct querying for generalization, despite its additional complexity; and (3)~adaptive strategy switching (HYB) does not outperform the simpler UPF heuristic. These results provide the first quantitative evidence that questioning strategy choice has a measurable impact on task performance in household preference learning, complementing prior work that has focused primarily on subjective user perceptions.
-
-
-%% ================================================================
 \revend}
-%% Study 2: User Study (TODO — to be redesigned and conducted)
-%% ================================================================
-
-% TODO: Redesign user study based on Study 1 findings. Key changes from CHI version:
-% - Use autonomous system instead of Wizard-of-Oz
-% - Include objective performance metrics (placement accuracy)
-% - Consider between-subjects design to address fatigue concerns
-% - Address reviewer concerns about participant blinding
-
-\section{Study 2: User Study}
+\section{User Study}
 \label{sec:study2}
 
-\textit{TODO: Study 2 will evaluate the effects of questioning strategies on user experience and interaction quality with real participants. This section is reserved for future work.}
-
-% Original CHI user study content preserved below for reference:
-% ----------------------------------------------------------------
-\begin{comment}
-\section{User Study}
-We conduct an in-person user study (N=18) to examine how varying a robot’s questioning strategy through the QUEST system prompts shapes users’ perceptions and interaction experience in household tasks.
+% TODO [Study 2 — to be conducted]: This section evaluates how questioning strategies
+% affect user experience, perceived robot competence, and interaction quality with real
+% participants. The simulation study (Section~\ref{sec:study1}) established objective
+% performance differences; this study examines their subjective correlates and ecological
+% validity, addressing the simulated-oracle limitation in Section~\ref{sec:discussion}.
 
 \subsection{Study Design}
-We employed a within-subjects design, in which all participants experienced all three task scenarios (\textit{desk tidying}, \textit{office desk tidying}, \textit{bar counter tidying}) and all three questioning strategies (\textit{Direct Querying}, \textit{Parallel Exploration}, \textit{User-Preference-First}). Each participant thus completed nine trials in total, with the order of scenarios and strategies counterbalanced using a Latin square. All scenarios were designed with comparable complexity (approximately 10--12 items and 2--3 storage spaces) to minimize potential confounds. The robot was operated via a Wizard-of-Oz setup to ensure consistent execution across conditions, thereby isolating the effects of the questioning strategies. Figure~\ref{fig:strategies} provides an overview of the three questioning strategies across the three task scenarios.
-
-
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\linewidth]{img/user-study.png}
-    \caption{Illustration of the three questioning strategies (\textit{Direct Querying}, \textit{Parallel Exploration}, \textit{User-Preference-First}) across three task scenarios (\textit{study desk tidying}, \textit{office desk tidying}, \textit{bar counter tidying}).}
-    \label{fig:strategies}
-\end{figure}
-
-\subsection{Tasks}
-We design three representative household tidying tasks, each set up as a long-term task with multiple sub-goals and inherent ambiguity. The study is conducted in a lab environment resembling a household setting: the required items (full lists are provided in Appendix~\ref{app:items}) are placed on a central table, and a dual-arm humanoid robot is positioned next to it. Participants’ goal is not to complete the tasks themselves but to \textit{teach the robot} how to perform them. A task is considered complete once the robot can continue without further questioning.  
-
-\textbf{Study Desk Tidying.} Participants teach the robot to organize a cluttered study desk. The goal is to achieve a neat and usable workspace, while individual preferences differ in how items are categorized or whether frequently used objects remain accessible.  
-
-\textbf{Office Desk Tidying.} Participants teach the robot to tidy a desk piled with various objects. The goal is to obtain a clean working surface, while user preferences vary in book arrangement and the use of storage utilities.  
-
-\textbf{Bar Counter Tidying.} Participants teach the robot to organize a cluttered bar counter. The goal is to achieve a clean and safe layout, while user preferences differ in how tableware is arranged and whether tools remain within reach.  
- 
-\subsection{Apparatus}
-We use a dual-arm humanoid robot system in the study. The robot is controlled by a PC running Linux, and an additional laptop is provided for participants to complete questionnaires. The robot is positioned on one side of the table, with participants seated in a designated chair on the opposite side. The field of view of the robot’s camera is marked on the floor, and participants are instructed to remain outside this area before the study begins.  
-
-The experimenter sits at the control PC with direct access to the robot’s emergency stop button and can start or stop the study tasks at any time. To ensure reliable execution of low-level actions, the robot is teleoperated in real time through a VR interface: the experimenter wears a VR headset and controllers, mapping natural arm and hand movements to the robot to achieve precise and flexible manipulation.  Participants interact with the robot using natural language. A microphone array captures speech, which is transcribed and passed to the questioning and teleoperation system to generate context-aware responses.
-
-
- 
-
-\subsection{Procedure}
-After a general introduction to the study and the robot, participants were informed about the study purpose, potential risks, and their rights, and provided written informed consent. The experimenter also familiarized participants with the experimental environment and objects, and reminded them of essential safety instructions (e.g., keeping a safe distance from the robot and avoiding unexpected contact during its movements). Participants then completed a demographic questionnaire, the Affinity for Technology Interaction scale (ATI), and the Negative Attitudes toward Robots Scale (NARS). 
-
-Before the main study, we conducted a standardized \textit{practice trial} in which participants guided the robot through its active questioning to place a bottle into a box. This familiarized participants with the “robot-asks–user-responds” interaction pattern, including answering clarification questions, explaining preferences, and correcting robot actions. Once participants indicated they were comfortable with the interaction, the main study began.  
-
-In the main study, each participant completed three tidying tasks. For each trial, the experimenter prepared the initial environment, and participants stood near the desk or bar counter while teaching the robot to complete the task by answering its questions. No strict time limit was imposed. After each trial, participants filled out a short questionnaire on a separate computer, after which the environment was reset and switched to another questioning strategy. After completing all three tasks, participants took part in a semi-structured interview focusing on their perceived differences between strategies, their preferences and trade-offs, and whether the robot had accurately captured their preferences.
-
-
-\subsection{Measures and Analysis}
-We administered three questionnaires after each task round. First, we used the original NASA-TLX scale~\cite{hart1988development} to evaluate participants’ perceived workload, covering six dimensions: mental demand, physical demand, temporal demand, effort, performance, and frustration. Second, we adopted the Perceived System Curiosity Scale (PSC)~\cite{conf/chi/LeusmannVB0M25}, which includes three subscales—Explorative Curiosity (PSC-E), Investigative Curiosity (PSC-I), and Social Curiosity (PSC-S)—to capture how participants perceived the robot’s “curious” behavior. We chose PSC because prior HRI studies demonstrated that robots displaying curiosity are often perceived as more engaging, human-like, and enjoyable interaction partners, and users tend to prefer teaching or collaborating with such robots over non-curious ones~\cite{8leusmann2025investigating}. Finally, we used the General Self-Efficacy Scale (GSE)~\cite{schwarzer1995generalized} to assess participants’ confidence and sense of control during the teaching process. By repeating these measures after each round, we were able to track how the three questioning strategies influenced subjective experience across different scenarios.
-
-
-
-Besides, we logged the complete interaction history between participants and the robot. Robot-side events were categorized into four activity states—\textit{Ask-Confirm}, \textit{Act}, \textit{Fail}, and \textit{Wait}—from which we derived quantitative metrics. Specifically, we modeled event sequences as row-normalized state-transition matrices to examine policy-dependent procedural dynamics (see Section~6.1.1).
-
-For qualitative feedback, after completing all three task rounds, each participant took part in a semi-structured interview lasting about fifteen minutes. The interview questions focused on their preferences and trade-offs between the questioning strategies, their subjective evaluation of the quality and timing of questions. All interviews were audio-recorded, transcribed, and analyzed thematically using Atlas.ti 5. Two researchers independently coded approximately 20\% of the material, after which the codes were discussed with two additional researchers to develop a unified codebook and thematic framework. The remaining material was coded by one researcher, and the final results were validated through team discussions.
-
+% TODO: Specify within-subjects or between-subjects design and justification (fatigue
+% vs.\ learning effects). Conditions: which strategies to compare (DQ, UPF, PAR, or subset).
+% Number of task scenarios per participant; counterbalancing scheme (Latin square).
+% Robot setup: autonomous PrefQuest system deployed on real hardware (not Wizard-of-Oz).
+% Ethics: IRB/ethics committee approval reference.
 
 \subsection{Participants}
-We recruited 18 participants (15 female, 3 male). To reduce novelty effects and focus the study on perceptions of the interaction rather than the robot itself, we aimed to recruit participants with relatively high technological affinity and, where possible, prior HRI experience. Participants’ mean age was 23.8 years ($SD = 6.1$, $min = 21$, $max = 45$). In terms of education, 2 held a doctoral degree, 11 a master’s degree, and 5 a bachelor’s degree. To capture baseline individual differences, we used the Affinity for Technology Interaction scale (ATI)~\cite{franke2019personal}, with an average score of $M = 3.16$ ($SD = 0.7$). We also administered the Negative Attitudes toward Robots Scale (NARS)~\cite{syrdal2009negative}, measuring participants’ negative attitudes toward (S1) interaction with robots ($M = 1.99$, $SD = 0.53$), (S2) social influence of robots ($M = 3.16$, $SD = 0.7$), and (S3) emotions in interaction with robots ($M = 2.59$, $SD = 0.75$).  Regarding prior experience with robots, 6 participants had interacted with robots more than seven times, 10 had interacted 1–7 times, and 2 had never interacted with a robot. Reported types of robots included robotic arms (5), humanoid robots (8), social robots (6), and household robots such as vacuum cleaners or voice assistants (16).  We additionally recorded participants’ task familiarity on a 7-point scale: they reported a mean frequency of 4.0 ($SD = 1.64$) for tidying desks or organizing items over the past six months, and a mean self-rated proficiency of 4.11 ($SD = 1.57$). This baseline data allowed us to control for differences in everyday experience across the three task scenarios.  
+% TODO: Target sample size and power analysis justification.
+% Report: N, age (M $\pm$ SD), gender distribution, education level.
+% Baseline measures: ATI (M $\pm$ SD), NARS subscales (S1, S2, S3).
+% Prior HRI experience distribution (frequency and robot type).
+% Recruitment source and any screening criteria.
 
+\subsection{Tasks}
+% TODO: Describe household tidying scenarios used in the study.
+% Per scenario: number of items, number of receptacles, estimated duration.
+% How scenarios are matched for complexity across conditions.
+% Full item lists provided in Appendix~\ref{app:items}.
 
-\section{Results}
+\subsection{Apparatus}
+% TODO: Robot platform and sensor suite.
+% PrefQuest deployment: autonomous LLM-based backend (model, backend config).
+% Participant interface: speech input, any visual or audio feedback.
+% Experimenter role: monitoring and safety only; no manual task intervention.
 
-\subsection{Quantitative Interaction Data Analysis}
-We verified that the three prompting policies, when deployed on the VLM-controlled robot, produced distinct interaction dynamics. Two core authors annotated all robot-only event states, yielding 413 sequences for \textit{Direct-Querying}, 253 for \textit{User-Preference-First}, and 373 for \textit{Parallel-Exploration}. Robot-only event sequences were modeled across four states—\textit{Ask-Confirm}, \textit{Act}, \textit{Preference-Elicit}, and \textit{Preference-Confirm} (where \textit{Act} denotes a physical operation by the robot)—as row-normalized 4$\times$4 transition matrices for each Participant $\times$ Policy (Fig.~\ref{fig:transition-matrices}). Following Leusmann et al.’s event-transition procedure~\cite{conf/chi/LeusmannVB0M25}, we conducted a repeated-measures multivariate test (Pillai’s trace) with Policy as the within-subject factor and participant IDs as a random effect, using all matrix elements as dependent variables.  
+\subsection{Procedure}
+% TODO: Step-by-step protocol per participant session.
+% 1. Informed consent; demographic questionnaire (ATI, NARS).
+% 2. Practice trial: familiarize participant with robot-asks--user-responds pattern.
+% 3. Main trials: one per strategy condition in counterbalanced order;
+%    questionnaire (NASA-TLX, PSC, GSE) administered after each trial.
+% 4. Semi-structured interview after all trials ($\approx$15 min).
+% Estimated total duration per participant: [TODO].
 
-The multivariate effect of Policy was significant (Pillai’s trace = 0.336, $F$(3,32) = 5.392, $p <$ .001). Holm-corrected post-hoc tests further isolated six diagnostic transitions that differed reliably across policies: \textit{Act$\rightarrow$Ask-Confirm}, \textit{Act$\rightarrow$Preference-Elicit}, \textit{Act$\rightarrow$Preference-Confirm}, \textit{Preference-Elicit$\rightarrow$Act}, \textit{Preference-Elicit$\rightarrow$Preference-Elicit}, and \textit{Preference-Confirm$\rightarrow$Act}. These findings establish systematic, policy-dependent state-transition patterns.  
+\subsection{Measures and Analysis}
+% TODO: List all dependent variables.
+% \textbf{Objective:} placement accuracy (seen / unseen), number of questions asked,
+%   interaction duration, robot event state-transition matrices
+%   (Pillai's trace test for policy-level behavioral separation).
+% \textbf{Subjective:} NASA-TLX (mental demand, physical demand, temporal demand,
+%   performance, effort, frustration, and composite); PSC (PSC-E, PSC-I, PSC-S, total);
+%   GSE (composite).
+% \textbf{Qualitative:} semi-structured interview; thematic analysis (Atlas.ti);
+%   inter-rater reliability (Cohen's $\kappa$) assessed on $\geq$20\% of transcripts
+%   by two independent coders.
+% \textbf{Statistical plan:} Shapiro--Wilk normality tests per condition;
+%   repeated-measures ANOVA (if normal) or Friedman test + Wilcoxon signed-rank
+%   post-hoc with Holm correction (if non-normal); effect sizes ($\eta^2$ or
+%   partial $\eta^2$) reported for all significant effects.
 
-Inspection of the transition matrices corroborated these statistical results. Compared to \textit{Direct-Querying}, both \textit{User-Preference-First} and \textit{Parallel-Exploration} reduced the \textit{Act$\rightarrow$Ask-Confirm} transition ($-0.56$/$-0.69$) and increased preference-related flows such as \textit{Preference-Elicit$\rightarrow$Act} ($+0.26$/$+0.29$). \textit{Parallel-Exploration} additionally amplified \textit{Act$\rightarrow$Preference-Elicit} ($+0.29$). In contrast, \textit{Direct-Querying} exhibited a tight \textit{Ask-Confirm$\leftrightarrow$Act} loop (0.95/1.00), whereas the other two policies routed actions through preference states and suppressed immediate returns to confirmation (\textit{Act$\rightarrow$Ask-Confirm}: 0.44 and 0.31).  
+\subsection{Results}
 
-For robustness, a pooled homogeneity $\chi^2$ test on Laplace-smoothed matrices also rejected the null hypothesis of equality across policies ($\chi^2$ = 465.35, $df$ = 30, $p <$ .001). All substantive claims, however, are based on the unsmoothed individual matrices.  
+\subsubsection{Objective Performance}
+% TODO: Placement accuracy (seen / unseen) per strategy with real users.
+% State-transition matrix analysis: confirm policy-level behavioral separation.
+% Compare with simulation benchmarks (Section~\ref{sec:study1}) to assess
+% ecological validity of simulation findings.
 
-\textit{Interpretation.} The deployed policies encode qualitatively distinct procedural strategies: \textit{Direct-Querying} favors an immediate confirm$\rightarrow$act$\rightarrow$confirm loop; \textit{User-Preference-First} channels actions through preference elicitation and confirmation; and \textit{Parallel-Exploration} interleaves acting with preference-related questioning. These patterns demonstrate that the policies achieved clear behavioral separation when executed on the robot, rather than merely reflecting superficial prompt variations.
+\subsubsection{Questionnaire Results}
+% TODO: Summary statistics table (Shapiro--Wilk W, F/$\chi^2$, p,
+% partial $\eta^2$/$\eta^2$) for NASA-TLX, PSC, and GSE across strategy conditions.
+% Pairwise post-hoc comparisons for all significant main effects.
 
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\linewidth]{img/transition-matrices.png}
-    \caption{Row-normalized state-transition matrices across the four event states (\textit{Ask-Confirm}, \textit{Act}, \textit{Preference-Elicit}, \textit{Preference-Confirm}) for each questioning policy. \textit{Direct-Querying} shows a tight \textit{Ask-Confirm$\leftrightarrow$Act} loop, whereas \textit{User-Preference-First} and \textit{Parallel-Exploration} route actions through preference states.}
-    \label{fig:transition-matrices}
-\end{figure}
+\subsubsection{Interview Results}
+% TODO: Thematic analysis results.
+% Anticipated themes: perception of strategy differences (efficient vs.\ curious vs.\
+%   mechanical), task-modulated preferences, individual trait effects (dominance,
+%   established organizational rules), HHI--HRI gap observations (latency, lack of
+%   non-verbal cues, memory across sessions, multi-user conflict).
 
-
-\subsection{Questionnaire Results}
-
-\begin{table}[ht]
-\centering
-\caption{Statistical analysis results of all questionnaires (S1 = Direct Querying, S2 = Parallel Exploration, and S3 = User-Preference-First).}
-\begin{tabular}{lccccc}
-\hline
-Measure & W & $p_{norm}$ & $F$ / $\chi^2$ & $p$ & $\eta^2$ / partial $\eta^2$ \\
-\hline
-\textbf{GSE} & & & & & \\
-GSE & 0.920 & .002 & 0.254 & .777 & .009 \\
-\hline
-\textbf{PSC} & & & & & \\
-PSCE        & 0.940 & .009 & 3.401  & .063 & .167 \\
-PSCI        & 0.952 & .030 & 6.838  & $<.01$\textsuperscript{*} & .287 \\
-PSCS        & 0.961 & .079 & 7.235  & $<.01$\textsuperscript{*} & .299 \\
-PSC         & 0.942 & .011 & 7.597  & $<.01$\textsuperscript{*} & .309 \\
-\hline
-\textbf{NASA-TLX} & & & & & \\
-Mental demand   & 0.922 & .002 & 6.644  & $<.05$\textsuperscript{*} & .185 \\
-Physical demand & 0.813 & .000 & 0.821  & .663 & .023 \\
-Temporal demand & 0.873 & .000 & 1.163  & .559 & .032 \\
-Performance     & 0.916 & .001 & 0.982  & .612 & .027 \\
-Effort          & 0.940 & .010 & 12.516 & $<.01$\textsuperscript{*} & .348 \\
-Frustration     & 0.899 & .000 & 7.609  & $<.05$\textsuperscript{*} & .211 \\
-NASA-TLX        & 0.962 & .640 & 4.515  & $<.05$\textsuperscript{*} & .210 \\
-\hline
-\end{tabular}
-\end{table}
-
-\subsubsection{Raw NASA-TLX}
-We first tested the normality of the overall NASA-TLX scores. The results indicated that the data under all three strategy conditions followed a normal distribution (Shapiro–Wilk, $p > .05$). Therefore, we conducted a repeated-measures ANOVA. The analysis revealed a significant main effect of strategy on the overall workload ($F(2,34) = 4.52, p < .05$, partial $\eta^2 = .21$), suggesting that different strategies influenced participants’ perceived workload.
-
-We then examined the six subscales separately. Since most of them did not satisfy the normality assumption, we applied non-parametric Friedman tests. The results showed significant effects of strategy on Mental Demand ($\chi^2(2) = 6.64, p < .05$), Effort ($\chi^2(2) = 12.52, p < .01$), and Frustration ($\chi^2(2) = 7.61, p < .05$). In contrast, no significant differences were observed for Physical Demand ($\chi^2(2) = 0.82, p = .663$), Temporal Demand ($\chi^2(2) = 1.16, p = .559$), or Performance ($\chi^2(2) = 0.98, p = .612$).
-
-
-\begin{figure*}[t]
-    \centering
-    \begin{subfigure}{0.14\linewidth}
-        \centering
-        \includegraphics[height=4.7cm]{img/nasa_tlx.png}
-        \caption{Raw NASA-TLX}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.58\linewidth}
-        \centering
-        \includegraphics[height=4.7cm]{img/psc.png}
-        \caption{PSC scales}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.12\linewidth}
-        \centering
-        \includegraphics[height=4.7cm]{img/gse.png}
-        \caption{GSE}
-    \end{subfigure}
-    \caption{Subjective measures across strategies: (a) overall workload (NASA-TLX), (b) perceived system curiosity (PSC subscales), and (c) general self-efficacy (GSE). S1 = Direct Querying, S2 = Parallel Exploration, and S3 = User-Preference-First}
-\end{figure*}
-
-
-\subsubsection{PSC}
-We conducted normality tests on the scores of the Perceived System Curiosity (PSC) subscales. PSCE ($p = .009$) and PSCI ($p = .030$) deviated from normality, whereas PSCS ($p = .079$) and the overall PSC score ($p = .011$) satisfied the assumption of normality. Since several subscales violated normality assumptions, we employed repeated-measures ANOVA with Greenhouse--Geisser correction where appropriate. The results revealed significant effects of strategy on PSCI ($F(2,34) = 6.838, p < .01, \eta^2 = .29$), PSCS ($F(2,34) = 7.235, p < .01, \eta^2 = .30$), and the overall PSC score ($F(2,34) = 7.597, p < .01, \eta^2 = .31$). Expressive Curiosity (PSCE) only showed a marginal effect ($F(2,34) = 3.401, p = .063, \eta^2 = .17$). Pairwise comparisons further indicated that Strategy~2 yielded significantly higher scores than both Strategy~1 and Strategy~3 on PSCI, PSCS, and the overall PSC, while no significant differences were found between S1 and S3. 
-
-
-\subsubsection{GSE}
-For the General Self-Efficacy Scale (GSE), we first tested the normality of the overall scores. The results indicated a significant deviation from normality (Shapiro--Wilk, $W = 0.920, p = .002$). Since the homogeneity of variance assumption was satisfied (Levene’s test, $p = .973$), we conducted a Welch ANOVA to compare the three strategy conditions. The analysis showed no significant main effect of strategy on the overall GSE scores ($F(2,33.92) = 0.254, p = .777$, $\eta^2 \approx .009$). These findings suggest that the different strategies did not significantly influence participants’ general self-efficacy.
-
-
-\subsection{Interview Results}
-
-\textbf{Perceptual Differences Between Strategies}
-When initiating the interviews, we asked all participants about the differences between the three strategies. \strategy{Parallel Exploration} was considered the most intelligent and efficient strategy by approximately 65\% of participants, capable of summarizing their preferences through a certain degree of interaction and effectively completing tasks. \smallitalic{"Parallel Exploration can infer my preferences based on my feedback, making it more efficient to organize."} \smallitalic{(P13)} In contrast, \strategy{Direct Querying} was perceived as mechanical by about 70\% of participants. \smallitalic{"Direct Querying asks for item locations one by one every time."} \smallitalic{(P08)} This was attributed to the strategy's repetitive questioning about item locations.
-For \strategy{User-Preference-First}, approximately 60\% of participants perceived that this strategy inquired about user preferences at the beginning of the conversation and then categorized items based on those preferences.
-\begin{quote}
-\smallitalic{"User-Preference-First seems to ask general directional questions at first, and after finding a pattern, it starts asking about the relevance between pairs of items."} \smallitalic{(P17)}
-\end{quote}
-
-\textbf{Most Liked Strategy}
-\strategy{Parallel Exploration} was the most popular strategy, chosen as the favorite by approximately 80\% of participants. The reason for this was its ability to efficiently summarize preferences and quickly provide personalized service:
-\begin{quote}
-\smallitalic{"Parallel Exploration allows me to complete the task in a shorter time because it can provide personalized recommendations based on my preferences."} \smallitalic{(P05)}
-\end{quote}
-Furthermore, one user considered its approach of summarizing patterns by arranging two or three items to be a positive performance: \smallitalic{"This strategy is very proactive, and its proactiveness is encouraging me."} \smallitalic{(P04)}
-Approximately 15\% of participants chose \strategy{User-Preference-First} as their favorite strategy, primarily because it could summarize participants' preferences and make decisions based on them: \smallitalic{"User-Preference-First summarized my preferences. Although sometimes slower, it closely matches my needs."} \smallitalic{(P06)}
-Although \strategy{Direct Querying} was less popular than \strategy{Parallel Exploration} and \strategy{User-Preference-First}, approximately 5\% of participants still considered it an effective strategy, especially for simpler tasks: \smallitalic{"Although Direct Querying is simple and direct, it is still effective when I only need simple categorization."} \smallitalic{(P12)}
-
-\textbf{Least Liked Strategy}
-\strategy{Direct Querying} was the most unpopular strategy, with about 70\% of participants considering it their least favorite. Its excessively high query frequency and lengthy interaction time led participants to generally perceive it as inefficient: \smallitalic{"Direct Querying requires me to answer each question individually. Although fast, it makes me feel repetitive and tedious."} \smallitalic{(P12)} The second least favorite was \strategy{User-Preference-First}. Although it could summarize preferences, the summarization process was slow: \smallitalic{"User-Preference-First although it can summarize my preferences, it takes a long time to process, often affecting my task progress."} \smallitalic{(P10)} Additionally, about 50\% of participants believed its summaries lacked accuracy, with one user even finding it aggressive: 
-\begin{quote}
-\smallitalic{"He is conscious and deliberately trying to explore my preferences, which makes me feel very aggressive."} \smallitalic{(P16)}
-\end{quote}
-For \strategy{Parallel Exploration}, only a small portion of participants found that: \smallitalic{"It sometimes gives incorrect classifications, which bothers me a bit."} \smallitalic{(P03)}
-
-\textbf{Balancing Efficiency and Effectiveness}
-\strategy{Parallel Exploration} was better at balancing effectiveness and efficiency, which was almost a consensus among most participants. \smallitalic{"Parallel Exploration not only provides personalized organization methods but is also more efficient and accurate in task execution."} \smallitalic{(P14)} In contrast, \strategy{Direct Querying} only asked about the placement of single items each time and did not group items according to participant preferences. It offered a more linear thought process that improved better outcomes: \smallitalic{"Direct Querying is good because it's very direct and clearly asks me where to put items."} \smallitalic{(P01)} However, its efficiency was low, making it the least efficient query method among the three strategies. \strategy{User-Preference-First} was pointed out by users for its low execution efficiency and inaccurate summarization process:
-\begin{quote}
-\smallitalic{"User-Preference-First can indeed summarize my preferences, but it is slow in processing and sometimes summarizes inaccurately, causing me to waste time."} \smallitalic{(P03)}
-\end{quote}
-
-\textbf{Teaching Confidence}
-Most participants showed high confidence in \strategy{Parallel Exploration}, especially when it could summarize their preferences and execute tasks efficiently. P11 mentioned: \smallitalic{"Parallel Exploration can quickly summarize my preferences and complete tasks, so I have high confidence in it."} In contrast, confidence in \strategy{Direct Querying} and \strategy{User-Preference-First} was lower, particularly for \strategy{Direct Querying} which did not summarize participant preferences: \smallitalic{"Although Direct Querying is fast, I can't trust it because it doesn't summarize my preferences."} \smallitalic{(P18)}
-
-\textbf{Interaction Burden}
-Participants felt a heavier interaction burden with \strategy{Direct Querying} because the robot frequently asked for the placement of each item. Approximately 65\% of participants believed \strategy{Direct Querying} increased the cognitive load of the task, making participants feel troubled. P17 mentioned: \smallitalic{"Direct Querying requires me to answer every question each time, which is really stressful. Parallel Exploration makes it much easier for me."} \strategy{Parallel Exploration} and \strategy{User-Preference-First}, on the other hand, placed less pressure on participants in this regard because their query frequencies were significantly reduced, and they could even process items in batches based on their common attributes, further reducing the user's interaction burden.
-
-\textbf{Situational Suitability}
-In scenarios requiring explicit item order and position, \strategy{Direct Querying} might be more suitable as it clarifies the location of each item individually, avoiding confusion. This includes unfamiliar contexts, such as temporary accommodations, where personal preferences might not apply:
-\begin{quote}
-\smallitalic{"For example, going to a hotel by chance, or going for a picnic, or something like that. Then the placement of certain items may not follow the pattern of my long-term preferences. Such scenarios would be more suitable for Direct Querying."} \smallitalic{(P09)}
-\end{quote}
-It is also preferred in situations where high user control is needed to prevent unwanted robotic behavior:
-\begin{quote}
-\smallitalic{"Because I have a cat at home, and I'm afraid it might have some strange understanding and do something weird to the cat, causing my cat to get stressed. In such cases, I hope it constantly confirms every detail with me."} \smallitalic{(P04)}
-\end{quote}
-
-\textbf{Future Preference and Long-Term Use}
-Users' expectations for future use are that the robot can learn their preferences within a short period and automatically summarize patterns when facing daily tasks, minimizing user disturbance as much as possible. Participants mentioned: \smallitalic{"I hope the robot can quickly adapt to my preferences in daily life. Parallel Exploration can do exactly that; it seems capable of meeting my long-term needs."} \smallitalic{(P14)} This indicates participants' advantages in adaptability and flexibility with \strategy{Parallel Exploration}. In contrast, \strategy{User-Preference-First}'s summarization is too slow, and when facing more complex daily scenarios, participants predict its response will be more sluggish. \strategy{Direct Querying} is too mechanical:
-\begin{quote}
-\smallitalic{"Especially since it needs to ask me the location of each item every time, it cannot self-adjust based on my preferences like Parallel Exploration."} \smallitalic{(P12)}
-\end{quote}
-
-
-
-
-
-\section{Discussion}
-\subsection{User Perception and Differentiation of Strategies}
-Our findings indicate that users were able to clearly perceive differences between questioning strategies and form consistent judgments about them. The questionnaire results revealed significant contrasts across conditions: Parallel Exploration was perceived as more “curious,” Direct Querying as mechanical and burdensome, and User-Preference-First as offering some value in inferring preferences but at the cost of efficiency. These outcomes were corroborated by NASA-TLX, where Direct Querying reduced interactional complexity but was associated with redundancy and frustration, while Parallel Exploration increased perceived intelligence and proactivity but also raised cognitive demand. 
-
-Interviews further illuminated these perceptual mechanisms. Most participants described Parallel Exploration as the most intelligent and efficient strategy because it could infer their preferences with limited exchanges, echoing earlier work that links perceived competence with positive robot evaluations~\cite{bartneck2009measurement}. In contrast, Direct Querying was often characterized as “repetitive” and “mechanical,” lacking flexibility—an observation consistent with findings that overly rigid interaction patterns undermine user engagement~\cite{naneva2020systematic}. User-Preference-First was valued for helping establish a categorization framework, but its inaccuracy and slower pace often hindered task progress. Such differences not only reflect strategic variation but also how users construct mental models of the robot: some framed it as a “tool” or “butler,” prioritizing efficiency and execution, while others treated it as a “friend” or even a “child,” expressing patience and willingness to “teach” it over time, in line with prior research on anthropomorphism and role attribution~\cite{de2016almost}. 
-
-Taken together, these findings suggest that participants were able to go beyond noticing surface differences and instead formed distinct interpretations of the three strategies. Parallel Exploration was often understood as a proactive way of inferring preferences, Direct Querying as a rigid and repetitive approach, and User-Preference-First as cooperative but slow. Within our tasks, these distinctions shaped how participants reasoned about the robot’s role and capability, influencing whether they framed it as efficient, mechanical, or in need of guidance.
-
-
-
-\subsection{Task and Individual Modulators}
-Our study further shows that task characteristics substantially shaped strategy preferences. Familiar tasks led participants to favor direct and minimal questioning to avoid redundancy, whereas unfamiliar or ambiguous situations made exploratory strategies more acceptable. Task frequency and importance also influenced expectations of strategy switching. For everyday chores such as tidying a desk, participants preferred robots to gradually learn general rules and reduce interruptions, while for important tasks such as organizing documents they welcomed step-by-step confirmation for accuracy and control. These observations resonate with prior work showing that user expectations for household robots vary by task familiarity and criticality~\cite{yoo_2024_preferences,bansal_2020_supportive}. They also extend evidence that goal-oriented tasks with well-defined outcomes (e.g., placing a single item) often favor preference-first questioning, while process-oriented tasks requiring multiple interdependent steps (e.g., packing a suitcase) invite ongoing exploration~\cite{hu2025task}. 
-
-Individual traits played an equally critical role. Dominant users emphasized efficiency and control, thus preferring direct strategies. Participants with established organizational rules resisted over-exploration, while others without strong rules appreciated additional probing. Parallel exploration proved particularly divisive: some perceived it as intrusive or “aggressive,” reflecting broader concerns about privacy and boundaries in HRI~\cite{cucciniello2023mind}, whereas others described the robot as “child-like” and expressed patience in teaching it, consistent with findings that anthropomorphism can foster tolerance and trust~\cite{de2016almost}. Such polarized responses explain why our questionnaires did not always reveal significant differences, while interviews exposed more nuanced patterns. 
-
-Finally, participants emphasized the challenges of multi-member households, where different users may hold conflicting expectations—one favoring efficiency and directness, another appreciating exploratory engagement. This highlights the need for personalized memory and multi-user modeling to balance competing demands, in line with emerging research on adaptive and multi-user HRI~\cite{rosenthal2010mixed}. Taken together, these findings suggest that task properties and individual differences jointly modulate strategy preferences, reinforcing the importance of adaptive, user-centered questioning frameworks. 
-
-\subsection{Efficiency, Experience, and Long-Term Trade-offs}
-We observed a tension between efficiency and experience. Direct Querying kept workload low but felt repetitive due to item-by-item prompts, whereas Parallel Exploration appeared more intelligent and proactive yet raised cognitive demand as it probed for richer information. These patterns support a conservative querying policy: the system should ask only when the expected value of information outweighs the interruption cost, a classic mixed-initiative principle that aligns with active preference-learning approaches designed to minimize queries while learning user objectives~\cite{biyik2019asking}.
-
-Participants also emphasized that short-term impressions do not capture long-term needs. They wanted the robot to remember household rules, avoid redundant questions in routine contexts, and re-query only when uncertainty genuinely increases. Prior work on long-term HRI highlights the role of gradual personalization and memory in sustaining engagement~\cite{matheus2025long}, and recent results in domestic tidying show that compact preference summaries can generalize across related scenarios~\cite{wu2023tidybot}. Taken together, within our tasks this points to memory-augmented, context-aware strategy switching as a practical path to maintain comfort over time.
-
-
-\subsection{Bridging the HHI–HRI Gap}
- The gap between human–human (HHI) and human–robot (HRI) questioning is especially salient in domestic contexts. In HHI, people naturally mix explicit questions with subtle cues—pointing, gaze, or shared routines—so that preference elicitation rarely feels repetitive. Robots, by contrast, rely on a narrow communication channel: limited prosody, rigid timing, and a lack of nonverbal signals make even simple questions sound mechanical, particularly during everyday tasks like tidying where efficiency is valued~\cite{mutlu2009footing}. Latency further disrupts the flow of collaboration, leading users to perceive interruptions as unnecessary effort.
- 
-Memory and uncertainty also create friction. In households, humans build up shared context over time (e.g., where items “usually” belong or which rules are exceptions). Current systems, however, often fail to retain preferences across sessions or to judge when re-asking is worthwhile~\cite{leite2013social,ji2023survey}. As a result, the same strategy that feels exploratory in HHI can feel redundant or inefficient in HRI. Users tolerate one-time clarification but become frustrated when a robot repeatedly asks about obvious or previously answered choices~\cite{ahn2022can}.
-
-To close this gap, questioning strategies must adapt to the domestic setting: improving interaction bandwidth with socially legible cues, while also incorporating memory-augmented, cost-aware policies that minimize repetitive queries and leverage past household knowledge. In this way, robots could elicit preferences when uncertainty is high but otherwise act autonomously, allowing strategies that work in HHI to feel more natural in long-term, everyday HRI.
-
-\subsection{Limitations}
-Questioning strategies may change over the course of long-term, life-long interactions. Our short-term controlled study cannot capture how preferences and robot behaviors evolve when interactions extend over weeks or months. Understanding these dynamics will be essential for assessing sustainable impacts on user experience and robot learning. 
-
-The current implementation tested strategies in isolation. For experimental control, human questioning patterns were abstracted into single strategies, but in reality people often mix or switch strategies dynamically. This simplification improves interpretability but reduces ecological validity. Future work should explore how robots can flexibly adjust or combine strategies in real time, balancing efficiency, personalization, and user comfort. 
-
-Evaluation was limited to a single household task. While this ensured comparability across participants, it constrains generalizability. Real-world household environments involve diverse and evolving tasks, where robust performance requires both task-specific adaptation and the ability to generalize across contexts. Future studies should investigate whether the identified strategies support such generalization and transfer. 
-
-
-\end{comment}
-%% ================================================================
-%% End of commented-out CHI user study content
-%% ================================================================
 
 
 \section{Discussion}
@@ -1108,7 +910,7 @@ Evaluation was limited to a single household task. While this ensured comparabil
 
 \subsection{Top-Down Elicitation Outperforms Bottom-Up Induction}
 
-The most striking finding from Study~1 is the large unseen-accuracy gap between PE-based strategies (UPF, HYB) and the PI-based strategy (PAR). At $B=5$, UPF achieves 69.8\% unseen accuracy versus PAR's 57.2\%---a difference of +12.6 percentage points. This gap arises from a fundamental asymmetry in budget efficiency: a single PE question can discover a category-level rule that immediately generalizes to multiple seen and unseen objects, whereas PI requires multiple prior AO turns to accumulate the evidence needed to propose a testable hypothesis. In practice, PAR spends most of its budget on evidence gathering (AO) and only occasionally triggers PI, resulting in a profile that closely resembles DQ.
+The most striking finding from the simulation-based evaluation is the large unseen-accuracy gap between PE-based strategies (UPF, HYB) and the PI-based strategy (PAR). At $B=5$, UPF achieves 69.8\% unseen accuracy versus PAR's 57.2\%---a difference of +12.6 percentage points. This gap arises from a fundamental asymmetry in budget efficiency: a single PE question can discover a category-level rule that immediately generalizes to multiple seen and unseen objects, whereas PI requires multiple prior AO turns to accumulate the evidence needed to propose a testable hypothesis. In practice, PAR spends most of its budget on evidence gathering (AO) and only occasionally triggers PI, resulting in a profile that closely resembles DQ.
 
 This finding has implications for the design of questioning strategies in interactive robot learning: when the goal is to maximize generalization under a limited question budget, top-down preference elicitation should be prioritized over bottom-up induction.
 
@@ -1125,9 +927,29 @@ UPF's unseen accuracy curve exhibits a characteristic ``elbow'' pattern: rapid i
 
 This finding supports a \textit{conservative querying policy}: robots should minimize the number of questions asked while maximizing information gain per question---a principle consistent with active preference learning approaches that balance task performance against interruption cost~\cite{biyik2019asking}.
 
+\subsection{User Perception and Differentiation of Strategies}
+% TODO [Study 2]: Integrate subjective experience findings here once Study 2 is complete.
+% Expected content: how users consciously differentiated strategies; connections between
+% NASA-TLX workload, PSC curiosity ratings, and strategy type; whether UPF is perceived
+% as efficient, PAR as curious/proactive, and DQ as mechanical or repetitive.
+% Relate to mental model formation (robot as tool vs.\ teacher vs.\ collaborator).
+
+\subsection{Task and Individual Modulators of Strategy Preference}
+% TODO [Study 2]: Report how task properties (familiarity, criticality, procedural vs.\
+% state-goal structure) and individual traits (dominance style, strength of prior
+% organizational rules, ATI/NARS scores) modulate strategy preference and tolerance.
+% Reference interview themes and any significant ATI/NARS covariate effects.
+
+\subsection{Bridging Simulation and Real Interaction}
+% TODO [Study 2]: Compare objective placement accuracy in Study 2 with simulation
+% benchmarks from Section~\ref{sec:study1}. Assess ecological validity: does UPF's
+% +11.1pp simulation advantage replicate with real users and oracle variability?
+% Identify discrepancies attributable to real-user answer variability (ambiguity,
+% tangents, emotional responses) and discuss implications for robust system design.
+
 \subsection{Limitations}
 
-\paragraph{Simulated oracle.} Study~1 uses an LLM-based oracle rather than real human participants. While the oracle generates natural-language responses grounded in annotator notes, it may not capture the full variability of human answers (e.g., irrelevant tangents, ambiguous phrasing, or emotional responses). A user study with real participants is needed to validate these findings.
+\paragraph{Simulated oracle.} The simulation-based evaluation uses an LLM-based oracle rather than real human participants. While the oracle generates natural-language responses grounded in annotator notes, it may not capture the full variability of human answers (e.g., irrelevant tangents, ambiguous phrasing, or emotional responses). A user study with real participants is needed to validate these findings.
 
 \paragraph{Single domain.} All experiments are conducted in the household rearrangement domain. While the structured preference state and strategies are domain-general in design, empirical validation in other task domains (e.g., cooking assistance, workspace organization) remains future work.
 
@@ -1273,6 +1095,30 @@ Remote & White, air conditioner remote \\
 \end{tabular}
 \caption{Study desk tidying item list.}
 \end{table}
+
+\section{Qwen3-8B Ablation Results}
+\label{app:qwen3}
+Table~\ref{tab:qwen3-results} reports seen and unseen accuracy for all conditions under Qwen3-8B (102 episodes). The ordering of strategies on unseen accuracy is consistent with the GPT-5-Chat results reported in the main text: UPF achieves the highest unseen accuracy at moderate budgets, followed by HYB, while PAR and DQ remain lower. The absolute accuracy values are lower than GPT-5-Chat across all conditions, reflecting the weaker commonsense prior of the smaller model.
+
+\begin{table*}[h]
+\centering
+\caption{Seen and unseen accuracy (mean $\pm$ SE) across 102 episodes for all conditions at selected budgets. Model: Qwen3-8B\@. $^\dagger$Raw LLM\@: $n=17$ episodes; full run pending.}
+\label{tab:qwen3-results}
+\begin{tabular}{l cc cc cc cc cc}
+\toprule
+ & \multicolumn{2}{c}{$B=0$} & \multicolumn{2}{c}{$B=1$} & \multicolumn{2}{c}{$B=3$} & \multicolumn{2}{c}{$B=5$} & \multicolumn{2}{c}{$B=10$} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
+\textbf{Condition} & Seen & Unseen & Seen & Unseen & Seen & Unseen & Seen & Unseen & Seen & Unseen \\
+\midrule
+No Question      & .501{\scriptsize$\pm$.017} & .507{\scriptsize$\pm$.015} & --- & --- & --- & --- & --- & --- & --- & --- \\
+Raw LLM$^\dagger$ & --- & --- & .574{\scriptsize$\pm$.041} & .574{\scriptsize$\pm$.032} & .578{\scriptsize$\pm$.041} & .607{\scriptsize$\pm$.031} & .603{\scriptsize$\pm$.047} & .631{\scriptsize$\pm$.035} & .647{\scriptsize$\pm$.045} & .692{\scriptsize$\pm$.032} \\
+DQ               & --- & --- & .534{\scriptsize$\pm$.017} & .505{\scriptsize$\pm$.015} & .667{\scriptsize$\pm$.015} & .553{\scriptsize$\pm$.014} & .753{\scriptsize$\pm$.012} & .587{\scriptsize$\pm$.014} & .931{\scriptsize$\pm$.006} & .631{\scriptsize$\pm$.013} \\
+UPF              & --- & --- & .541{\scriptsize$\pm$.018} & .520{\scriptsize$\pm$.014} & .616{\scriptsize$\pm$.016} & .560{\scriptsize$\pm$.013} & .792{\scriptsize$\pm$.017} & \textbf{.698}{\scriptsize$\pm$.014} & .874{\scriptsize$\pm$.016} & \textbf{.715}{\scriptsize$\pm$.013} \\
+PAR              & --- & --- & .544{\scriptsize$\pm$.017} & .501{\scriptsize$\pm$.015} & .650{\scriptsize$\pm$.015} & .548{\scriptsize$\pm$.015} & .721{\scriptsize$\pm$.013} & .572{\scriptsize$\pm$.015} & .858{\scriptsize$\pm$.009} & .615{\scriptsize$\pm$.014} \\
+HYB              & --- & --- & .544{\scriptsize$\pm$.017} & .526{\scriptsize$\pm$.014} & .620{\scriptsize$\pm$.018} & .574{\scriptsize$\pm$.014} & .771{\scriptsize$\pm$.019} & .682{\scriptsize$\pm$.016} & .835{\scriptsize$\pm$.018} & .695{\scriptsize$\pm$.015} \\
+\bottomrule
+\end{tabular}
+\end{table*}
 
 \end{document}
 \endinput

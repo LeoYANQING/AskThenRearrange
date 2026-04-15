@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if participant_complete %}
+<section class="card">
+  <h2>实验结束</h2>
+  <p>感谢参与本次实验。</p>
+</section>
+{% elif trial and trial.result %}
+<section class="card">
+  <h2>系统放置结果</h2>
+  <p>以下是系统为本轮生成的最终放置方案。</p>
+  <table>
+    <thead>
+      <tr>
+        <th>物品</th>
+        <th>系统放置位置</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item, receptacle in trial.result.predicted_placements.items() %}
+      <tr>
+        <td>{{ item }}</td>
+        <td>{{ receptacle }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="card-row">
+  <section class="card">
+    <h2>问卷</h2>
+    {% if trial.questionnaire_url %}
+    <a class="button-link" href="/participant/trials/{{ trial.trial_id }}/questionnaire">打开问卷</a>
+    {% else %}
+    <p>本轮未配置问卷链接。</p>
+    {% endif %}
+  </section>
+  <section class="card">
+    <h2>继续</h2>
+    <form method="post" action="/participant/trials/{{ trial.trial_id }}/complete">
+      <button type="submit">我已完成，进入下一轮</button>
+    </form>
+  </section>
+</section>
+{% else %}
+<section class="card">
+  <h2>结果尚未准备好</h2>
+  <p>请返回当前页面等待系统完成。</p>
+</section>
+{% endif %}
+{% endblock %}

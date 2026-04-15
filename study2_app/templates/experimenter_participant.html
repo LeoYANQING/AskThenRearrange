@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="card-row">
+  <section class="card">
+    <h2>{{ participant.participant_id }}</h2>
+    <p>Status: <strong>{{ participant.status }}</strong></p>
+    <p>Counterbalance: <strong>{{ participant.counterbalance_group }}</strong></p>
+    <p><a href="/participant/{{ participant.participant_id }}/current" target="_blank">打开 participant 页面</a></p>
+  </section>
+  <section class="card">
+    <h2>导出</h2>
+    <form method="post" action="/experimenter/participants/{{ participant.participant_id }}/export">
+      <button type="submit">导出此 participant</button>
+    </form>
+  </section>
+</section>
+
+<section class="card">
+  <h2>Trial 顺序</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Trial</th>
+        <th>Strategy</th>
+        <th>Scene</th>
+        <th>Status</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for trial in trials %}
+      <tr>
+        <td>T{{ trial.trial_index + 1 }}</td>
+        <td>{{ trial.strategy }}</td>
+        <td>{{ trial.scene_label }}</td>
+        <td>{{ trial.status }}</td>
+        <td><a href="/experimenter/trials/{{ trial.trial_id }}">打开 Trial 控制台</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% if current_trial %}
+<section class="card">
+  <h2>当前 Trial</h2>
+  <p>T{{ current_trial.trial_index + 1 }} · {{ current_trial.strategy }} · {{ current_trial.scene_label }}</p>
+  <p><a href="/experimenter/trials/{{ current_trial.trial_id }}">进入当前 Trial</a></p>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+{% if trial and trial.status in ["assigned", "dialogue_active", "dialogue_processing", "dialogue_failed", "trial_interrupted"] %}
+<meta http-equiv="refresh" content="{{ auto_refresh_seconds }}" />
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if not trial %}
+<section class="card">
+  <h2>实验已完成</h2>
+  <p>所有 trial 已结束，感谢参与。</p>
+</section>
+{% elif trial.status == "dialogue_waiting_for_answer" %}
+<section class="card">
+  <h2>{{ trial.scene_label }} · Trial {{ trial.trial_index + 1 }}</h2>
+  <p>请阅读问题并输入你的回答。</p>
+  <blockquote>{{ trial.pending_turn.question }}</blockquote>
+  <form method="post" action="/participant/trials/{{ trial.trial_id }}/answer">
+    <label for="answer_text">你的回答</label>
+    <textarea id="answer_text" name="answer_text" rows="4" required autofocus></textarea>
+    <button type="submit">提交回答</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>历史对话</h2>
+  {% if trial.turns %}
+  <ol class="turn-list">
+    {% for turn in trial.turns %}
+    <li>
+      <div>Q: {{ turn.question }}</div>
+      <div class="muted">A: {{ turn.participant_answer_raw }}</div>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p>这是当前 trial 的第一问。</p>
+  {% endif %}
+</section>
+{% elif trial.status in ["assigned", "dialogue_active"] %}
+<section class="card">
+  <h2>请等待实验员开始 Trial</h2>
+  <p>当前状态：{{ trial.status }}</p>
+</section>
+{% elif trial.status == "dialogue_processing" %}
+<section class="card">
+  <h2>系统正在处理你的回答</h2>
+  <p>请稍候，页面会自动刷新。</p>
+</section>
+{% elif trial.status == "dialogue_failed" %}
+<section class="card danger">
+  <h2>系统暂时不可用</h2>
+  <p>实验员正在处理，请稍候。</p>
+</section>
+{% elif trial.status == "trial_interrupted" %}
+<section class="card">
+  <h2>Trial 暂停中</h2>
+  <p>请等待实验员恢复。</p>
+</section>
+{% else %}
+<section class="card">
+  <h2>状态更新中</h2>
+  <p>页面会自动跳转。</p>
+</section>
+{% endif %}
+{% endblock %}

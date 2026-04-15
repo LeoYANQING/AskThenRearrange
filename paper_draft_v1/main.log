@@ -1,7 +1,6 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.4.8)  8 APR 2026 19:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.4.8)  15 APR 2026 19:12
 entering extended mode
  restricted \write18 enabled.
- file:line:error style messages enabled.
  %&-line parsing enabled.
 **main.tex
 (./main.tex
@@ -1310,7 +1309,7 @@ LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
 (Font)              scaled to size 10.95pt on input line 384.
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
 (Font)              scaled to size 10.95pt on input line 384.
-<teaser.pdf, id=166, 2459.29802pt x 834.47862pt>
+<teaser.pdf, id=174, 2459.29802pt x 834.47862pt>
 File: teaser.pdf Graphic file (type pdf)
 <use teaser.pdf>
 Package pdftex.def Info: teaser.pdf  used on input line 384.
@@ -1394,52 +1393,444 @@ cal/texlive/2026/texmf-dist/fonts/enc/dvips/libertine/lbtn_nh77jq.enc} <./tease
 r.pdf>]
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/n' will be
 (Font)              scaled to size 9.0pt on input line 386.
+LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/n' will be
+(Font)              scaled to size 9.0pt on input line 389.
+
+
+Package natbib Warning: Citation `wu2023tidybot' on page 2 undefined on input l
+ine 389.
+
+
+Package natbib Warning: Citation `nasiriany2024robocasa' on page 2 undefined on
+ input line 389.
+
+
+Package natbib Warning: Citation `zheng2019personalized' on page 2 undefined on
+ input line 389.
+
+
+Package natbib Warning: Citation `lawley2024val' on page 2 undefined on input l
+ine 389.
+
+
+Package natbib Warning: Citation `biyik2019asking' on page 2 undefined on input
+ line 389.
+
+
+Package natbib Warning: Citation `6padmakumar2022teach' on page 2 undefined on 
+input line 389.
+
+
+Package natbib Warning: Citation `8leusmann2025investigating' on page 2 undefin
+ed on input line 389.
+
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
 (Font)              scaled to size 9.0pt on input line 389.
-LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/n' will be
-(Font)              scaled to size 9.0pt on input line 391.
-LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 9.0pt on input line 395.
-LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 6.6pt on input line 395.
-LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
-(Font)              scaled to size 9.0pt on input line 395.
-LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
-(Font)              scaled to size 6.6pt on input line 395.
-LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 9.0pt on input line 395.
-LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 6.6pt on input line 395.
-LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 9.0pt on input line 395.
-LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 6.6pt on input line 395.
-LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 9.0pt on input line 395.
-LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 6.6pt on input line 395.
-LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 9.0pt on input line 395.
-LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 6.6pt on input line 395.
-LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 9.0pt on input line 395.
-LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 6.6pt on input line 395.
-LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 9.0pt on input line 395.
-LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 6.6pt on input line 395.
 
-[2.2] [3.3]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Package natbib Warning: Citation `cakmak2012designing' on page 2 undefined on i
+nput line 389.
+
+
+Package natbib Warning: Citation `mutlu2009footing' on page 2 undefined on inpu
+t line 389.
+
+
+Package natbib Warning: Citation `cakmak2012designing' on page 2 undefined on i
+nput line 391.
+
+
+Package natbib Warning: Citation `biyik2019asking' on page 2 undefined on input
+ line 391.
+
+
+Package natbib Warning: Citation `habibian2022here' on page 2 undefined on inpu
+t line 391.
+
+
+Package natbib Warning: Citation `5ramrakhya2025grounding' on page 2 undefined 
+on input line 391.
+
+
+Package natbib Warning: Citation `7uehara2024learning' on page 2 undefined on i
+nput line 391.
+
+
+Package natbib Warning: Citation `12biyik2019asking' on page 2 undefined on inp
+ut line 391.
+
+
+Package natbib Warning: Citation `oviatt2006human' on page 2 undefined on input
+ line 391.
+
+
+Package natbib Warning: Citation `kosch2023survey' on page 2 undefined on input
+ line 391.
+
+
+Package natbib Warning: Citation `tyshka2023interactive' on page 2 undefined on
+ input line 391.
+
+
+Package natbib Warning: Citation `hu2024designing' on page 2 undefined on input
+ line 391.
+
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
+(Font)              scaled to size 9.0pt on input line 395.
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
+(Font)              scaled to size 6.6pt on input line 395.
+LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
+(Font)              scaled to size 9.0pt on input line 395.
+LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
+(Font)              scaled to size 6.6pt on input line 395.
+LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
+(Font)              scaled to size 9.0pt on input line 395.
+LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
+(Font)              scaled to size 6.6pt on input line 395.
+LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
+(Font)              scaled to size 9.0pt on input line 395.
+LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
+(Font)              scaled to size 6.6pt on input line 395.
+LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
+(Font)              scaled to size 9.0pt on input line 395.
+LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
+(Font)              scaled to size 6.6pt on input line 395.
+LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
+(Font)              scaled to size 9.0pt on input line 395.
+LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
+(Font)              scaled to size 6.6pt on input line 395.
+LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
+(Font)              scaled to size 9.0pt on input line 395.
+LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
+(Font)              scaled to size 6.6pt on input line 395.
+LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
+(Font)              scaled to size 9.0pt on input line 395.
+LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
+(Font)              scaled to size 6.6pt on input line 395.
+[2.2]
+
+Package natbib Warning: Citation `zhong2021gap' on page 3 undefined on input li
+ne 417.
+
+
+Package natbib Warning: Citation `tsuji2025survey' on page 3 undefined on input
+ line 419.
+
+
+Package natbib Warning: Citation `hussein2017imitation' on page 3 undefined on 
+input line 419.
+
+
+Package natbib Warning: Citation `wake2024gpt' on page 3 undefined on input lin
+e 419.
+
+
+Package natbib Warning: Citation `she2014teaching' on page 3 undefined on input
+ line 419.
+
+
+Package natbib Warning: Citation `nasiriany2024robocasa' on page 3 undefined on
+ input line 419.
+
+
+Package natbib Warning: Citation `shrestha2024natsgd' on page 3 undefined on in
+put line 419.
+
+
+Package natbib Warning: Citation `tyshka2023interactive' on page 3 undefined on
+ input line 421.
+
+
+Package natbib Warning: Citation `reimann2024survey' on page 3 undefined on inp
+ut line 421.
+
+
+Package natbib Warning: Citation `schmidt2018survey' on page 3 undefined on inp
+ut line 421.
+
+
+Package natbib Warning: Citation `luo2019learning' on page 3 undefined on input
+ line 421.
+
+
+Package natbib Warning: Citation `zheng2019personalized' on page 3 undefined on
+ input line 421.
+
+
+Package natbib Warning: Citation `lawley2024val' on page 3 undefined on input l
+ine 421.
+
+
+Package natbib Warning: Citation `habibian2022here' on page 3 undefined on inpu
+t line 423.
+
+
+Package natbib Warning: Citation `biyik2019asking' on page 3 undefined on input
+ line 423.
+
+
+Package natbib Warning: Citation `wu2023tidybot' on page 3 undefined on input l
+ine 423.
+
+[3.3]
+
+Package natbib Warning: Citation `hunt2024survey' on page 4 undefined on input 
+line 425.
+
+
+Package natbib Warning: Citation `hu2025task' on page 4 undefined on input line
+ 428.
+
+
+Package natbib Warning: Citation `shen2025elba' on page 4 undefined on input li
+ne 428.
+
+
+Package natbib Warning: Citation `3ren2023robots' on page 4 undefined on input 
+line 429.
+
+
+Package natbib Warning: Citation `4andukuri2024star' on page 4 undefined on inp
+ut line 429.
+
+
+Package natbib Warning: Citation `5ramrakhya2025grounding' on page 4 undefined 
+on input line 429.
+
+
+Package natbib Warning: Citation `6padmakumar2022teach' on page 4 undefined on 
+input line 429.
+
+
+Package natbib Warning: Citation `hu2025task' on page 4 undefined on input line
+ 430.
+
+
+Package natbib Warning: Citation `7uehara2024learning' on page 4 undefined on i
+nput line 430.
+
+
+Package natbib Warning: Citation `8leusmann2025investigating' on page 4 undefin
+ed on input line 431.
+
+
+Package natbib Warning: Citation `9carter2022you' on page 4 undefined on input 
+line 431.
+
+
+Package natbib Warning: Citation `10leusmann2025developing' on page 4 undefined
+ on input line 431.
+
+
+Package natbib Warning: Citation `11scialom2019ask' on page 4 undefined on inpu
+t line 431.
+
+
+Package natbib Warning: Citation `7uehara2024learning' on page 4 undefined on i
+nput line 433.
+
+
+Package natbib Warning: Citation `12biyik2019asking' on page 4 undefined on inp
+ut line 433.
+
+
+Package natbib Warning: Citation `13gonzalez2018analyzing' on page 4 undefined 
+on input line 433.
+
+
+Package natbib Warning: Citation `5ramrakhya2025grounding' on page 4 undefined 
+on input line 433.
+
+
+Package natbib Warning: Citation `7uehara2024learning' on page 4 undefined on i
+nput line 433.
+
+
+Package natbib Warning: Citation `12biyik2019asking' on page 4 undefined on inp
+ut line 433.
+
+
+Package natbib Warning: Citation `shen2019learning' on page 4 undefined on inpu
+t line 433.
+
+
+Package natbib Warning: Citation `oviatt2006human' on page 4 undefined on input
+ line 433.
+
+
+Package natbib Warning: Citation `kosch2023survey' on page 4 undefined on input
+ line 433.
+
+
+Package natbib Warning: Citation `tyshka2023interactive' on page 4 undefined on
+ input line 433.
+
+
+Package natbib Warning: Citation `tyshka2023interactive' on page 4 undefined on
+ input line 433.
+
+
+Package natbib Warning: Citation `hu2024designing' on page 4 undefined on input
+ line 433.
+
+
+Package natbib Warning: Citation `kosch2023survey' on page 4 undefined on input
+ line 433.
+
+
+Package natbib Warning: Citation `stivers2010overview' on page 4 undefined on i
+nput line 435.
+
+
+Package natbib Warning: Citation `kwan2023survey' on page 4 undefined on input 
+line 435.
+
+
+Package natbib Warning: Citation `stivers2010overview' on page 4 undefined on i
+nput line 435.
+
+
+Package natbib Warning: Citation `kwan2023survey' on page 4 undefined on input 
+line 435.
+
+
+Package natbib Warning: Citation `hu2024designing' on page 4 undefined on input
+ line 437.
+
+
+Package natbib Warning: Citation `redfield1981meta' on page 4 undefined on inpu
+t line 445.
+
+
+Package natbib Warning: Citation `tofade2013best' on page 4 undefined on input 
+line 445.
+
+
+Package natbib Warning: Citation `redfield1981meta' on page 4 undefined on inpu
+t line 445.
+
+
+Package natbib Warning: Citation `tofade2013best' on page 4 undefined on input 
+line 445.
+
+
+Package natbib Warning: Citation `robinson2023probing' on page 4 undefined on i
+nput line 445.
+
+
+Package natbib Warning: Citation `balza2022effective' on page 4 undefined on in
+put line 445.
+
+
+Package natbib Warning: Citation `dejonckheere2019semistructured' on page 4 und
+efined on input line 445.
+
+
+Package natbib Warning: Citation `robinson2023probing' on page 4 undefined on i
+nput line 445.
+
+
+Package natbib Warning: Citation `dejonckheere2019semistructured' on page 4 und
+efined on input line 445.
+
+
+Underfull \vbox (badness 2073) has occurred while \output is active []
 
  [4.4]
-Underfull \vbox (badness 4048) has occurred while \output is active []
 
- [5.5]
+Package natbib Warning: Citation `hu2024designing' on page 5 undefined on input
+ line 447.
+
+
+Package natbib Warning: Citation `cakmak2012designing' on page 5 undefined on i
+nput line 447.
+
+
+Package natbib Warning: Citation `habibian2022here' on page 5 undefined on inpu
+t line 447.
+
+
+Package natbib Warning: Citation `shin2023uncertainty' on page 5 undefined on i
+nput line 447.
+
+
+Package natbib Warning: Citation `hu2025task' on page 5 undefined on input line
+ 447.
+
+
+Package natbib Warning: Citation `adamson2021we' on page 5 undefined on input l
+ine 447.
+
+
+Package natbib Warning: Citation `singh2022ask4help' on page 5 undefined on inp
+ut line 447.
+
+
+Package natbib Warning: Citation `driess2023palm' on page 5 undefined on input 
+line 453.
+
+
+Package natbib Warning: Citation `zitkovich2023rt' on page 5 undefined on input
+ line 453.
+
+
+Package natbib Warning: Citation `ma2024survey' on page 5 undefined on input li
+ne 453.
+
+
+Package natbib Warning: Citation `zeng2023large' on page 5 undefined on input l
+ine 453.
+
+
+Package natbib Warning: Citation `huang2023instruct2act' on page 5 undefined on
+ input line 455.
+
+
+Package natbib Warning: Citation `tie2025manual2skill' on page 5 undefined on i
+nput line 455.
+
+
+Package natbib Warning: Citation `3ren2023robots' on page 5 undefined on input 
+line 455.
+
+
+Package natbib Warning: Citation `5ramrakhya2025grounding' on page 5 undefined 
+on input line 455.
+
+
+Package natbib Warning: Citation `4andukuri2024star' on page 5 undefined on inp
+ut line 455.
+
+
+Package natbib Warning: Citation `shen2025elba' on page 5 undefined on input li
+ne 455.
+
+
+Package natbib Warning: Citation `wu2023tidybot' on page 5 undefined on input l
+ine 455.
+
+
+Package natbib Warning: Citation `tyshka2023interactive' on page 5 undefined on
+ input line 457.
+
+
+Package natbib Warning: Citation `cakmak2012designing' on page 5 undefined on i
+nput line 461.
+
+
+Package natbib Warning: Citation `hu2024designing' on page 5 undefined on input
+ line 461.
+
+[5.5]
+
+Package natbib Warning: Citation `dai2024think' on page 6 undefined on input li
+ne 472.
+
+
+Package natbib Warning: Citation `racca2018active' on page 6 undefined on input
+ line 472.
+
 [6.6]
-<img/3.2.png, id=477, 2483.52844pt x 891.83188pt>
+<img/3.2.png, id=332, 2483.52844pt x 891.83188pt>
 File: img/3.2.png Graphic file (type png)
 <use img/3.2.png>
 Package pdftex.def Info: img/3.2.png  used on input line 480.
@@ -1452,20 +1843,38 @@ Class acmart Warning: A possible image without description on input line 485.
 Package natbib Warning: Citation `braun2006using' on page 7 undefined on input 
 line 488.
 
-[7.7 <./img/3.2.png>]
-<img/3.3.png, id=488, 7322.6072pt x 2768.84438pt>
+<img/3.3.png, id=335, 7322.6072pt x 2768.84438pt>
 File: img/3.3.png Graphic file (type png)
 <use img/3.3.png>
 Package pdftex.def Info: img/3.3.png  used on input line 495.
 (pdftex.def)             Requested size: 430.00462pt x 162.57457pt.
 
-
 Class acmart Warning: A possible image without description on input line 498.
 
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/it' will be
 (Font)              scaled to size 9.0pt on input line 501.
+
+Package natbib Warning: Citation `shin2023uncertainty' on page 7 undefined on i
+nput line 501.
+
+
+Package natbib Warning: Citation `wilson1999models' on page 7 undefined on inpu
+t line 501.
+
+
+Underfull \vbox (badness 3525) has occurred while \output is active []
+
+ [7.7 <./img/3.2.png>]
+
+Package natbib Warning: Citation `redfield1981meta' on page 8 undefined on inpu
+t line 503.
+
+
+Package natbib Warning: Citation `tofade2013best' on page 8 undefined on input 
+line 503.
+
 [8.8 <./img/3.3.png (PNG copy)>] [9.9]
-<img/3.3.3.png, id=512, 1978.14032pt x 843.65187pt>
+<img/3.3.3.png, id=363, 1978.14032pt x 843.65187pt>
 File: img/3.3.3.png Graphic file (type png)
 <use img/3.3.3.png>
 Package pdftex.def Info: img/3.3.3.png  used on input line 551.
@@ -1474,55 +1883,127 @@ Package pdftex.def Info: img/3.3.3.png  used on input line 551.
 
 Class acmart Warning: A possible image without description on input line 555.
 
-
-Underfull \vbox (badness 1546) has occurred while \output is active []
-
- [10.10 <./img/3.3.3.png>]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [11.11]
-[12.12{/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/libertine/lbtn_oexx6f
-.enc}] [13.13] [14.14] [15.15] [16.16]
+[10.10 <./img/3.3.3.png>]
+<img/pattern-cards.png, id=371, 985.40144pt x 484.57034pt>
+File: img/pattern-cards.png Graphic file (type png)
+<use img/pattern-cards.png>
+Package pdftex.def Info: img/pattern-cards.png  used on input line 597.
+(pdftex.def)             Requested size: 430.00462pt x 211.45924pt.
+LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/sc' will be
+(Font)              scaled to size 8.0pt on input line 598.
+LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
+(Font)              scaled to size 6.0pt on input line 598.
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 6.5pt on input line 800.
+(Font)              scaled to size 6.5pt on input line 598.
 LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
-(Font)              scaled to size 6.5pt on input line 800.
+(Font)              scaled to size 6.5pt on input line 598.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 6.5pt on input line 800.
+(Font)              scaled to size 6.5pt on input line 598.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 6.5pt on input line 800.
+(Font)              scaled to size 6.5pt on input line 598.
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 6.5pt on input line 800.
+(Font)              scaled to size 6.5pt on input line 598.
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 6.5pt on input line 800.
+(Font)              scaled to size 6.5pt on input line 598.
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 6.5pt on input line 800.
+(Font)              scaled to size 6.5pt on input line 598.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 6.5pt on input line 800.
-<../plots/qwen3_ablation_with_no_question.png, id=574, 773.5299pt x 331.4784pt>
-
-File: ../plots/qwen3_ablation_with_no_question.png Graphic file (type png)
-<use ../plots/qwen3_ablation_with_no_question.png>
-Package pdftex.def Info: ../plots/qwen3_ablation_with_no_question.png  used on 
-input line 811.
-(pdftex.def)             Requested size: 387.00153pt x 165.845pt.
+(Font)              scaled to size 6.5pt on input line 598.
 
 
-Class acmart Warning: A possible image without description on input line 814.
+Class acmart Warning: A possible image without description on input line 600.
 
-[17.17 <../plots/qwen3_ablation_with_no_question.png>] [18.18] [19.19]
-(./main.bbl
-LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 7.0pt on input line 47.
- [20.20] [21.21])
-<img/layout_1.png, id=614, 1964.84062pt x 482.05093pt>
+[11.11]
+<img/strategy-timeline.png, id=379, 917.46765pt x 392.78745pt>
+File: img/strategy-timeline.png Graphic file (type png)
+<use img/strategy-timeline.png>
+Package pdftex.def Info: img/strategy-timeline.png  used on input line 629.
+(pdftex.def)             Requested size: 430.00462pt x 184.09468pt.
+
+
+Class acmart Warning: A possible image without description on input line 632.
+
+
+Underfull \vbox (badness 3039) has occurred while \output is active []
+
+ [12.12{/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/libertine/lbtn_omcwp
+2.enc}{/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/libertine/lbtn_oexx6f
+.enc} <./img/pattern-cards.png>]
+Overfull \vbox (5.26811pt too high) has occurred while \output is active []
+
+
+[13.13 <./img/strategy-timeline.png>]
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/sb/n' will be
+(Font)              scaled to size 9.0pt on input line 648.
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/sb/n' will be
+(Font)              scaled to size 6.6pt on input line 648.
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/sb/n' will be
+(Font)              scaled to size 5.5pt on input line 648.
+LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/sc' will be
+(Font)              scaled to size 9.0pt on input line 659.
+ [14.14{/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/libertine/lbtn_fygcu
+p.enc}{/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/libertine/lbtn_ncsllp
+.enc}] [15.15] [16.16]
+<img/system-v2.png, id=432, 1004.19165pt x 642.84164pt>
+File: img/system-v2.png Graphic file (type png)
+<use img/system-v2.png>
+Package pdftex.def Info: img/system-v2.png  used on input line 741.
+(pdftex.def)             Requested size: 430.00462pt x 275.26886pt.
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/sb/n' will be
+(Font)              scaled to size 8.0pt on input line 742.
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/sb/n' will be
+(Font)              scaled to size 6.0pt on input line 742.
+
+
+Class acmart Warning: A possible image without description on input line 744.
+
+[17.17 <./img/system-v2.png>]
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/sb/n' will be
+(Font)              scaled to size 6.5pt on input line 789.
+<img/ablation_gpt5chat_ep0-49_with_no_question_matched_nature.png, id=442, 548.
+5293pt x 238.12965pt>
+File: img/ablation_gpt5chat_ep0-49_with_no_question_matched_nature.png Graphic 
+file (type png)
+<use img/ablation_gpt5chat_ep0-49_with_no_question_matched_nature.png>
+Package pdftex.def Info: img/ablation_gpt5chat_ep0-49_with_no_question_matched_
+nature.png  used on input line 802.
+(pdftex.def)             Requested size: 387.00153pt x 168.01222pt.
+
+
+Class acmart Warning: A possible image without description on input line 805.
+
+[18.18] [19.19 <./img/ablation_gpt5chat_ep0-49_with_no_question_matched_nature.
+png>]
+Underfull \vbox (badness 2846) has occurred while \output is active []
+
+ [20.20]
+
+Package natbib Warning: Citation `biyik2019asking' on page 21 undefined on inpu
+t line 928.
+
+
+Underfull \vbox (badness 1558) has occurred while \output is active []
+
+ [21.21]
+No file main.bbl.
+
+Package natbib Warning: Citation `10.1145/3568294.3580077' on page 22 undefined
+ on input line 991.
+
+
+Package natbib Warning: Citation `10.1145/3568294.3580077' on page 22 undefined
+ on input line 991.
+
+<img/layout_1.png, id=481, 1964.84062pt x 482.05093pt>
 File: img/layout_1.png Graphic file (type png)
 <use img/layout_1.png>
-Package pdftex.def Info: img/layout_1.png  used on input line 1199.
+Package pdftex.def Info: img/layout_1.png  used on input line 1021.
 (pdftex.def)             Requested size: 430.00462pt x 105.49251pt.
 
+Class acmart Warning: A possible image without description on input line 1024.
 
-Class acmart Warning: A possible image without description on input line 1202.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
@@ -1530,6 +2011,12 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
+
+Overfull \hbox (13.06694pt too wide) in paragraph at lines 1107--1121
+ [][] 
+ []
+
+[22.22]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
@@ -1553,9 +2040,9 @@ ence can ingest your work..
 
 
 Class acmart Warning: \vspace should only be used to provide space above/below 
-surrounding objects on input line 1277.
+surrounding objects on input line 1123.
 
-[22.22] [23.23 <./img/layout_1.png>]
+[23.23 <./img/layout_1.png>]
 (/usr/local/texlive/2026/texmf-dist/tex/generic/stringenc/se-pdfdoc.def
 File: se-pdfdoc.def 2019/11/29 v1.12 stringenc: PDFDocEncoding
 )
@@ -1572,32 +2059,35 @@ L3 programming layer <2026-01-19>
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 59355D5C660A196CFDC30A37B20E3701;7461.
+(rerunfilecheck)             Checksum: 6E8604D01B952F9E859EAD644AD6E6BD;8200.
  ) 
 Here is how much of TeX's memory you used:
- 34786 strings out of 467525
- 650146 string characters out of 5418983
- 1176824 words of memory out of 5000000
- 62160 multiletter control sequences out of 15000+600000
- 819516 words of font info for 536 fonts, out of 8000000 for 9000
+ 34646 strings out of 467525
+ 647164 string characters out of 5418983
+ 1180264 words of memory out of 5000000
+ 62006 multiletter control sequences out of 15000+600000
+ 844688 words of font info for 576 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
- 98i,17n,131p,1695b,790s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 98i,17n,131p,1642b,747s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/newtx/LibertineMathMI.
 pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/newtx/LibertineMathM
-I7.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/libertine/LinBiol
-inumT.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/libertine/LinB
-iolinumTB.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/libertine/
-LinBiolinumTI.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/libert
-ine/LinLibertineT.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/li
-bertine/LinLibertineTB.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/publ
-ic/libertine/LinLibertineTI.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1
-/public/newtx/NewTXMI.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/publi
+I5.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/newtx/LibertineMa
+thMI7.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/libertine/LinB
+iolinumT.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/libertine/L
+inBiolinumTB.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/liberti
+ne/LinBiolinumTI.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/lib
+ertine/LinLibertineT.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public
+/libertine/LinLibertineTB.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/p
+ublic/libertine/LinLibertineTI.pfb></usr/local/texlive/2026/texmf-dist/fonts/ty
+pe1/public/libertine/LinLibertineTZ.pfb></usr/local/texlive/2026/texmf-dist/fon
+ts/type1/public/newtx/NewTXMI.pfb></usr/local/texlive/2026/texmf-dist/fonts/typ
+e1/public/newtx/txexs.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/publi
 c/newtx/txmiaX.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/newtx
 /txsys.pfb>
-Output written on main.pdf (24 pages, 21151463 bytes).
+Output written on main.pdf (24 pages, 21667699 bytes).
 PDF statistics:
- 726 PDF objects out of 1000 (max. 8388607)
- 601 compressed objects within 7 object streams
- 161 named destinations out of 1000 (max. 500000)
- 92531 words of extra memory for PDF output out of 106986 (max. 10000000)
+ 604 PDF objects out of 1000 (max. 8388607)
+ 466 compressed objects within 5 object streams
+ 114 named destinations out of 1000 (max. 500000)
+ 115090 words of extra memory for PDF output out of 128383 (max. 10000000)
 

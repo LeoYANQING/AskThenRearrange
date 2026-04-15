@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+{% if trial.status in ["dialogue_active", "dialogue_waiting_for_answer", "dialogue_processing", "dialogue_failed"] %}
+<meta http-equiv="refresh" content="{{ auto_refresh_seconds }}" />
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="card-row">
+  <section class="card">
+    <h2>Trial 概览</h2>
+    <p>Participant: <strong>{{ participant.participant_id }}</strong></p>
+    <p>Trial: <strong>T{{ trial.trial_index + 1 }}</strong></p>
+    <p>Strategy: <strong>{{ trial.strategy }}</strong></p>
+    <p>Scene: <strong>{{ trial.scene_label }}</strong></p>
+    <p>Status: <strong>{{ trial.status }}</strong></p>
+    <p>Budget: <strong>{{ trial.budget_total }}</strong></p>
+    <p>Turns finished: <strong>{{ trial.turns|length }}</strong></p>
+    <p><a href="/participant/{{ participant.participant_id }}/current" target="_blank">打开 participant 端</a></p>
+  </section>
+  <section class="card">
+    <h2>操作</h2>
+    {% if trial.status == "assigned" %}
+    <form method="post" action="/experimenter/trials/{{ trial.trial_id }}/start">
+      <button type="submit">开始 Trial</button>
+    </form>
+    {% elif trial.status == "dialogue_failed" %}
+    <form method="post" action="/experimenter/trials/{{ trial.trial_id }}/retry">
+      <button type="submit">重试当前轮</button>
+    </form>
+    {% elif trial.status == "trial_interrupted" %}
+    <form method="post" action="/experimenter/trials/{{ trial.trial_id }}/resume">
+      <button type="submit">恢复 Trial</button>
+    </form>
+    {% else %}
+    <form method="post" action="/experimenter/trials/{{ trial.trial_id }}/interrupt">
+      <button type="submit">中断 Trial</button>
+    </form>
+    {% endif %}
+  </section>
+</section>
+
+{% if trial.failure %}
+<section class="card danger">
+  <h2>失败状态</h2>
+  <p>Stage: <strong>{{ trial.failure.stage }}</strong></p>
+  <p>{{ trial.failure.message }}</p>
+</section>
+{% endif %}
+
+{% if trial.pending_turn %}
+<section class="card">
+  <h2>当前待答问题</h2>
+  <p>Pattern: <strong>{{ trial.pending_turn.question_pattern }}</strong></p>
+  <p>Guidance: {{ trial.pending_turn.guidance }}</p>
+  <blockquote>{{ trial.pending_turn.question }}</blockquote>
+  {% if trial.pending_turn.covered_objects %}
+  <p>Covered objects: {{ trial.pending_turn.covered_objects|join(", ") }}</p>
+  {% endif %}
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Turn 历史</h2>
+  {% if trial.turns %}
+  <ol class="turn-list">
+    {% for turn in trial.turns %}
+    <li>
+      <div><strong>{{ turn.question_pattern }}</strong> · {{ turn.question }}</div>
+      <div class="muted">A: {{ turn.participant_answer_raw }}</div>
+      <details>
+        <summary>状态摘要</summary>
+        <pre>{{ turn.state_summary | tojson(indent=2) }}</pre>
+      </details>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p>还没有已完成的 turn。</p>
+  {% endif %}
+</section>
+
+{% if trial.result %}
+<section class="card">
+  <h2>客观结果</h2>
+  <p>Overall accuracy: <strong>{{ "%.3f"|format(trial.result.overall_accuracy) }}</strong></p>
+  <p>Discussed-item accuracy: <strong>{{ "%.3f"|format(trial.result.discussed_item_accuracy) }}</strong></p>
+  <p>Undiscussed-item accuracy: <strong>{{ "%.3f"|format(trial.result.undiscussed_item_accuracy) }}</strong></p>
+  <details>
+    <summary>预测结果</summary>
+    <pre>{{ trial.result.predicted_placements | tojson(indent=2) }}</pre>
+  </details>
+  <details>
+    <summary>Participant 参考偏好</summary>
+    <pre>{{ trial.result.participant_reference_placements | tojson(indent=2) }}</pre>
+  </details>
+</section>
+{% endif %}
+{% endblock %}

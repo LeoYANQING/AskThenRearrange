@@ -1,0 +1,13 @@
+[1/50] ep0: seen=0.750 unseen=0.833 (55.6s) | total 56s | ETA 2724s (45min)
+[10/50] ep9: seen=0.750 unseen=0.667 (63.3s) | total 849s | ETA 3394s (57min)
+[20/50] ep19: seen=0.667 unseen=0.667 (99.7s) | total 1651s | ETA 2477s (41min)
+[30/50] ep29: seen=0.667 unseen=0.583 (68.0s) | total 2370s | ETA 1580s (26min)
+[40/50] ep39: seen=0.917 unseen=0.917 (52.3s) | total 2988s | ETA 747s (12min)
+[50/50] ep49: seen=1.000 unseen=0.750 (61.8s) | total 3638s | ETA 0s (0min)
+
+=== Summary ===
+  raw_llm(b=1): seen=0.5967±0.0241  unseen=0.5867±0.0244
+  raw_llm(b=3): seen=0.6683±0.0248  unseen=0.6400±0.0236
+  raw_llm(b=5): seen=0.7233±0.0246  unseen=0.6917±0.0240
+  raw_llm(b=10): seen=0.8117±0.0156  unseen=0.7817±0.0163
+  total time: 3638s (60.6min)

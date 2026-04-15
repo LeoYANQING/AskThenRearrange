@@ -559,6 +559,9 @@ class ActionProposer:
         base_url: str = DEFAULT_BASE_URL,
         temperature: float = 0.0,
     ) -> None:
+        self.model_name = model
+        self.base_url = base_url
+        self.temperature = temperature
         self.model: Any = create_chat_model(
             model=model,
             base_url=base_url,

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="card-row">
+  <section class="card">
+    <h2>创建被试</h2>
+    <form method="post" action="/experimenter/participants">
+      <button type="submit">新建 Participant</button>
+    </form>
+  </section>
+  <section class="card">
+    <h2>导出</h2>
+    <form method="post" action="/experimenter/export/all">
+      <button type="submit">导出全部 CSV</button>
+    </form>
+  </section>
+</section>
+
+<section class="card">
+  <h2>Participant 列表</h2>
+  {% if participants %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Group</th>
+        <th>Status</th>
+        <th>Current Trial</th>
+        <th>Participant Link</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in participants %}
+      <tr>
+        <td>{{ row.participant_id }}</td>
+        <td>{{ row.counterbalance_group }}</td>
+        <td>{{ row.status }}</td>
+        <td>
+          {% if row.current_trial %}
+          T{{ row.current_trial.trial_index + 1 }} · {{ row.current_trial.strategy }} · {{ row.current_trial.scene_label }}
+          {% else %}
+          已完成
+          {% endif %}
+        </td>
+        <td><a href="/participant/{{ row.participant_id }}/current" target="_blank">打开被试页</a></td>
+        <td><a href="/experimenter/participants/{{ row.participant_id }}">查看详情</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>还没有 participant。</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,87 @@
+Building name map for 134 English names...
+
+==============================================================================
+ RECEPTACLE-CENTRIC QUESTIONS
+==============================================================================
+
+[RC-1] room=living room  episode=episode_7
+  hyp: items typically kept in the TV stand
+  EN: What kinds of items do you typically keep in the TV stand?
+  ZH: 电视柜你一般会放些什么？
+
+[RC-2] room=bedroom  episode=episode_38
+  hyp: items typically kept in the bedside table
+  EN: What kinds of items do you typically keep in the bedside table?
+  ZH: 床头抽屉你一般会放些什么？
+
+[RC-3] room=kitchen  episode=episode_72
+  hyp: items typically kept in the utensil drawer
+  EN: What kinds of items do you typically keep in the utensil drawer?
+  ZH: 你一般会把什么厨具用品放在餐具抽屉里？
+
+[RC-4] room=living room  episode=episode_7
+  hyp: items typically kept in the display shelf
+  EN: What kinds of items do you typically keep in the display shelf?
+  ZH: 展示架你一般会放些什么？
+
+[RC-5] room=bedroom  episode=episode_38
+  hyp: items typically kept in the wardrobe shelf
+  EN: What kinds of items do you typically keep in the wardrobe shelf?
+  ZH: 衣柜里的架子你一般会放些什么？
+
+[RC-6] room=kitchen  episode=episode_72
+  hyp: items typically kept in the dish cabinet
+  EN: What kinds of items do you typically keep in the dish cabinet?
+  ZH: 你一般会把什么放在餐具柜里？
+
+==============================================================================
+ CATEGORY-CENTRIC QUESTIONS
+==============================================================================
+
+[CAT-1] room=living room  episode=episode_7
+  hyp: soft flexible catchall and storage containers
+  covered: ['silicone catchall tray', 'plastic magazine holder']
+  EN: How do you usually organize soft flexible catchall and storage containers — do they tend to stay in one spot or spread out based on use?
+  ZH: 软软的收纳盒和储物容器你一般都放一起吗？还是哪儿用哪儿放？
+
+[CAT-2] room=bedroom  episode=episode_38
+  hyp: personal reading and writing materials
+  covered: ['leather-bound notebook', 'hardcover novel']
+  EN: How do you usually organize personal reading and writing materials — do they tend to stay in one spot?
+  ZH: 像书、杂志这类读物，你一般都放一起吗？
+
+[CAT-3] room=kitchen  episode=episode_72
+  hyp: small battery-powered kitchen gadgets
+  covered: ['plug-in kettle', 'corded blender', 'electric food thermometer', 'wireless recipe tablet']
+  EN: How do you usually organize small battery-powered kitchen gadgets — do they tend to stay in one spot or spread out based on use?
+  ZH: 小号的电池款厨房小工具你一般都放一起吗？
+
+[CAT-4] room=living room  episode=episode_8
+  hyp: soft warm textiles and throws
+  covered: ['fleece shawl', 'velvet throw pillow']
+  EN: How do you usually organize soft warm textiles and throws — do they tend to stay in one spot or spread around based on use?
+  ZH: 你一般会把毛绒毯子和柔软的纺织品放一起吗？
+
+[CAT-5] room=bedroom  episode=episode_40
+  hyp: fragile ceramic and porcelain decorative items
+  covered: ['ceramic jewelry dish', 'porcelain ring tray']
+  EN: How do you usually organize fragile ceramic and porcelain decorative items — do they tend to stay in one spot or spread out based on use?
+  ZH: 陶瓷和瓷器这类易碎的装饰品，你一般都放一起吗？
+
+[CAT-6] room=kitchen  episode=episode_72
+  hyp: ripe and fresh produce items
+  covered: ['fresh bananas', 'ripe avocados']
+  EN: How do you usually organize ripe and fresh produce items — do they tend to stay in one spot or spread out based on use?
+  ZH: 你一般怎么放新鲜和成熟的蔬果？是都放在一起，还是根据使用情况分散放？
+
+[CAT-7] room=living room  episode=episode_9
+  hyp: plastic and woven surface accessories
+  covered: ['plastic tray', 'rubber coaster set', 'wooden tray', 'woven coaster holder']
+  EN: Do you usually keep plastic and woven surface accessories together in one specific area, or do they tend to be spread out based on use?
+  ZH: 塑料和编织材质的表面配件，你一般都放一块吗，还是根据使用情况分散放？
+
+[CAT-8] room=bedroom  episode=episode_40
+  hyp: soft textile accessories and seasonal items
+  covered: ['off-season scarf set', 'storage pouch', 'hair clip box', 'wooden keepsake box']
+  EN: How do you usually organize soft textile accessories and seasonal items — do they tend to stay in one spot or spread out based on use?
+  ZH: 软纺织品和季节性物品你一般都放一起吗？还是哪儿用哪儿放？

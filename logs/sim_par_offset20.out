@@ -1,0 +1,351 @@
+Running 10 PAR episodes, budget=6, offset=20, tag=par_offset20
+
+================================================================================
+Episode 1/10  id=episode_20  room=living room
+================================================================================
+
+[T1] pattern=action_oriented
+  Q: Where should the LED reading lamp go?
+  A: The LED reading lamp should go in the side drawer.
+
+[T2] pattern=action_oriented
+  Q: Where should the battery-powered game controller go?
+  A: The battery-powered game controller should go in the side drawer.
+
+[T3] pattern=preference_induction
+  hypothesis: small plug-in bedside electronics go to the side drawer
+  covered:    ['LED reading lamp', 'battery-powered game controller']
+  Q: Are small plug-in bedside electronics placed in the side drawer?
+  A: Yes, small plug-in bedside electronics go in the side drawer.
+
+[T4] pattern=action_oriented
+  Q: Where should the plug-in record player go?
+  A: The plug-in record player should go on the TV stand.
+
+[T5] pattern=action_oriented
+  Q: Where should the foam exercise block go?
+  A: The foam exercise block should go in the decorative basket.
+
+[T6] pattern=action_oriented
+  Q: Where should the corded floor lamp go?
+  A: The corded floor lamp should go on the TV stand.
+
+[EVAL] seen=0.500  unseen=0.500  total=0.500
+
+================================================================================
+Episode 2/10  id=episode_21  room=living room
+================================================================================
+
+[T1] pattern=action_oriented
+  Q: Where should the battery-powered game controller go?
+  A: The battery-powered game controller goes in the side drawer.
+
+[T2] pattern=action_oriented
+  Q: Where should the portable e-reader go?
+  A: The portable e-reader goes in the side drawer.
+
+[T3] pattern=preference_induction
+  hypothesis: small rechargeable personal electronics go to the side drawer
+  covered:    ['battery-powered game controller', 'portable e-reader']
+  Q: preference_induction
+  A: Display-worthy books and albums go to the display shelf.
+
+[T4] pattern=action_oriented
+  Q: Where should the corded floor lamp go?
+  A: The corded floor lamp goes on the TV stand.
+
+[T5] pattern=action_oriented
+  Q: Where should the wired speaker go?
+  A: The wired speaker goes on the TV stand.
+
+[T6] pattern=preference_induction
+  hypothesis: medium-sized plug-in lighting fixtures go to the TV stand
+  covered:    ['corded floor lamp', 'wired speaker']
+  Q: preference_induction
+  A: Small decorative or archived loose living-room items go to the decorative basket.
+
+[EVAL] seen=0.583  unseen=0.417  total=0.500
+
+================================================================================
+Episode 3/10  id=episode_22  room=living room
+================================================================================
+
+[T1] pattern=action_oriented
+  Q: Where should the portable e-reader go?
+  A: The portable e-reader goes in the side drawer.
+
+[T2] pattern=action_oriented
+  Q: Where should the cordless table lamp go?
+  A: The cordless table lamp goes in the side drawer.
+
+[T3] pattern=preference_induction
+  hypothesis: small, portable electronics with minimal power requirements go to the side drawer
+  covered:    ['portable e-reader', 'cordless table lamp']
+  Q: preference_induction
+  A: Upright reading and reference books go to the bookshelf — fragile display pieces and delicate drinkware also go there. Shared tabletop leisure, display, and catchall items go to the center table.
+
+[T4] pattern=action_oriented
+  Q: Where should the wired speaker go?
+  A: The wired speaker goes on the TV stand.
+
+[T5] pattern=action_oriented
+  Q: Where should the plug-in media hub go?
+  A: The plug-in media hub goes on the TV stand.
+
+[T6] pattern=preference_induction
+  hypothesis: small, battery-powered electronics with minimal power requirements go to the side drawer
+  covered:    ['portable e-reader', 'cordless table lamp']
+  Q: preference_induction
+  A: Large wired entertainment devices and plug-in media equipment go to the TV stand. Stored, seasonal, or archived living-room accessories go to the storage basket. Upright reading and reference books, along with fragile display pieces and delicate drinkware, go to the bookshelf. Shared tabletop leisure, display, and catchall items go to the center table. Small entertainment and personal electronics go to the side drawer.
+
+[EVAL] seen=0.833  unseen=0.583  total=0.708
+
+================================================================================
+Episode 4/10  id=episode_23  room=living room
+================================================================================
+
+[T1] pattern=action_oriented
+  Q: Where should the cordless table lamp go?
+  A: The cordless table lamp should go in the media drawer.
+
+[T2] pattern=action_oriented
+  Q: Where should the battery-powered remote go?
+  A: The battery-powered remote should go in the media drawer.
+
+[T3] pattern=preference_induction
+  hypothesis: small plug-in electronics with remote control functionality go to the media drawer
+  covered:    ['cordless table lamp', 'battery-powered remote']
+  Q: preference_induction
+  A: Fragile display pieces and delicate drinkware go to the bookshelf.
+
+[T4] pattern=action_oriented
+  Q: Where should the plug-in media hub go?
+  A: The plug-in media hub should go on the TV stand.
+
+[T5] pattern=action_oriented
+  Q: Where should the wired game console go?
+  A: The wired game console should go on the TV stand.
+
+[T6] pattern=preference_induction
+  hypothesis: larger plug-in electronics with physical controls go to the TV stand
+  covered:    ['plug-in media hub', 'wired game console']
+  Q: preference_induction
+  A: Cozy lounge textiles and plush comfort items go to the sofa.
+
+[EVAL] seen=0.667  unseen=0.833  total=0.750
+
+================================================================================
+Episode 5/10  id=episode_54  room=bedroom
+================================================================================
+
+[T1] pattern=action_oriented
+  Q: Where should the wireless earbuds case go?
+  A: The wireless earbuds case should go in the bedside drawer.
+
+[T2] pattern=action_oriented
+  Q: Where should the battery-powered alarm clock go?
+  A: The battery-powered alarm clock should go in the bedside drawer.
+
+[T3] pattern=preference_induction
+  hypothesis: small, battery-powered personal electronics go to the bedside drawer
+  covered:    ['wireless earbuds case', 'battery-powered alarm clock']
+  Q: preference_induction
+  A: Small bedside electronics and light sources go to the bedside drawer.
+
+[T4] pattern=action_oriented
+  Q: Where should the wired headphones go?
+  A: The wired headphones should go on the nightstand.
+
+[T5] pattern=action_oriented
+  Q: Where should the plug-in fan go?
+  A: The plug-in fan should go on the nightstand.
+
+[T6] pattern=preference_induction
+  hypothesis: small plug-in bedside electronics go to the nightstand
+  covered:    ['wired headphones', 'plug-in fan']
+  Q: preference_induction
+  A: Fragile keepsakes and grooming-display accessories go to the vanity tray.
+
+[EVAL] seen=0.667  unseen=0.583  total=0.625
+
+================================================================================
+Episode 6/10  id=episode_55  room=bedroom
+================================================================================
+
+[T1] pattern=action_oriented
+  Q: Where should the battery-powered alarm clock go?
+  A: The battery-powered alarm clock goes in the nightstand drawer.
+
+[T2] pattern=action_oriented
+  Q: Where should the electric sleep mask controller go?
+  A: The electric sleep mask controller goes in the nightstand drawer.
+
+[T3] pattern=preference_induction
+  hypothesis: small plug-in bedside electronics go to the nightstand drawer
+  covered:    ['battery-powered alarm clock', 'electric sleep mask controller']
+  Q: Are small plug-in bedside electronics placed in the nightstand drawer?
+  A: Yes, small plug-in bedside electronics go in the nightstand drawer.
+
+[T4] pattern=action_oriented
+  Q: Where should the rigid-cover photo diary go?
+  A: The rigid-cover photo diary goes on the reading shelf.
+
+[T5] pattern=action_oriented
+  Q: Where should the leather-bound notebook go?
+  A: The leather-bound notebook goes on the reading shelf.
+
+[T6] pattern=preference_induction
+  hypothesis: hardbound notebooks and photo diaries go on the reading shelf
+  covered:    ['rigid-cover photo diary', 'leather-bound notebook']
+  Q: preference_induction
+  A: Current reading and sturdy books go on the reading shelf — but fragile keepsakes and grooming-display accessories go on the vanity tray instead.
+
+[EVAL] seen=0.667  unseen=0.833  total=0.750
+
+================================================================================
+Episode 7/10  id=episode_56  room=bedroom
+================================================================================
+
+[T1] pattern=action_oriented
+  Q: Where should the corded alarm clock go?
+  A: The corded alarm clock goes on the bedside table.
+
+[T2] pattern=action_oriented
+  Q: Where should the wired headphones go?
+  A: The wired headphones go on the bedside table.
+
+[T3] pattern=preference_induction
+  hypothesis: small plug-in bedside electronics go to the bedside table
+  covered:    ['corded alarm clock', 'wired headphones']
+  Q: preference_induction
+  A: The ceramic candle holder, glass perfume bottle, wooden keepsake box, and framed photo go on the vanity tray.
+
+[T4] pattern=action_oriented
+  Q: Where should the folded scarf go?
+  A: The folded scarf goes on the closet shelf.
+
+[T5] pattern=action_oriented
+  Q: Where should the clean cotton pajamas go?
+  A: The clean cotton pajamas go on the closet shelf.
+
+[T6] pattern=preference_induction
+  hypothesis: folded clothing items go to the closet shelf
+  covered:    ['folded scarf', 'clean cotton pajamas']
+  Q: preference_induction
+  A: Ready-to-wear bedroom clothing like clean cotton pajamas and folded scarves go on the closet shelf. Soft, bulky, travel, or overflow bedroom accessories like travel neck pillows and plush bedtime toys go on the storage bench.
+
+[EVAL] seen=0.667  unseen=0.750  total=0.708
+
+================================================================================
+Episode 8/10  id=episode_88  room=kitchen
+================================================================================
+
+[T1] pattern=action_oriented
+  Q: Where should the corded milk frother go?
+  A: The corded milk frother goes on the prep counter.
+
+[T2] pattern=action_oriented
+  Q: Where should the plug-in rice cooker go?
+  A: The plug-in rice cooker goes on the prep counter.
+
+[T3] pattern=preference_induction
+  hypothesis: small plug-in kitchen appliances go to the prep counter
+  covered:    ['corded milk frother', 'plug-in rice cooker']
+  Q: Are small plug-in kitchen appliances placed on the prep counter?
+  A: Yes, small plug-in kitchen appliances go on the prep counter.
+
+[T4] pattern=action_oriented
+  Q: Where should the silicone snack bag go?
+  A: The silicone snack bag goes in the lower cabinet.
+
+[T5] pattern=action_oriented
+  Q: Where should the rubber-seal lunch box go?
+  A: The rubber-seal lunch box goes in the lower cabinet.
+
+[T6] pattern=preference_induction
+  hypothesis: sealed and resealable food containers go in the lower cabinet
+  covered:    ['silicone snack bag', 'rubber-seal lunch box']
+  Q: preference_induction
+  A: Shelf-stable pantry staples and dry goods go to the dry-goods shelf.
+
+[EVAL] seen=0.500  unseen=0.583  total=0.542
+
+================================================================================
+Episode 9/10  id=episode_89  room=kitchen
+================================================================================
+
+[T1] pattern=action_oriented
+  Q: Where should the battery-powered can opener go?
+  A: The battery-powered can opener goes in the utensil drawer.
+
+[T2] pattern=action_oriented
+  Q: Where should the digital kitchen timer go?
+  A: The digital kitchen timer goes in the utensil drawer.
+
+[T3] pattern=preference_induction
+  hypothesis: small battery-operated kitchen tools go to the utensil drawer
+  covered:    ['battery-powered can opener', 'digital kitchen timer']
+  Q: Are small battery-operated kitchen tools placed in the utensil drawer?
+  A: Small battery-operated kitchen tools go in the utensil drawer.
+
+[T4] pattern=action_oriented
+  Q: Where should the porcelain teacup set go?
+  A: The porcelain teacup set goes in the upper cabinet.
+
+[T5] pattern=action_oriented
+  Q: Where should the glass pitcher go?
+  A: The glass pitcher goes in the upper cabinet.
+
+[T6] pattern=preference_induction
+  hypothesis: clear glass containers and ceramic tea-related items go to the upper cabinet
+  covered:    ['porcelain teacup set', 'glass pitcher']
+  Q: preference_induction
+  A: Fragile glass and ceramic items go in the upper cabinet, while durable food-storage containers go in the base cabinet.
+
+[EVAL] seen=0.583  unseen=0.917  total=0.750
+
+================================================================================
+Episode 10/10  id=episode_90  room=kitchen
+================================================================================
+
+[T1] pattern=action_oriented
+  Q: Where should the plug-in kettle go?
+  A: The plug-in kettle goes on the prep counter.
+
+[T2] pattern=action_oriented
+  Q: Where should the corded blender go?
+  A: The corded blender goes on the prep counter.
+
+[T3] pattern=preference_induction
+  hypothesis: small plug-in kitchen appliances go to the prep counter
+  covered:    ['plug-in kettle', 'corded blender']
+  Q: Are small plug-in kitchen appliances placed on the prep counter?
+  A: Yes, small plug-in kitchen appliances go on the prep counter.
+
+[T4] pattern=action_oriented
+  Q: Where should the glass pitcher go?
+  A: The glass pitcher goes in the upper cabinet.
+
+[T5] pattern=action_oriented
+  Q: Where should the ceramic soup bowl go?
+  A: The ceramic soup bowl goes in the upper cabinet.
+
+[T6] pattern=preference_induction
+  hypothesis: clear glass containers and ceramic bowls go in the upper cabinet
+  covered:    ['glass pitcher', 'ceramic soup bowl']
+  Q: preference_induction
+  A: Fragile glass and ceramic items go in the upper cabinet, while durable food-storage containers and kitchen linens go in the lower cabinet.
+
+[EVAL] seen=0.583  unseen=0.500  total=0.542
+
+================================================================================
+Pattern distribution across all turns:
+  action_oriented            41  (68.3%)
+  preference_induction       19  (31.7%)
+
+Aggregate PSR (n=10, B=6):
+  seen_psr    = 0.625 ± 0.031
+  unseen_psr  = 0.650 ± 0.054
+  total_psr   = 0.638 ± 0.034
+
+Full transcript -> /Users/yuanda/Documents/AskThenRearrange/logs/sim_par_user_study_par_offset20.jsonl

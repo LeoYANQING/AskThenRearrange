@@ -1,0 +1,87 @@
+Name map: 134 names
+
+==============================================================================
+ RECEPTACLE-CENTRIC (6)
+==============================================================================
+
+[RC-1] room=living room ep=episode_20
+  hyp: items typically kept in the bookshelf
+  EN: What kinds of things usually end up in the bookshelf for you?
+  ZH: 书架上你一般会放些什么？
+
+[RC-2] room=bedroom ep=episode_54
+  hyp: items typically kept in the nightstand
+  EN: What kinds of things usually end up in the nightstand for you?
+  ZH: 夜灯这类小物件，你一般会放在床头柜上吗？
+
+[RC-3] room=kitchen ep=episode_88
+  hyp: items typically kept in the dish cabinet
+  EN: What kinds of things usually end up in the dish cabinet for you?
+  ZH: 你一般会把什么东西放进餐具柜里？
+
+[RC-4] room=living room ep=episode_20
+  hyp: items typically kept in the coffee table
+  EN: What kinds of things usually end up in the coffee table for you?
+  ZH: 茶几上你一般会放些什么？
+
+[RC-5] room=bedroom ep=episode_54
+  hyp: items typically kept in the wardrobe shelf
+  EN: How do you decide what goes in the wardrobe shelf?
+  ZH: 衣柜架子上放什么，你一般怎么决定？
+
+[RC-6] room=kitchen ep=episode_88
+  hyp: items typically kept in the prep counter
+  EN: What kinds of things usually end up in the prep counter for you?
+  ZH: prep counter 你一般会放些什么？
+
+==============================================================================
+ CATEGORY-CENTRIC (8)
+==============================================================================
+
+[CAT-1] room=living room ep=episode_20
+  hyp: small storage and organization tools
+  cov: ['plastic toy bin', 'leather catchall', 'stored greeting card set', 'dried lavender bundle']
+  EN: Do small storage and organization tools usually stay together in one place for you, or are they spread out based on use?
+  ZH: 小号收纳工具你一般都放一起吗？还是哪儿用哪儿放？
+
+[CAT-2] room=bedroom ep=episode_54
+  hyp: small battery-powered handheld devices
+  cov: ['wireless earbuds case', 'battery-powered alarm clock']
+  EN: How do you usually organize small battery-powered handheld devices — do they tend to stay in one spot or spread out based on use?
+  ZH: 小号的电池款手持设备你一般都放一起吗？
+
+[CAT-3] room=kitchen ep=episode_88
+  hyp: reusable food storage containers
+  cov: ['silicone snack bag', 'rubber-seal lunch box', 'sealed cereal box', 'bag of lentils', 'fresh berries box']
+  EN: How do you usually organize reusable food storage containers — do they tend to stay in one spot or spread out based on use?
+  ZH: 你一般怎么收纳这些可重复使用的食品储存盒？是都放在一起，还是根据使用情况分散放？
+
+[CAT-4] room=living room ep=episode_20
+  hyp: small handheld lighting tools
+  cov: ['LED reading lamp', 'corded floor lamp']
+  EN: How do you usually organize small handheld lighting tools — do they tend to stay in one spot or spread out based on use?
+  ZH: 小号的照明工具你一般都放一起吗？还是哪儿用哪儿放？
+
+[CAT-5] room=bedroom ep=episode_54
+  hyp: small decorative and collectible items
+  cov: ['crystal keepsake box', 'small souvenir tray']
+  EN: Do small decorative items like the crystal keepsake box usually end up in the nightstand for you?
+  ZH: 像水晶纪念品盒这类的小装饰品，你一般会放在床头柜上吗？
+
+[CAT-6] room=kitchen ep=episode_88
+  hyp: sealed and packaged dry goods
+  cov: ['sealed cereal box', 'bag of lentils']
+  EN: How do you usually organize sealed and packaged dry goods — do they tend to stay in one spot or spread out based on use?
+  ZH: 密封包装的干货你一般都放哪儿？是都放在一个地方，还是根据使用情况分散放？
+
+[CAT-7] room=living room ep=episode_21
+  hyp: battery-powered handheld entertainment devices
+  cov: ['battery-powered game controller', 'portable e-reader']
+  EN: How do you usually organize battery-powered handheld entertainment devices — do they tend to stay in one spot or spread out based on use?
+  ZH: 电池供电的便携娱乐设备你一般都放一起吗？还是哪儿用哪儿放？
+
+[CAT-8] room=bedroom ep=episode_55
+  hyp: durable leather and rigid-bound notebooks
+  cov: ['rigid-cover photo diary', 'leather-bound notebook']
+  EN: Do durable notebooks and leather-bound items usually stay together in one place, or are they spread out based on use?
+  ZH: 耐用笔记本和皮面制品你是习惯都放一块，还是哪儿用哪儿放？

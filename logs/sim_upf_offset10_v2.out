@@ -1,0 +1,522 @@
+Running 10 UPF episodes, budget=6, offset=10, tag=study2_offset10_v2
+PE proposer: Study2PreferenceElicitingProposer
+
+================================================================================
+Episode 1/10  id=episode_10  room=living room
+receptacles: ['bookshelf', 'coffee table', 'end table', 'side drawer', 'media console', 'sofa', 'storage basket']
+seen_objects: ['portable e-reader', 'cordless table lamp', 'hardcover art book', 'hardcover travel guide', 'glass ornament', 'ceramic vase', 'knit blanket', 'plush ottoman cover', 'small flower vase', 'reading glasses case', 'old catalog', 'rolled puzzle mat']
+unseen_objects: ['wireless headphones case', 'battery-powered diffuser', 'hardcover cookbook', 'rigid-cover photo album', 'porcelain photo frame', 'glass bud vase', 'fuzzy lap throw', 'plush floor cushion', 'open snack bowl', 'tea cup on saucer', 'holiday banner roll', 'backup napkin ring pouch']
+================================================================================
+
+[T1] pattern=preference_eliciting
+  hypothesis: items typically kept in the coffee table
+  covered:    []
+  Q: What kinds of things usually end up in the coffee table for you?
+  A: I keep small tabletop accents, drinkware, and items used while seated on the end table — like the small flower vase and reading glasses case.
+  oracle_receptacle: end table
+
+[T2] pattern=preference_eliciting
+  hypothesis: items typically kept in the bookshelf
+  covered:    []
+  Q: What kinds of things usually end up in the bookshelf for you?
+  A: I keep upright reading and reference books, fragile display pieces, and delicate drinkware on the bookshelf — like the hardcover art book, hardcover travel guide, and glass ornament.
+  oracle_receptacle: bookshelf
+
+[T3] pattern=preference_eliciting
+  hypothesis: items typically kept in the media console
+  covered:    []
+  Q: How do you decide what goes in the media console?
+  A: I keep small entertainment devices and personal electronics in the media console — like the portable e-reader and cordless table lamp.
+  oracle_receptacle: media console
+
+[T4] pattern=preference_eliciting
+  hypothesis: items typically kept in the side drawer
+  covered:    []
+  Q: What kinds of things usually end up in the side drawer for you?
+  A: I keep small entertainment and personal electronics in the side drawer — like the portable e-reader and cordless table lamp.
+  oracle_receptacle: side drawer
+
+[T5] pattern=preference_eliciting
+  hypothesis: items typically kept in the sofa
+  covered:    []
+  Q: How do you decide what goes in the sofa for you?
+  A: I keep cozy lounge textiles and plush comfort items on the sofa — like the knit blanket and plush ottoman cover.
+  oracle_receptacle: sofa
+
+[T6] pattern=preference_eliciting
+  hypothesis: items typically kept in the storage basket
+  covered:    []
+  Q: What kinds of things usually end up in the storage basket for you?
+  A: I keep stored, seasonal, or archived living-room accessories in the storage basket — like the old catalog and rolled puzzle mat.
+  oracle_receptacle: storage basket
+
+[EVAL] seen=0.917  unseen=0.667  total=0.792
+
+================================================================================
+Episode 2/10  id=episode_11  room=living room
+receptacles: ['display shelf', 'center table', 'side table', 'media drawer', 'TV stand', 'storage ottoman', 'storage basket']
+seen_objects: ['cordless table lamp', 'battery-powered remote', 'plug-in media hub', 'wired game console', 'leather-bound journal', 'hardcover novel', 'foam exercise block', 'plastic toy bin', 'leather notebook sleeve', 'wooden tray', 'rolled puzzle mat', 'seasonal garland']
+unseen_objects: ['portable karaoke microphone', 'cordless photo light', 'corded charging dock', 'wired sound bar', 'rigid-cover photo album', 'hardcover atlas', 'plastic serving bowl', 'rubber cable organizer', 'wooden picture frame', 'woven candle mat', 'keepsake postcard bundle', 'dried eucalyptus stems']
+================================================================================
+
+[T1] pattern=preference_eliciting
+  hypothesis: items typically kept in the TV stand
+  covered:    []
+  Q: What kinds of things usually end up in the TV stand for you?
+  A: Large wired entertainment devices and plug-in media equipment go to the TV stand.
+  oracle_receptacle: TV stand
+
+[T2] pattern=preference_eliciting
+  hypothesis: items typically kept in the center table
+  covered:    []
+  Q: How do you decide what goes in the center table for you?
+  A: Shared tabletop leisure, display, and catchall items go to the center table.
+  oracle_receptacle: center table
+
+[T3] pattern=preference_eliciting
+  hypothesis: items typically kept in the storage ottoman
+  covered:    []
+  Q: What kinds of things usually end up in the storage ottoman for you?
+  A: Stored, seasonal, or archived living-room accessories go to the storage ottoman.
+  oracle_receptacle: storage ottoman
+
+[T4] pattern=preference_eliciting
+  hypothesis: items typically kept in the media drawer
+  covered:    []
+  Q: How do you decide what goes in the media drawer?
+  A: Handheld media-control and portable entertainment devices go in the media drawer.
+  oracle_receptacle: media drawer
+
+[T5] pattern=preference_eliciting
+  hypothesis: items typically kept in the display shelf
+  covered:    []
+  Q: What kinds of things usually end up in the display shelf for you?
+  A: Display-worthy books and albums go to the display shelf.
+  oracle_receptacle: display shelf
+
+[T6] pattern=preference_eliciting
+  hypothesis: items typically kept in the side table
+  covered:    []
+  Q: What kinds of things usually end up in the side table for you?
+  A: Small, functional items and occasional tabletop decor go on the side table — but I mostly use it for holding a lamp, remote, and temporary items like the puzzle mat or seasonal garland.
+  oracle_receptacle: side table
+
+[EVAL] seen=0.333  unseen=0.333  total=0.333
+
+================================================================================
+Episode 3/10  id=episode_12  room=living room
+receptacles: ['display shelf', 'coffee table', 'side table', 'media drawer', 'media console', 'storage ottoman', 'decorative basket']
+seen_objects: ['battery-powered remote', 'wireless speaker', 'hardcover poetry collection', 'hardcover history book', 'glass candle holder', 'ceramic figurine', 'plastic toy bin', 'silicone catchall tray', 'board game box', 'current magazine', 'seasonal garland', 'spare coaster pouch']
+unseen_objects: ['solar-powered lantern', 'rechargeable projector remote', 'hardcover design annual', 'encyclopedia volume', 'china decorative plate', 'frosted glass bowl', 'silicone snack tray', 'plastic puzzle case', 'travel photo book', 'sudoku booklet', 'archived brochure bundle', 'stored placemat set']
+================================================================================
+
+[T1] pattern=preference_eliciting
+  hypothesis: items typically kept in the display shelf
+  covered:    []
+  Q: Is there a particular role the display shelf plays in how you organize?
+  A: The display shelf is for display-worthy books and albums, fragile display pieces, and delicate drinkware.
+  oracle_receptacle: display shelf
+
+[T2] pattern=preference_eliciting
+  hypothesis: items typically kept in the media console
+  covered:    []
+  Q: How do you decide what goes in the media console for you?
+  A: The media console holds media-control devices and portable entertainment items, like the battery-powered remote and wireless speaker, along with shared tabletop items such as the board game box and current magazine.
+  oracle_receptacle: media console
+
+[T3] pattern=preference_eliciting
+  hypothesis: items typically kept in the storage ottoman
+  covered:    []
+  Q: What kinds of things usually end up in the storage ottoman for you?
+  A: The storage ottoman holds durable loose organizers and synthetic living-room accessories, like the plastic toy bin and silicone catchall tray, as well as small decorative or archived loose living-room items.
+  oracle_receptacle: storage ottoman
+
+[T4] pattern=preference_eliciting
+  hypothesis: items typically kept in the coffee table
+  covered:    []
+  Q: What kinds of things usually end up in the coffee table for you?
+  A: The coffee table holds shared tabletop leisure, display, and catchall items, like the board game box and current magazine, along with small decorative or archived loose living-room items that might also go in the decorative basket.
+  oracle_receptacle: coffee table
+
+[T5] pattern=preference_eliciting
+  hypothesis: items typically kept in the decorative basket
+  covered:    []
+  Q: What kinds of things usually end up in the decorative basket for you?
+  A: The decorative basket holds durable loose organizers and synthetic living-room accessories, like the plastic toy bin and silicone catchall tray, as well as small decorative or archived loose living-room items, such as the seasonal garland and spare coaster pouch.
+  oracle_receptacle: decorative basket
+
+[T6] pattern=preference_eliciting
+  hypothesis: items typically kept in the media drawer
+  covered:    []
+  Q: How do you decide what goes in the media drawer?
+  A: Handheld media-control and portable entertainment devices go in the media drawer, like the battery-powered remote and wireless speaker.
+  oracle_receptacle: media drawer
+
+[EVAL] seen=0.500  unseen=0.667  total=0.583
+
+================================================================================
+Episode 4/10  id=episode_13  room=living room
+receptacles: ['bookshelf', 'center table', 'side table', 'media drawer', 'media console', 'sofa', 'storage basket']
+seen_objects: ['wired speaker', 'plug-in media hub', 'hardcover history book', 'leather-bound journal', 'ceramic figurine', 'porcelain trinket dish', 'soft stuffed bear', 'fleece shawl', 'woven coaster holder', 'leather catchall', 'spare coaster pouch', 'stored greeting card set']
+unseen_objects: ['plug-in diffuser', 'corded charging dock', 'hardcover cookbook', 'rigid-cover photo album', 'porcelain photo frame', 'glass bud vase', 'fuzzy lap throw', 'plush floor cushion', 'wooden bead bowl', 'woven storage mat', 'holiday banner roll', 'backup napkin ring pouch']
+================================================================================
+
+[T1] pattern=preference_eliciting
+  hypothesis: items typically kept in the media console
+  covered:    []
+  Q: What kinds of things usually end up in the media console for you?
+  A: I keep wired entertainment devices and console equipment on the media console — like the wired speaker and plug-in media hub. I also place small, shared tabletop items there, such as the woven coaster holder and leather catchall.
+  oracle_receptacle: media console
+
+[T2] pattern=preference_eliciting
+  hypothesis: items typically kept in the bookshelf
+  covered:    []
+  Q: Is there a particular role the bookshelf plays in how you organize?
+  A: The bookshelf plays a key role in holding upright reading and reference books, as well as fragile display pieces and delicate drinkware — like the hardcover history book, leather-bound journal, ceramic figurine, and porcelain trinket dish.
+  oracle_receptacle: bookshelf
+
+[T3] pattern=preference_eliciting
+  hypothesis: items typically kept in the center table
+  covered:    []
+  Q: What kinds of things usually end up in the center table for you?
+  A: I keep shared tabletop leisure, display, and catchall items on the center table — like the woven coaster holder and leather catchall. I also place small, shared items there such as spare coaster pouches and stored greeting card sets.
+  oracle_receptacle: center table
+
+[T4] pattern=preference_eliciting
+  hypothesis: warm and cozy textile coverings
+  covered:    ['fleece shawl']
+  Q: Is there a specific area you always assign to reading materials like books or magazines?
+  A: I keep upright reading and reference books, as well as fragile display pieces and delicate drinkware on the bookshelf — like the hardcover history book, leather-bound journal, ceramic figurine, and porcelain trinket dish.
+  oracle_receptacle: bookshelf
+
+[T5] pattern=preference_eliciting
+  hypothesis: warm and cozy textile coverings
+  covered:    ['fleece shawl']
+  Q: Is there a particular role the fleece shawl plays in how you organize?
+  A: The fleece shawl plays a cozy role in the living room by accompanying plush comfort items on the sofa — like the soft stuffed bear. It’s meant for lounging and adding warmth during relaxation.
+  oracle_receptacle: sofa
+
+[T6] pattern=preference_eliciting
+  hypothesis: items typically kept in the media drawer
+  covered:    []
+  Q: How do you decide what goes in the media drawer?
+  A: I keep media-related items like wired speakers and plug-in media hubs in the media drawer — along with small, shared tabletop items such as spare coaster pouches and stored greeting card sets. However, larger shared items like the woven coaster holder and leather catchall go on the center table instead.
+  oracle_receptacle: media drawer
+
+[EVAL] seen=0.667  unseen=0.667  total=0.667
+
+================================================================================
+Episode 5/10  id=episode_44  room=bedroom
+receptacles: ['bedroom bookshelf', 'nightstand', 'bedside drawer', 'wardrobe shelf', 'linen hamper', 'vanity tray', 'bed bench']
+seen_objects: ['electric sleep mask controller', 'portable reading light', 'folded scarf', 'clean cotton pajamas', 'damp bath towel', 'sleep shirt from last night', 'ceramic candle holder', 'glass perfume bottle', 'travel neck pillow', 'plush bedtime toy', 'wooden keepsake box', 'framed photo']
+unseen_objects: ['portable white-noise machine', 'wireless bedside remote', 'ready-to-wear robe', 'clean knit top', 'worn hoodie', 'sweaty workout top', 'porcelain trinket dish', 'crystal hairpin box', 'quilted bed runner', 'cotton body pillow', 'memory trinket tray', 'bracelet case']
+================================================================================
+
+[T1] pattern=preference_eliciting
+  hypothesis: items typically kept in the nightstand
+  covered:    []
+  Q: How do you decide what goes in the nightstand for you?
+  A: I keep small personal accessories and keepsakes on the vanity tray — but soft, bulky, travel, or overflow bedroom accessories go on the bed bench instead.
+  oracle_receptacle: vanity tray
+
+[T2] pattern=preference_eliciting
+  hypothesis: items typically kept in the bedside drawer
+  covered:    []
+  Q: How do you decide what goes in the bedside drawer?
+  A: I keep small bedside electronics and light sources in the bedside drawer — but ready-to-wear bedroom clothing goes on the wardrobe shelf instead.
+  oracle_receptacle: bedside drawer
+
+[T3] pattern=preference_eliciting
+  hypothesis: items typically kept in the bed bench
+  covered:    []
+  Q: What kinds of things usually end up in the bed bench for you?
+  A: I keep soft, bulky, travel, or overflow bedroom accessories on the bed bench — but small personal accessories and keepsakes go on the vanity tray instead.
+  oracle_receptacle: bed bench
+
+[T4] pattern=preference_eliciting
+  hypothesis: items typically kept in the bedroom bookshelf
+  covered:    []
+  Q: Is there a particular role the bedroom bookshelf plays in how you organize?
+  A: The bedroom bookshelf isn't specifically mentioned in my organizing rules, so I don't have a specific role for it right now.
+
+[T5] pattern=preference_eliciting
+  hypothesis: items typically kept in the wardrobe shelf
+  covered:    []
+  Q: How do you usually organize items on the wardrobe shelf?
+  A: I keep ready-to-wear bedroom clothing on the wardrobe shelf — but small personal accessories and keepsakes go on the vanity tray instead.
+  oracle_receptacle: wardrobe shelf
+
+[T6] pattern=preference_eliciting
+  hypothesis: items typically kept in the linen hamper
+  covered:    []
+  Q: What kinds of things usually end up in the linen hamper for you?
+  A: Laundry-bound clothing and used soft items go to the linen hamper — but ready-to-wear clothing and clean pajamas go on the wardrobe shelf instead.
+  oracle_receptacle: linen hamper
+
+[EVAL] seen=0.750  unseen=1.000  total=0.875
+
+================================================================================
+Episode 6/10  id=episode_45  room=bedroom
+receptacles: ['reading shelf', 'bedside table', 'nightstand drawer', 'wardrobe shelf', 'laundry hamper', 'dresser top', 'storage bench']
+seen_objects: ['wired headphones', 'plug-in fan', 'clean cotton pajamas', 'folded linen shirt', 'sleep shirt from last night', 'used socks', 'glass perfume bottle', 'ceramic jewelry dish', 'small souvenir tray', 'hair clip box', 'spare hanger pack', 'off-season scarf set']
+unseen_objects: ['tablet charging dock', 'plug-in humidifier', 'folded shawl', 'fresh sleep shirt', 'used robe', 'worn lounge shorts', 'delicate ceramic bracelet stand', 'glass vanity organizer', 'earring holder', 'ring box', 'garment pouch', 'stored fabric belt']
+================================================================================
+
+[T1] pattern=preference_eliciting
+  hypothesis: items typically kept in the nightstand drawer
+  covered:    []
+  Q: How do you decide what goes in the nightstand drawer?
+  A: I keep small personal accessories and keepsakes like hair clip boxes, jewelry dishes, and souvenir trays in the nightstand drawer — but fragile display items go on the dresser top instead.
+  oracle_receptacle: nightstand drawer
+
+[T2] pattern=preference_eliciting
+  hypothesis: items typically kept in the dresser top
+  covered:    []
+  Q: How do you decide what goes in the dresser top?
+  A: I keep fragile keepsakes and display accessories like glass perfume bottles, ceramic jewelry dishes, and small souvenir trays on the dresser top.
+  oracle_receptacle: dresser top
+
+[T3] pattern=preference_eliciting
+  hypothesis: items typically kept in the wardrobe shelf
+  covered:    []
+  Q: Is there a particular role the wardrobe shelf plays in how you organize?
+  A: The wardrobe shelf is where I keep ready-to-wear bedroom clothing like clean cotton pajamas, folded linen shirts, and other current garments. Soft, bulky, or overflow items go to the storage bench instead.
+  oracle_receptacle: wardrobe shelf
+
+[T4] pattern=preference_eliciting
+  hypothesis: items typically kept in the bedside table
+  covered:    []
+  Q: How do you decide what goes in the bedside table?
+  A: I keep plug-in bedside devices used during rest or reading like wired headphones and plug-in fans on the bedside table. Soft, bulky, or overflow bedroom accessories go to the storage bench instead.
+  oracle_receptacle: bedside table
+
+[T5] pattern=preference_eliciting
+  hypothesis: items typically kept in the laundry hamper
+  covered:    []
+  Q: What kinds of things usually end up in the laundry hamper for you?
+  A: I keep laundry-bound clothing and used soft items like sleep shirts from last night and used socks in the laundry hamper.
+  oracle_receptacle: laundry hamper
+
+[T6] pattern=preference_eliciting
+  hypothesis: items typically kept in the reading shelf
+  covered:    []
+  Q: What kinds of things usually end up in the reading shelf for you?
+  A: I keep hardcover novels, art books, and reference guides on the reading shelf — but small puzzle books and game accessories go on the center table instead.
+  oracle_receptacle: reading shelf
+
+[EVAL] seen=0.750  unseen=0.667  total=0.708
+
+================================================================================
+Episode 7/10  id=episode_46  room=bedroom
+receptacles: ['reading shelf', 'nightstand', 'nightstand drawer', 'wardrobe shelf', 'linen hamper', 'dresser top', 'storage bench']
+seen_objects: ['rigid-cover photo diary', 'leather-bound notebook', 'folded linen shirt', 'fresh sweater', 'used socks', 'worn leggings', 'ceramic jewelry dish', 'porcelain ring tray', 'sleep journal', 'water tumbler', 'folded knit blanket', 'travel neck pillow']
+unseen_objects: ['rigid-cover memory book', 'hardcover poetry anthology', 'clean lounge pants', 'folded wool socks', 'used pajama pants', 'damp washcloth', 'china keepsake plate', 'glass serum bottle', 'bookmark tin', 'small notebook', 'plush rabbit toy', 'soft reading pillow']
+================================================================================
+
+[T1] pattern=preference_eliciting
+  hypothesis: items typically kept in the nightstand drawer
+  covered:    []
+  Q: How do you decide what goes in the nightstand drawer?
+  A: I keep nightly-use items like the sleep journal and water tumbler within reach on the nightstand — but I also store small, frequently used items like travel neck pillows and folded knit blankets there as overflow.
+  oracle_receptacle: nightstand
+
+[T2] pattern=preference_eliciting
+  hypothesis: items typically kept in the dresser top
+  covered:    []
+  Q: How do you decide what goes in the dresser top?
+  A: I keep fragile keepsakes and display accessories like the ceramic jewelry dish and porcelain ring tray on the dresser top.
+  oracle_receptacle: dresser top
+
+[T3] pattern=preference_eliciting
+  hypothesis: items typically kept in the wardrobe shelf
+  covered:    []
+  Q: How do you decide what goes in the wardrobe shelf?
+  A: I keep ready-to-wear bedroom clothing like the folded linen shirt and fresh sweater on the wardrobe shelf. I also store seasonal or less-frequently worn items there to keep the space organized.
+  oracle_receptacle: wardrobe shelf
+
+[T4] pattern=preference_eliciting
+  hypothesis: items typically kept in the reading shelf
+  covered:    []
+  Q: What kinds of things usually end up in the reading shelf for you?
+  A: I keep current reading and sturdy books like the rigid-cover photo diary and leather-bound notebook on the reading shelf.
+  oracle_receptacle: reading shelf
+
+[T5] pattern=preference_eliciting
+  hypothesis: items typically kept in the storage bench
+  covered:    []
+  Q: How do you decide what goes in the storage bench?
+  A: I keep soft, bulky, travel, or overflow bedroom accessories like the folded knit blanket and travel neck pillow in the storage bench. This includes items that don’t fit neatly elsewhere or are used occasionally.
+  oracle_receptacle: storage bench
+
+[T6] pattern=preference_eliciting
+  hypothesis: items typically kept in the linen hamper
+  covered:    []
+  Q: What kinds of things usually end up in the linen hamper for you?
+  A: Laundry-bound clothing and used soft items like the used socks and worn leggings go to the linen hamper.
+  oracle_receptacle: linen hamper
+
+[EVAL] seen=0.667  unseen=0.667  total=0.667
+
+================================================================================
+Episode 8/10  id=episode_78  room=kitchen
+receptacles: ['upper cabinet', 'base cabinet', 'countertop', 'pantry shelf', 'refrigerator shelf', 'kitchen drawer', 'fruit basket']
+seen_objects: ['plug-in kettle', 'corded blender', 'electric food thermometer', 'wireless recipe tablet', 'glass mixing bowl', 'ceramic serving platter', 'plastic mixing bowl', 'silicone ice tray', 'folded dish towel', 'oven mitt set', 'dessert stand', 'party punch bowl']
+unseen_objects: ['plug-in waffle maker', 'corded immersion blender', 'electric jar opener', 'rechargeable kitchen scale', 'china gravy boat', 'frosted glass canister', 'plastic batter bowl', 'silicone baking mat', 'folded kitchen rag', 'cloth bread basket liner', 'holiday mug set', 'special-occasion pitcher']
+================================================================================
+
+[T1] pattern=preference_eliciting
+  hypothesis: items typically kept in the upper cabinet
+  covered:    []
+  Q: What kinds of things usually end up in the upper cabinet for you?
+  A: I keep fragile glass, ceramic, and other delicate kitchenware and tableware in the upper cabinet — along with special-occasion serving and display items.
+  oracle_receptacle: upper cabinet
+
+[T2] pattern=preference_eliciting
+  hypothesis: corded and plug-in kitchen appliances
+  covered:    ['plug-in kettle', 'corded blender', 'electric food thermometer']
+  Q: How do you usually organize corded and plug-in kitchen appliances — do they tend to stay in one spot?
+  A: Corded and plug-in kitchen appliances usually stay on the countertop — they tend to stay in one spot where they’re easily accessible for use.
+  oracle_receptacle: countertop
+
+[T3] pattern=preference_eliciting
+  hypothesis: items typically kept in the kitchen drawer
+  covered:    []
+  Q: How do you decide what goes in the kitchen drawer?
+  A: Small powered kitchen gadgets, including battery-powered, rechargeable, or wireless tools, go to the kitchen drawer.
+  oracle_receptacle: kitchen drawer
+
+[T4] pattern=preference_eliciting
+  hypothesis: items typically kept in the base cabinet
+  covered:    []
+  Q: What kinds of things usually end up in the base cabinet for you?
+  A: Durable food-storage and prep containers, along with kitchen linens and cloth utility items, usually end up in the base cabinet.
+  oracle_receptacle: base cabinet
+
+[T5] pattern=preference_eliciting
+  hypothesis: items typically kept in the fruit basket
+  covered:    []
+  Q: What kinds of things usually end up in the fruit basket for you?
+  A: I usually put fresh fruits, pre-cut fruit arrangements, and small snacks in the fruit basket — along with decorative fruit-themed items for display.
+  oracle_receptacle: fruit basket
+
+[T6] pattern=preference_eliciting
+  hypothesis: items typically kept in the pantry shelf
+  covered:    []
+  Q: What kinds of things usually end up in the pantry shelf for you?
+  A: I usually keep durable food-storage and prep containers, along with kitchen linens and cloth utility items, in the base cabinet. The pantry shelf is for dry goods, canned items, and bulk ingredients — not for kitchen tools or appliances.
+  oracle_receptacle: pantry shelf
+
+[EVAL] seen=0.583  unseen=0.750  total=0.667
+
+================================================================================
+Episode 9/10  id=episode_79  room=kitchen
+receptacles: ['upper cabinet', 'base cabinet', 'countertop', 'dry-goods shelf', 'refrigerator shelf', 'utensil drawer', 'fruit basket']
+seen_objects: ['battery-powered milk frother', 'rechargeable spice grinder', 'ceramic soup bowl', 'crystal dessert dish', 'silicone snack bag', 'rubber-seal lunch box', 'sealed cereal box', 'bag of lentils', 'oven mitt set', 'cotton apron', 'party punch bowl', 'cake topper tin']
+unseen_objects: ['digital meat thermometer', 'wireless pantry scanner', 'porcelain side plate', 'ceramic baking dish', 'plastic produce keeper', 'silicone freezer tray', 'bag of oats', 'sealed flour bag', 'bar towel bundle', 'apron hanger pouch', 'party dessert plate set', 'brunch pastry stand']
+================================================================================
+
+[T1] pattern=preference_eliciting
+  hypothesis: reusable food storage containers
+  covered:    ['silicone snack bag', 'rubber-seal lunch box', 'sealed cereal box', 'bag of lentils']
+  Q: Do personal food storage items like snacks or lunches generally stay together for you, or spread around based on use?
+  A: Personal food storage items like snacks or lunches stay together in the base cabinet — specifically, the silicone snack bag and rubber-seal lunch box are both there. Shelf-stable pantry staples like the sealed cereal box and bag of lentils go to the dry-goods shelf instead.
+  oracle_receptacle: base cabinet
+
+[T2] pattern=preference_eliciting
+  hypothesis: items typically kept in the countertop
+  covered:    []
+  Q: What kinds of things usually end up in the countertop for you?
+  A: I usually keep small powered kitchen gadgets, like the battery-powered milk frother and rechargeable spice grinder, on the countertop — along with the oven mitt set and cotton apron for easy access. The party punch bowl and cake topper tin also sit there for serving.
+  oracle_receptacle: countertop
+
+[T3] pattern=preference_eliciting
+  hypothesis: items typically kept in the dry-goods shelf
+  covered:    []
+  Q: What kinds of things usually end up in the dry-goods shelf for you?
+  A: Shelf-stable pantry staples and dry goods like the sealed cereal box and bag of lentils usually end up in the dry-goods shelf. I also keep items like silicone snack bags and rubber-seal lunch boxes there for food storage.
+  oracle_receptacle: dry-goods shelf
+
+[T4] pattern=preference_eliciting
+  hypothesis: fragile ceramic and crystal serving dishes
+  covered:    ['ceramic soup bowl', 'crystal dessert dish']
+  Q: How do you usually organize fragile ceramic and crystal serving dishes — do they tend to stay in one spot?
+  A: Fragile ceramic and crystal serving dishes tend to stay in one spot — specifically, the upper cabinet. I keep them there with other delicate kitchenware and special-occasion serving items.
+  oracle_receptacle: upper cabinet
+
+[T5] pattern=preference_eliciting
+  hypothesis: items typically kept in the fruit basket
+  covered:    []
+  Q: What kinds of things usually end up in the fruit basket for you?
+  A: I usually keep fresh fruits, pre-cut fruit arrangements, and small fruit-related items like fruit knives or citrus zesters in the fruit basket. I also sometimes place decorative fruit-themed items there for display.
+  oracle_receptacle: fruit basket
+
+[T6] pattern=preference_eliciting
+  hypothesis: items typically kept in the utensil drawer
+  covered:    []
+  Q: How do you decide what goes in the utensil drawer?
+  A: Small powered kitchen gadgets, including battery-powered, rechargeable, or wireless tools, go to the utensil drawer.
+  oracle_receptacle: utensil drawer
+
+[EVAL] seen=0.500  unseen=0.417  total=0.458
+
+================================================================================
+Episode 10/10  id=episode_80  room=kitchen
+receptacles: ['dish cabinet', 'lower cabinet', 'prep counter', 'pantry shelf', 'fridge shelf', 'kitchen drawer', 'produce basket']
+seen_objects: ['rechargeable spice grinder', 'electric food thermometer', 'crystal dessert dish', 'glass mixing bowl', 'rubber-seal lunch box', 'plastic mixing bowl', 'bag of lentils', 'sealed pasta box', 'whole onions', 'garlic bulb set', 'cake topper tin', 'serving candle set']
+unseen_objects: ['battery-powered egg timer', 'electric jar opener', 'crystal juice glass', 'china gravy boat', 'rubber-seal leftovers box', 'plastic batter bowl', 'canned chickpeas', 'coffee bean pouch', 'fresh apples', 'ripe pears', 'festive serving tray', 'celebration cake stand']
+================================================================================
+
+[T1] pattern=preference_eliciting
+  hypothesis: items typically kept in the dish cabinet
+  covered:    []
+  Q: What kinds of things usually end up in the dish cabinet for you?
+  A: I keep fragile glass, ceramic, and other delicate kitchenware and tableware in the dish cabinet — along with special-occasion serving and display items.
+  oracle_receptacle: dish cabinet
+
+[T2] pattern=preference_eliciting
+  hypothesis: items typically kept in the prep counter
+  covered:    []
+  Q: How do you decide what goes in the prep counter for you?
+  A: I keep durable food-storage and prep containers, like rubber-seal lunch boxes and plastic mixing bowls, on the prep counter — but I also place durable glass and ceramic items, like glass mixing bowls, in the dish cabinet instead.
+  oracle_receptacle: prep counter
+
+[T3] pattern=preference_eliciting
+  hypothesis: items typically kept in the pantry shelf
+  covered:    []
+  Q: What kinds of things usually end up in the pantry shelf for you?
+  A: I keep shelf-stable pantry staples and dry goods, like bags of lentils and sealed pasta boxes, on the pantry shelf.
+  oracle_receptacle: pantry shelf
+
+[T4] pattern=preference_eliciting
+  hypothesis: items typically kept in the fridge shelf
+  covered:    []
+  Q: What kinds of things usually end up in the fridge shelf for you?
+  A: I keep room-temperature produce, like whole onions and garlic bulb sets, on the produce basket — but I also place sealed food items, like bags of lentils and sealed pasta boxes, in the pantry shelf instead.
+  oracle_receptacle: produce basket
+
+[T5] pattern=preference_eliciting
+  hypothesis: whole and fresh produce items
+  covered:    ['whole onions', 'garlic bulb set']
+  Q: Do certain items naturally live in the produce basket for you?
+  A: I keep room-temperature produce, like whole onions and garlic bulb sets, on the produce basket.
+  oracle_receptacle: produce basket
+
+[T6] pattern=preference_eliciting
+  hypothesis: items typically kept in the lower cabinet
+  covered:    []
+  Q: What kinds of things usually end up in the lower cabinet for you?
+  A: I keep durable food-storage and prep containers, like rubber-seal lunch boxes and plastic mixing bowls, in the lower cabinet.
+  oracle_receptacle: lower cabinet
+
+[EVAL] seen=0.833  unseen=0.750  total=0.792
+
+================================================================================
+Pattern distribution across all turns:
+  preference_eliciting       60  (100.0%)
+
+Aggregate PSR (n=10, B=6):
+  seen_psr    = 0.650 ± 0.055
+  unseen_psr  = 0.658 ± 0.058
+  total_psr   = 0.654 ± 0.051
+
+Full transcript -> /Users/yuanda/Documents/AskThenRearrange/logs/sim_upf_user_study_study2_offset10_v2.jsonl

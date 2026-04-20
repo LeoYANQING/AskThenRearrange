@@ -1,177 +1,293 @@
-# Study 2 User Experiment Guide
+# Study 2 用户实验指南（实验员手册）
 
-## 1. Purpose
+> **适用版本**：基于 2026-04-19 设计冻结版本（参与者完全自由终止、无轮次上限 + 3 场景 × 12 物品 / 4 receptacles + per-trial 问卷在反馈前）。
+> **前置条件**：study2_app 已按本次会话的修改方案完成升级（隐藏轮次计数器、新增终止原因 modal、Phase 顺序调整、per-trial 问卷组件上线）。
 
-Study 2 evaluates whether the strategy effects observed in simulation also appear with real users, and whether objective performance aligns with subjective interaction quality.
+---
 
-## 2. Research Questions
+## 0. 实验前准备（每参与者前 30 min）
 
-- **RQ1**: To what extent do strategy-dependent differences in placement generalization replicate when the agent interacts with real users rather than simulated oracles?
-- **RQ2**: How do questioning strategies shape users' perceived workload, perceived control, and overall interaction quality during preference teaching?
-- **RQ3**: Do objective task performance and users' strategy preferences diverge, and if so, what kinds of trade-offs characterize that divergence?
+### 0.1 物理布景
 
-## 3. Design
-
-- **Design**: within-subjects
-- **Conditions**: DQ, UPF, PAR
-- **Counterbalancing**: Latin-square style assignment for strategy order; scene order should be counterbalanced separately rather than fixed to trial position
-- **Question budget**: fixed at `B = 6`
-- **Sample target**: `N = 20-24`
-
-### Strategy Conditions
-
-| Code | Strategy | Patterns |
+| 场景 | 12 物品（6 seen + 6 unseen） | 4 receptacles |
 |---|---|---|
-| DQ | Direct Querying | AO only |
-| UPF | User-Preference-First | PE -> AO |
-| PAR | Parallel Exploration | AO -> PI |
+| Kitchen | 见 Appendix D / kitchen_items.json | 4 个储物区（橱柜/抽屉/料理台/冰箱外壳） |
+| Bedroom | 见 bedroom_items.json | 4 个（衣柜/床头柜/书桌抽屉/收纳篮） |
+| Study | 见 study_items.json | 4 个（书架/抽屉/桌面收纳/文件盒） |
+| Bathroom (practice) | 8 物品 | 3 个 |
 
-## 4. Core Design Decision: Preference Form After Dialogue
+**布景规则：**
+- 每个场景一张工作台，12 物品按**随机布局**摆放在台面中央（每参与者前重新打乱）
+- 4 receptacles 用同色标签清晰标注（中文 + 编号 R1–R4）
+- 物品全部贴隐藏 ID 标签（用于物理放置追踪）
+- 机器人位于工作台一侧，**在参与者视野内**，距离 1.5 m
 
-The preference form should be completed **after** the dialogue and **before** the system reveals its final placement plan.
+### 0.2 设备清单
 
-### Rationale
+- [ ] 工作台 1 张
+- [ ] 12 物品 + 4 receptacles（按当前 trial 场景）
+- [ ] 双臂人形机器人（已上电，校准完成）
+- [ ] 参与者侧平板/笔记本（连 study2_app 前端，全屏 chrome 无书签栏）
+- [ ] 实验员侧笔记本（运行 backend + 后台 monitor 视图）
+- [ ] 领夹麦 1 个（参与者佩戴）
+- [ ] 备用录音设备（手机/录音笔）—— 退出访谈用
+- [ ] 纸质同意书 + 笔
+- [ ] 计时器（手腕表或手机）
 
-- If participants fill in a full placement sheet before the interaction, they become highly familiar with the object set and receptacles in advance.
-- That pre-exposure would reduce ecological validity and make workload comparisons across strategies harder to interpret.
-- Post-dialogue elicitation better preserves the natural teaching situation: participants first answer the agent's questions, then articulate their own full preference structure for evaluation.
+### 0.3 系统启动 checklist
 
-### Consequence for Evaluation
+```bash
+# 实验员侧终端
+cd /Users/yuanda/Documents/AskThenRearrange/study2_app
+conda activate behavior
+./start.sh
+```
 
-- The post-dialogue form functions as the participant's **reference preference annotation** for that trial.
-- It should be collected before any system prediction is shown, so the annotation remains independent of system output.
-- In the paper, this should be described carefully as a post-interaction ground-truth elicitation step rather than a pre-existing gold label.
+启动后验证：
+- [ ] backend `http://localhost:8000/health` 返回 200
+- [ ] frontend `http://localhost:5173` 加载完成
+- [ ] 后台 monitor 视图（experimenter 路由）显示当前 session=空闲
+- [ ] 麦克风测试：参与者侧按住 mic 按钮录 3 秒"测试一二三"，确认 STT 返回正常
+- [ ] LLM 后端连通：后台 monitor 显示 `LLM: GPT-5-Chat OK`
+- [ ] 机器人 IK / 抓取测试：抓取 1 个测试物品并放入 R1，复位
 
-## 5. Trial Structure
+---
 
-Each participant completes three trials, one per strategy, using counterbalanced household scenes drawn from a four-scene pool.
+## 1. 参与者到达（5 min）
 
-### Per-Trial Flow
+### 1.1 接待与签到
 
-1. Present the scene and receptacle layout.
-2. Run the dialogue with the assigned strategy (`B = 6` questions).
-3. Ask the participant to complete a preference form assigning all items to receptacles.
-4. Show the system's final placement plan.
-5. Administer the post-trial questionnaire.
+**话术：**
+> "您好，欢迎参加本次研究。整个实验大约 70 分钟，包括签同意书、基线问卷、1 个练习任务、3 个正式任务和 1 个简短访谈。中途您随时可以休息或退出。"
 
-### Timing
+### 1.2 知情同意
 
-- Consent + demographics + ATI/NARS: `5-8 min`
-- Training / practice: `5 min`
-- Each trial: `12-15 min`
-- Final ranking + interview: `10-15 min`
-- Total: about `60-70 min`
+- 递交纸质同意书，留 3 分钟阅读
+- 重点口头复述：
+  - 实验内容（向机器人教家居整理偏好）
+  - 数据匿名化处理
+  - 退出权利
+  - **退出访谈将录音**（参与者勾选）
+- 签字后扫描归档
 
-## 6. Scenes
+### 1.3 基线问卷（参与者侧前端 → "基线问卷" tab）
 
-Use four matched household scenes with comparable complexity.
+参与者填写：demographics（年龄、性别、学历）+ ATI（9 项）+ NARS-S1/S2（共 9 项）+ 自评整理频率与信心。约 5 min。
 
-### Constraints
+实验员**不要在旁边看**，告诉参与者：
+> "请按您的真实情况填写，没有标准答案。我在那边的电脑上准备下一步，您填好叫我一下。"
 
-- `12` items per scene
-- `5` receptacles per scene
-- `3-4` plausible semantic categories
-- at least a few boundary cases per scene
-- similar ambiguity level across scenes
+---
 
-### Candidate Scenes
+## 2. 系统配置（实验员后台，2 min）
 
-- study
-- bedroom
-- kitchen
-- living room
+### 2.1 录入参与者 ID
 
-The exact item lists should be maintained in a separate materials sheet rather than embedded in this guide.
+后台 monitor → "新建 Session" → 输入 P-XX（XX = 01..24）→ 系统按 Latin square 表自动分配该参与者的 strategy 顺序与 scene 顺序。
 
-## 7. Measures
+### 2.2 校验分配
 
-### Objective Measures
+后台显示如：
+```
+P-07 → Trial 1: UPF × Kitchen
+       Trial 2: PAR × Study
+       Trial 3: DQ  × Bedroom
+       Practice: DQ × Bathroom (固定)
+```
 
-- **Placement accuracy** over all items, relative to the participant's post-dialogue preference form
-- **Discussed-item accuracy**: accuracy on items explicitly mentioned during dialogue
-- **Undiscussed-item accuracy**: accuracy on items not explicitly mentioned during dialogue
+**校验三件事：**
+- [ ] 三个 strategy 各出现一次
+- [ ] 三个正式 scene 各出现一次（kitchen/bedroom/study）
+- [ ] 此 ID 之前未跑过（防重复）
 
-Note: because the preference form is collected after dialogue, these measures should be framed as agreement with participants' articulated post-dialogue preferences, not recovery of a pre-registered hidden ground truth.
+### 2.3 准备第一个场景
 
-### Subjective Measures
+按 trial 1 场景把对应 12 物品摆上工作台，4 receptacles 按编号就位。
 
-- NASA-TLX
-- PSC
-- perceived control
-- overall preference ranking across strategies
+---
 
-### Behavioral Measures
+## 3. Practice Trial（10 min, Bathroom × DQ）
 
-- number of turns
-- pattern counts (AO / PE / PI)
-- response length
-- repair events, clarification requests, parsing failures
+### 3.1 引导话术
 
-### Qualitative Data
+> "正式开始前我们先做一个练习。这个练习用浴室场景，比正式任务简单一些，目的是让您熟悉流程。**您的任务是教会机器人怎么按您的习惯整理这些物品**。机器人会向您提问，您用自然语言回答。回答方式是按住屏幕上的麦克风按钮说话，松开后系统会把您说的话转成文字，您可以修改后提交。"
 
-- short semi-structured exit interview
+> "您觉得机器人已经理解了您的偏好时，可以点'结束教学'按钮。结束后会让您手动填一份偏好表，然后看一下机器人最终的整理结果。"
 
-## 8. Participants
+**关键不要说的：**
+- ❌ 不要透露策略名（DQ/UPF/PAR）
+- ❌ 不要透露有 10 轮上限
+- ❌ 不要提示"通常需要问几次"
+- ❌ 不要在对话中暗示机器人答得对不对
 
-### Inclusion Criteria
+### 3.2 流程演示
 
-- age `18+`
-- regular experience organizing household items
-- technically diverse sample
-- no participation in the earlier study
+参与者站到工作台旁，实验员从后台启动 practice session。完整走一遍：
+1. Scene intro 屏幕 → 介绍物品名称、receptacle 标签
+2. Dialogue：参与者答 2–3 轮后，主动按"结束教学"
+3. Termination modal 弹出 → 让参与者熟悉勾选界面
+4. Preference form：拖拽 8 件到 3 receptacles
+5. 简化问卷（仅 2 项示意）
+6. Prediction reveal：让参与者看清"哪些已确认 / 哪些是推断"的视觉区分
 
-### Background Measures
+### 3.3 答疑
 
-- age, gender, education
-- ATI
-- NARS
-- self-reported organizing frequency and organizing confidence
+练习结束后留 2 min 回答任何流程问题。**不回答策略相关或评估相关的问题**（"哪种问法最好""我应该回答多少次"等推到访谈环节）。
 
-## 9. Analysis Plan
+---
 
-### Main Quantitative Analysis
+## 4. Formal Trial × 3（每 trial ≈ 12 min, 总 ≈ 36 min）
 
-Use repeated-measures models with strategy as the main within-subject factor.
+每 trial 五个 phase 严格按下表执行。
 
-Primary comparisons:
+### Phase 1: Scene Intro（1 min）
 
-- UPF vs DQ on undiscussed-item accuracy
-- PAR vs DQ on undiscussed-item accuracy
+| 操作方 | 动作 |
+|---|---|
+| 实验员 | 后台点击 "Start Trial N" → 参与者屏幕跳到 scene_intro |
+| 参与者屏幕 | 显示当前场景 12 物品照片网格 + 4 receptacles 缩略图 |
+| 实验员话术 | "这个场景是【kitchen/bedroom/study】。请先看一下台面上的实物和屏幕上的物品列表。准备好了点'开始教学'。" |
+| 后台 monitor | 显示 trial 序号、strategy、scene、当前 phase |
 
-### Subjective Analysis
+### Phase 2: Dialogue（3–6 min, 自由终止）
 
-- NASA-TLX by strategy
-- PSC by strategy
-- perceived control by strategy
-- preference ranking with non-parametric repeated-measures tests if needed
+| 操作方 | 动作 |
+|---|---|
+| 系统 | 机器人 TTS 播报第 1 个问题，同时屏幕显示文本 |
+| 参与者 | 按住 mic 按钮回答 → 松开 → STT 文本出现 → 可编辑 → 提交 |
+| 系统 | 若回答触发 A+，**机器人立即抓取对应物品并放入对应 receptacle**（物理可见）；屏幕只更新对话流，**不显示放置状态汇总** |
+| 后台 monitor | 实时显示：当前轮次（仅实验员可见）、A+/P+ 列表、累计时长 |
+| 参与者 | 任何时候可点"结束教学"——这是唯一的终止途径 |
+| 系统 | 弹 **Termination Modal**：单选 [系统已经懂我了 / 我不想再回答了 / 问题开始重复 / 其他___] + 必填文本框 → 提交后进 Phase 3 |
+| 实验员关键监控 | 见下表 4.A |
 
-### Interpretation Goal
+**4.A 实验员 Phase 2 监控清单：**
 
-The main theoretical target is not only whether one strategy is better, but whether different strategies optimize different aspects of the interaction:
+- [ ] **不对轮次做任何干预**——参与者想问几轮就问几轮，无系统硬上限
+- [ ] STT 错误率 > 30%（参与者反复修改）→ 检查麦克风
+- [ ] 物理放置失败（机器人抓空 / 掉物）→ **不要中断**，记 `physical_failure_event`，让对话继续；事后人工补放
+- [ ] 参与者向实验员发问 → 标准回答："您按自己的判断来就好，没有标准答案"
+- [ ] 极端情况（单 trial 超过 20 轮且明显进入循环）→ 后台 "Pause" 后口头中性确认："您觉得目前的状态如何？需要继续还是结束？"——**不暗示倾向**，决定权仍在参与者
 
-- generalization accuracy
-- cognitive burden
-- perceived intelligence or curiosity
-- felt control
+### Phase 3: Preference Form（2 min）
 
-## 10. Interview Focus
+| 操作方 | 动作 |
+|---|---|
+| 系统 | Termination Modal 提交后自动进 preference form |
+| 参与者屏幕 | 12 件物品（**随机顺序**）+ 4 receptacles，必须全部分配才能提交 |
+| 实验员话术（一次性） | "请把这 12 件物品按您**真正希望**的方式分到 4 个位置。这是您本次的偏好答案，和机器人刚才的表现没关系。" |
+| 关键提示 | 在参与者提交前，**不要展示** prediction reveal；参与者提交完直接进 Phase 4 |
 
-Keep the exit interview short and comparative.
+### Phase 4: Per-Trial 问卷（3 min）
 
-Suggested prompts:
+| 操作方 | 动作 |
+|---|---|
+| 系统 | 自动跳出问卷页：NASA-TLX (6 项, 21-point) + PSC (5 项, 7-point Likert) + Perceived Control (3 项, 7-point Likert) |
+| 实验员话术 | "请根据您**刚才那一轮和机器人交互的感受**填写。" |
+| 关键 | **此 phase 完成前绝不展示系统准确率**，否则 RQ6 数据污染 |
 
-- Which interaction style felt most natural, and why?
-- Which style best captured your preferences?
-- Which style felt most effortful?
-- Were any questions confusing, redundant, or presumptuous?
-- Would you want the system to keep one fixed style or adapt its style over time?
+### Phase 5: Prediction Reveal（1 min）
 
-## 11. Open Decisions
+| 操作方 | 动作 |
+|---|---|
+| 系统 | 显示完整放置结果，区分 confirmed (A+) / inferred 两类，与参与者偏好表对比，高亮匹配/不匹配，显示总 PSR |
+| 实验员话术 | "这是机器人最终的整理结果。绿色是和您一致的，红色是不一致的。看完点'下一任务'。" |
+| 关键 | 不评论好坏，不解释为什么错；如参与者主动评论，简短附和"嗯，您先看看，等会儿访谈会聊到"，转 trial 间过渡 |
 
-- Whether 3 trials per participant is sufficient, or whether a fourth scene should be added in a future revision
-- Whether the final interface is robot-based or screen-based
-- Whether discussed / undiscussed is sufficient, or whether a stronger seen / unseen manipulation should be introduced in a later revision
+### Trial 间过渡（2 min）
 
-## 12. Recommended Paper Framing
+- 实验员清空工作台 → 摆下一场景物品
+- 参与者可短暂休息（喝水、走动）
+- 后台点击"Next Trial"切换 strategy/scene
 
-When writing the paper, position Study 2 as a test of whether strategy effects remain meaningful under real-user variability, where answers may be ambiguous, incomplete, or differently granular from the simulated oracle in Study 1.
+---
+
+## 5. 最终排序 + 退出访谈（15 min）
+
+### 5.1 策略排序（2 min）
+
+参与者屏幕 → "最终排序" → 把三种交互方式（标签为"风格 1/2/3"，**不显示策略名**）按个人偏好拖动排序，附文字说明可选。
+
+### 5.2 半结构化访谈（≈12 min, **录音**）
+
+启动录音设备 → 开场：
+> "感谢您完成所有任务。最后想听您聊聊感受，没有标准答案。我会录音方便整理记录，您可以随时让我停。"
+
+**核心提纲（按顺序，每题留 1.5–2 min，可追问）：**
+
+1. 三种风格里，您觉得**哪种最自然**？为什么？
+2. 哪种**最准确捕捉到了您的偏好**？是不是和您觉得最自然的那种是同一种？
+3. 哪种让您**感觉最费劲**？哪里费劲（提问方式 / 回答 / 不确定）？
+4. 有没有哪个问题让您觉得**冗余、令人困惑、或者越权**？具体是哪种风格？
+5. 在真实家里，您愿意机器人**固定用一种**风格，还是**根据情境切换**？什么情境用什么？
+6. 关于"机器人在对话中实时把物品放到位置上"这个行为，您有什么感受？这影响了您后续的回答方式吗？
+7. 有没有哪一轮您**特别想结束**但又再答了一两次？为什么？
+8. 还有什么想补充的？
+
+访谈结束 → 停止录音 → 备份音频两份（手机 + 录音笔）→ 关闭 session。
+
+---
+
+## 6. 异常处理 Cheat Sheet
+
+| 情况 | 处理 |
+|---|---|
+| STT 完全失败（连续 2 次返回空） | 切到键盘输入备用模式（前端按钮），记 `input_mode_switch` |
+| 系统卡死 / LLM 超时 | 后台 "Pause" → 等 30s → 若未恢复，"Resume Trial" 重发当前问题；记 `system_stall_event` |
+| 参与者要求暂停 | 后台 "Pause Session" → 暂停所有计时；恢复时口头提醒"我们继续刚才那一轮" |
+| 参与者中途退出 | 立即结束 session，标记 `early_termination`，数据保留但不入分析；按 IRB 流程退还报酬 |
+| 物理放置失败 | 不打断对话；trial 结束后人工补放，标记日志 |
+| 机器人抓错物品 | 同上，不打断；后台标记 `wrong_object_grasped` |
+| 参与者要求看准确率（Phase 2/3/4） | 标准回答："最后会展示，先按现在的步骤来" |
+| 参与者询问其他参与者表现 | 标准回答："不能透露，研究结束后可以告诉您整体结果" |
+
+---
+
+## 7. 数据导出 + 现场清理
+
+### 7.1 数据导出 checklist
+
+每 session 结束后：
+
+- [ ] backend 自动生成 `logs/P-XX_YYYYMMDD_HHMM.jsonl`
+- [ ] 验证：jsonl 行数合理（基线问卷 + 3 trials × ~30 events + 访谈元数据 ≈ 100+ 行）
+- [ ] 关键字段抽查：`termination_reason`, `nasa_tlx`, `psc`, `perceived_control`, `final_ranking`, `psr_seen`, `psr_unseen`
+- [ ] 录音文件命名 `P-XX_interview.m4a`，复制到加密备份盘
+- [ ] 同意书扫描归档至 `consent/P-XX.pdf`
+
+### 7.2 现场清理
+
+- [ ] 物品归位到下一场景待用区
+- [ ] 工作台擦拭
+- [ ] 机器人复位至待机姿势
+- [ ] 麦克风消毒
+- [ ] 屏幕、笔记本清理日志缓存（如需）
+
+---
+
+## 8. 当日多 session 排程建议
+
+| 时间 | 内容 |
+|---|---|
+| 单 session 净时长 | ~70 min |
+| 单 session 准备 + 清理 | ~30 min |
+| 单 session 总占用 | ~100 min |
+| 建议每日上限 | 3 sessions（避免实验员疲劳影响话术一致性） |
+| 实验员轮换 | 若多名实验员，每周固定同一人收某一段时间避免 between-experimenter 效应；记 `experimenter_id` |
+
+---
+
+## 附录 A：标准话术速查卡（实验员可打印随身）
+
+| 场景 | 话术 |
+|---|---|
+| 参与者发问"我应该回答多少次" | "您觉得机器人已经懂了，就可以结束。" |
+| 参与者发问"哪种风格最好" | "实验过程中不能透露，最后访谈会聊到。" |
+| 参与者发问"我答得对吗" | "没有对错，按您的真实习惯就好。" |
+| 参与者发问"机器人放错了怎么办" | "正常的，最后会有完整结果，您先继续。" |
+| 参与者发问"我可以重新回答上一题吗" | "这一轮已经提交了，您可以在下一轮提到。" |
+| 参与者要求看其他参与者数据 | "研究结束后可以告诉您整体结果，单个参与者的数据不能分享。" |
+
+---
+
+**指南结束。** 任何流程歧义请在实验前向研究负责人确认；实验中遇到本指南未覆盖的异常，记录在 `logs/anomalies.md` 并继续 trial（不要现场决策破坏标准化）。

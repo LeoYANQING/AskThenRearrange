@@ -1,8 +1,34 @@
+# Python
 __pycache__/
 *.pyc
-/tmp/
+.venv/
+
+# macOS / IDE
 .DS_Store
 .vscode/browse.vc.db
 .vscode/browse.vc.db-shm
 .vscode/browse.vc.db-wal
+.mcp.json
+
+# Misc
+/tmp/
 study2_data/
+
+# LaTeX build artifacts
+paper_draft_v1/build/
+paper_draft_v1/scratch/
+paper_draft_v1/*.synctex.gz
+paper_draft_v1/*.aux
+paper_draft_v1/*.log
+paper_draft_v1/*.out
+paper_draft_v1/*.fdb_latexmk
+paper_draft_v1/*.fls
+paper_draft_v1/*.blg
+
+# Node / Vite
+study2_app/frontend/node_modules/
+study2_app/frontend/dist/
+study2_app/frontend/.vite/
+
+# Study 2 participant session logs (kept locally, not in git)
+study2_app/logs/

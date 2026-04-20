@@ -1,0 +1,6 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+
+# STT (Dashscope paraformer-realtime-v2); requires DASHSCOPE_API_KEY env var
+dashscope>=1.23

@@ -1,0 +1,24 @@
+# PrefQuest / AskThenRearrange — Python dependencies.
+# Install into a Python 3.10 conda env (recommended) or any Python 3.10+ venv.
+
+# Core data models
+pydantic>=2.0
+
+# LLM backends
+langchain-ollama>=0.2
+langchain-openai>=0.2
+
+# Study 2 backend (FastAPI)
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+
+# STT (Aliyun Dashscope paraformer-realtime-v2); set DASHSCOPE_API_KEY env var
+dashscope>=1.23
+
+# Plotting (ablation figures + Study 2 simulation)
+matplotlib>=3.7
+
+# Study 2 simulation analysis only
+numpy>=1.24
+pandas>=2.0

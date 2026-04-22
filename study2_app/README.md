@@ -30,7 +30,7 @@ npm run dev            # http://localhost:5173
 bash study2_app/start.sh
 ```
 
-Vite dev server 默认代理到 `http://localhost:8001`（见 `vite.config.ts`）。后端端口不同时通过 `PREFQUEST_BACKEND_URL` 覆盖：
+Vite dev server 默认代理到 `http://localhost:8001`（见 `frontend/vite.config.ts`）。后端端口不同时通过 `PREFQUEST_BACKEND_URL` 覆盖：
 
 ```bash
 PREFQUEST_BACKEND_URL=http://localhost:8000 npm run dev
@@ -68,7 +68,7 @@ npm run preview        # 本地预览构建产物
 ## 文件地图
 
 ```
-src/
+frontend/src/
 ├── App.tsx               ← 根组件 + SessionContext（全局会话状态）
 ├── api.ts                ← 所有后端调用（axios），每个 HTTP 端点一个函数
 ├── types.ts              ← 所有 TS 类型（AgentState / Trial / Session / 标签映射）
@@ -115,7 +115,7 @@ completed
 
 ## 后端 API 契约
 
-所有端点在 [src/api.ts](src/api.ts) 中集中管理，返回值类型在 [src/types.ts](src/types.ts)。
+所有端点在 [frontend/src/api.ts](frontend/src/api.ts) 中集中管理，返回值类型在 [frontend/src/types.ts](frontend/src/types.ts)。
 
 | 方法 | 端点 | 用途 |
 |---|---|---|
@@ -130,7 +130,7 @@ completed
 | POST | `/sessions/{id}/final_ranking` | 3 轮后提交策略排名和主观反馈 |
 | POST | `/voice/stt` | 录音 WAV → Dashscope paraformer 转写文本 |
 
-Vite 代理（见 `vite.config.ts`）转发的前缀：`/sessions`、`/dialogue`、`/logs`、`/health`、`/voice`。
+Vite 代理（见 `frontend/vite.config.ts`）转发的前缀：`/sessions`、`/dialogue`、`/logs`、`/health`、`/voice`。
 
 ---
 

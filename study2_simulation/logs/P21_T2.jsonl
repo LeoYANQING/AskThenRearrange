@@ -1,0 +1,13 @@
+{"event": "trial_start", "participant_id": 21, "trial_index": 2, "strategy": "DQ", "scene": "living", "timestamp": "2026-03-31T10:30:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "AO", "question": "Where should I put the charging cable?", "answer": "Put it in the TV unit shelf.", "psr_at_k": {"seen": 0.1, "unseen": 0.05, "total": 0.075}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "AO", "question": "Where would you like the coaster to go?", "answer": "I'd put that in the TV unit shelf.", "psr_at_k": {"seen": 0.181, "unseen": 0.144, "total": 0.162}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Which container should the candle go into?", "answer": "The side table works for that.", "psr_at_k": {"seen": 0.299, "unseen": 0.156, "total": 0.228}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Where should I put the throw pillow?", "answer": "Put it in the TV unit shelf.", "psr_at_k": {"seen": 0.374, "unseen": 0.197, "total": 0.285}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Where would you like the plant spray to go?", "answer": "I'd put that in the display cabinet.", "psr_at_k": {"seen": 0.438, "unseen": 0.214, "total": 0.326}}
+{"event": "dialogue_turn", "turn_index": 6, "pattern": "AO", "question": "Which container should the magazine go into?", "answer": "The side table works for that.", "psr_at_k": {"seen": 0.425, "unseen": 0.302, "total": 0.364}}
+{"event": "dialogue_turn", "turn_index": 7, "pattern": "AO", "question": "Where should I put the blanket?", "answer": "Put it in the side table.", "psr_at_k": {"seen": 0.51, "unseen": 0.238, "total": 0.374}}
+{"event": "dialogue_turn", "turn_index": 8, "pattern": "AO", "question": "Where would you like the TV remote to go?", "answer": "I'd put that in the coffee table.", "psr_at_k": {"seen": 0.568, "unseen": 0.253, "total": 0.41}}
+{"event": "trial_end", "n_turns": 8}
+{"event": "preference_form", "unseen_psr": 0.534, "seen_psr": 0.815, "total_psr": 0.675}
+{"event": "questionnaire", "CL1": 6.0, "CL2": 5.0, "CL3": 5.5, "PU1": 2.0, "PU2": 3.0, "PU3": 3.0, "IA1": 2.5, "IA2": 3.0, "IA3": 3.0, "CL_mean": 5.5, "PU_mean": 2.667, "IA_mean": 2.833}
+{"event": "evaluation_summary", "strategy": "DQ", "unseen_psr": 0.534, "seen_psr": 0.815}

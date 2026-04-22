@@ -1,0 +1,10 @@
+{"event": "trial_start", "participant_id": 22, "trial_index": 3, "strategy": "DQ", "scene": "kitchen", "timestamp": "2026-03-32T10:45:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "AO", "question": "Where should I put the oven gloves?", "answer": "Put it in the countertop.", "psr_at_k": {"seen": 0.173, "unseen": 0.158, "total": 0.165}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "AO", "question": "Where would you like the coffee mug to go?", "answer": "I'd put that in the top drawer.", "psr_at_k": {"seen": 0.234, "unseen": 0.168, "total": 0.201}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Which container should the cutting board go into?", "answer": "The pantry shelf works for that.", "psr_at_k": {"seen": 0.407, "unseen": 0.206, "total": 0.306}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Where should I put the dish soap?", "answer": "Put it in the top drawer.", "psr_at_k": {"seen": 0.495, "unseen": 0.305, "total": 0.4}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Where would you like the measuring cup to go?", "answer": "I'd put that in the under-sink cabinet.", "psr_at_k": {"seen": 0.581, "unseen": 0.31, "total": 0.446}}
+{"event": "trial_end", "n_turns": 5}
+{"event": "preference_form", "unseen_psr": 0.589, "seen_psr": 1.0, "total_psr": 0.794}
+{"event": "questionnaire", "CL1": 5.5, "CL2": 5.0, "CL3": 6.0, "PU1": 4.0, "PU2": 4.0, "PU3": 4.5, "IA1": 4.0, "IA2": 3.5, "IA3": 3.5, "CL_mean": 5.5, "PU_mean": 4.167, "IA_mean": 3.667}
+{"event": "evaluation_summary", "strategy": "DQ", "unseen_psr": 0.589, "seen_psr": 1.0}

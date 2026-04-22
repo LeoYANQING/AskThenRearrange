@@ -1,0 +1,11 @@
+{"event": "trial_start", "participant_id": 15, "trial_index": 3, "strategy": "PAR", "scene": "bedroom", "timestamp": "2026-03-25T10:45:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "AO", "question": "I'm going to place the phone charger in the desk surface \u2014 does that work?", "answer": "Yes, that's fine / Actually, I'd prefer the bathroom cabinet.", "psr_at_k": {"seen": 0.105, "unseen": 0.1, "total": 0.102}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "AO", "question": "Let me try putting lamp in the under-bed storage. Does this match your preference?", "answer": "That works / I'd actually put it in the desk surface.", "psr_at_k": {"seen": 0.289, "unseen": 0.207, "total": 0.248}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "PI", "question": "I notice a pattern \u2014 you tend to organise by function rather than by item type. Does that sound right?", "answer": "Yes, that's a good summary / It's a bit more nuanced than that.", "psr_at_k": {"seen": 0.317, "unseen": 0.22, "total": 0.268}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Let me try putting notebook in the wardrobe shelf. Does this match your preference?", "answer": "That works / I'd actually put it in the under-bed storage.", "psr_at_k": {"seen": 0.335, "unseen": 0.377, "total": 0.356}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "I'm going to place the alarm clock in the under-bed storage \u2014 does that work?", "answer": "Yes, that's fine / Actually, I'd prefer the desk surface.", "psr_at_k": {"seen": 0.389, "unseen": 0.434, "total": 0.412}}
+{"event": "dialogue_turn", "turn_index": 6, "pattern": "PI", "question": "I notice a pattern \u2014 you tend to organise by function rather than by item type. Does that sound right?", "answer": "Yes, that's a good summary / It's a bit more nuanced than that.", "psr_at_k": {"seen": 0.487, "unseen": 0.389, "total": 0.438}}
+{"event": "trial_end", "n_turns": 6}
+{"event": "preference_form", "unseen_psr": 0.775, "seen_psr": 0.933, "total_psr": 0.854}
+{"event": "questionnaire", "CL1": 2.0, "CL2": 1.5, "CL3": 3.0, "PU1": 3.5, "PU2": 3.5, "PU3": 5.0, "IA1": 3.5, "IA2": 3.5, "IA3": 4.0, "CL_mean": 2.167, "PU_mean": 4.0, "IA_mean": 3.667}
+{"event": "evaluation_summary", "strategy": "PAR", "unseen_psr": 0.775, "seen_psr": 0.933}

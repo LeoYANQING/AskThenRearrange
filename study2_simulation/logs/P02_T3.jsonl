@@ -1,0 +1,9 @@
+{"event": "trial_start", "participant_id": 2, "trial_index": 3, "strategy": "UPF", "scene": "living", "timestamp": "2026-03-12T10:45:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "PE", "question": "How do you generally organise items in your living?", "answer": "I usually keep everyday things within easy reach and store rarely used items away.", "psr_at_k": {"seen": 0.114, "unseen": 0.283, "total": 0.199}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "PI", "question": "So you prefer items you use daily to be in easily accessible spots?", "answer": "Yes, exactly. Convenience is my top priority.", "psr_at_k": {"seen": 0.26, "unseen": 0.4, "total": 0.33}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Based on your preferences, where should candle go?", "answer": "I think the side table makes sense given what I said.", "psr_at_k": {"seen": 0.388, "unseen": 0.476, "total": 0.432}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Given what you told me, which container fits plant spray best?", "answer": "I'd say TV unit shelf \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.399, "unseen": 0.575, "total": 0.487}}
+{"event": "trial_end", "n_turns": 4}
+{"event": "preference_form", "unseen_psr": 0.878, "seen_psr": 0.797, "total_psr": 0.837}
+{"event": "questionnaire", "CL1": 4.0, "CL2": 4.5, "CL3": 3.5, "PU1": 3.5, "PU2": 4.0, "PU3": 3.0, "IA1": 4.0, "IA2": 5.0, "IA3": 5.5, "CL_mean": 4.0, "PU_mean": 3.5, "IA_mean": 4.833}
+{"event": "evaluation_summary", "strategy": "UPF", "unseen_psr": 0.878, "seen_psr": 0.797}

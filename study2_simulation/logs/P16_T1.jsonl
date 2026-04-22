@@ -1,0 +1,10 @@
+{"event": "trial_start", "participant_id": 16, "trial_index": 1, "strategy": "UPF", "scene": "living", "timestamp": "2026-03-26T10:15:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "PE", "question": "How do you generally organise items in your living?", "answer": "I usually keep everyday things within easy reach and store rarely used items away.", "psr_at_k": {"seen": 0.113, "unseen": 0.194, "total": 0.153}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "PI", "question": "So you prefer items you use daily to be in easily accessible spots?", "answer": "Yes, exactly. Convenience is my top priority.", "psr_at_k": {"seen": 0.227, "unseen": 0.349, "total": 0.288}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Based on your preferences, where should blanket go?", "answer": "I think the coffee table makes sense given what I said.", "psr_at_k": {"seen": 0.29, "unseen": 0.46, "total": 0.375}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Given what you told me, which container fits plant spray best?", "answer": "I'd say storage ottoman \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.383, "unseen": 0.518, "total": 0.45}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Based on your preferences, where should charging cable go?", "answer": "I think the TV unit shelf makes sense given what I said.", "psr_at_k": {"seen": 0.45, "unseen": 0.564, "total": 0.507}}
+{"event": "trial_end", "n_turns": 5}
+{"event": "preference_form", "unseen_psr": 0.684, "seen_psr": 0.858, "total_psr": 0.771}
+{"event": "questionnaire", "CL1": 4.0, "CL2": 4.0, "CL3": 4.5, "PU1": 4.0, "PU2": 2.5, "PU3": 3.0, "IA1": 5.0, "IA2": 5.0, "IA3": 3.5, "CL_mean": 4.167, "PU_mean": 3.167, "IA_mean": 4.5}
+{"event": "evaluation_summary", "strategy": "UPF", "unseen_psr": 0.684, "seen_psr": 0.858}

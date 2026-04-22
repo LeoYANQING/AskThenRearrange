@@ -1,0 +1,10 @@
+{"event": "trial_start", "participant_id": 12, "trial_index": 2, "strategy": "UPF", "scene": "living", "timestamp": "2026-03-22T10:30:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "PE", "question": "How do you generally organise items in your living?", "answer": "I usually keep everyday things within easy reach and store rarely used items away.", "psr_at_k": {"seen": 0.144, "unseen": 0.152, "total": 0.148}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "PI", "question": "So you prefer items you use daily to be in easily accessible spots?", "answer": "Yes, exactly. Convenience is my top priority.", "psr_at_k": {"seen": 0.167, "unseen": 0.314, "total": 0.24}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Based on your preferences, where should throw pillow go?", "answer": "I think the display cabinet makes sense given what I said.", "psr_at_k": {"seen": 0.323, "unseen": 0.488, "total": 0.406}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Given what you told me, which container fits candle best?", "answer": "I'd say storage ottoman \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.37, "unseen": 0.52, "total": 0.445}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Based on your preferences, where should plant spray go?", "answer": "I think the coffee table makes sense given what I said.", "psr_at_k": {"seen": 0.426, "unseen": 0.591, "total": 0.508}}
+{"event": "trial_end", "n_turns": 5}
+{"event": "preference_form", "unseen_psr": 0.841, "seen_psr": 0.837, "total_psr": 0.839}
+{"event": "questionnaire", "CL1": 3.5, "CL2": 3.0, "CL3": 4.5, "PU1": 5.5, "PU2": 6.0, "PU3": 6.0, "IA1": 6.0, "IA2": 7.0, "IA3": 6.0, "CL_mean": 3.667, "PU_mean": 5.833, "IA_mean": 6.333}
+{"event": "evaluation_summary", "strategy": "UPF", "unseen_psr": 0.841, "seen_psr": 0.837}

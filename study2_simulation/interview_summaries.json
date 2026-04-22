@@ -1,0 +1,866 @@
+[
+  {
+    "participant_id": 1,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "It felt very mechanical \u2014 just answering the same type of question over and over.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "A bit challenging at first because I'd never articulated my rules before.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "Nice that it did the work of inferring rather than just asking.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "For a real robot, I think PAR would work best in my home.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I don't really have set rules, so having the robot guess and confirm was easier.",
+        "organizing_frequency": 5,
+        "note": "High organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 2,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "It was straightforward but a bit tedious after a while.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "I liked being asked about my principles first \u2014 it felt more like a real conversation.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "I loved that it made suggestions \u2014 felt like it was paying attention.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "If I had to choose for everyday use, PAR wins \u2014 less repetition, more understanding.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I don't really have set rules, so having the robot guess and confirm was easier.",
+        "organizing_frequency": 1,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 3,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "Simple enough, but I felt like the robot wasn't really learning anything deeper.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "I liked being asked about my principles first \u2014 it felt more like a real conversation.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "The confirmation questions were satisfying \u2014 I felt understood.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred UPF for real deployment",
+        "quote": "For a real robot, I think UPF would work best in my home.",
+        "preferred_strategy": "UPF",
+        "ranking": {
+          "UPF": 1,
+          "PAR": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "My housemates would probably prefer PAR \u2014 they never think about organising.",
+        "organizing_frequency": 4,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 4,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "I appreciated the directness, but it got repetitive.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "It made me think hard about why I organise things the way I do.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "I loved that it made suggestions \u2014 felt like it was paying attention.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "If I had to choose for everyday use, PAR wins \u2014 less repetition, more understanding.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "My housemates would probably prefer PAR \u2014 they never think about organising.",
+        "organizing_frequency": 5,
+        "note": "High organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 5,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "It was straightforward but a bit tedious after a while.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "I liked being asked about my principles first \u2014 it felt more like a real conversation.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "I loved that it made suggestions \u2014 felt like it was paying attention.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred UPF for real deployment",
+        "quote": "I'd prefer the second approach (UPF) for real use \u2014 it felt most natural.",
+        "preferred_strategy": "UPF",
+        "ranking": {
+          "UPF": 1,
+          "PAR": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I don't really have set rules, so having the robot guess and confirm was easier.",
+        "organizing_frequency": 3,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 6,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "It felt very mechanical \u2014 just answering the same type of question over and over.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "Felt the most intelligent of the three interactions.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "I loved that it made suggestions \u2014 felt like it was paying attention.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "For a real robot, I think PAR would work best in my home.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I don't really have set rules, so having the robot guess and confirm was easier.",
+        "organizing_frequency": 4,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 7,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "Simple enough, but I felt like the robot wasn't really learning anything deeper.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "Felt the most intelligent of the three interactions.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "Nice that it did the work of inferring rather than just asking.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred UPF for real deployment",
+        "quote": "For a real robot, I think UPF would work best in my home.",
+        "preferred_strategy": "UPF",
+        "ranking": {
+          "UPF": 1,
+          "PAR": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "My housemates would probably prefer PAR \u2014 they never think about organising.",
+        "organizing_frequency": 1,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 8,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "I appreciated the directness, but it got repetitive.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "It made me think hard about why I organise things the way I do.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "The confirmation questions were satisfying \u2014 I felt understood.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "I'd prefer the second approach (PAR) for real use \u2014 it felt most natural.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I don't really have set rules, so having the robot guess and confirm was easier.",
+        "organizing_frequency": 3,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 9,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "I appreciated the directness, but it got repetitive.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "Felt the most intelligent of the three interactions.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "The confirmation questions were satisfying \u2014 I felt understood.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "If I had to choose for everyday use, PAR wins \u2014 less repetition, more understanding.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I don't really have set rules, so having the robot guess and confirm was easier.",
+        "organizing_frequency": 5,
+        "note": "High organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 10,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "It felt very mechanical \u2014 just answering the same type of question over and over.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "It made me think hard about why I organise things the way I do.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "Nice that it did the work of inferring rather than just asking.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "I'd prefer the second approach (PAR) for real use \u2014 it felt most natural.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I don't really have set rules, so having the robot guess and confirm was easier.",
+        "organizing_frequency": 5,
+        "note": "High organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 11,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "It was straightforward but a bit tedious after a while.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "A bit challenging at first because I'd never articulated my rules before.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "The confirmation questions were satisfying \u2014 I felt understood.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "If I had to choose for everyday use, PAR wins \u2014 less repetition, more understanding.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I'm quite organised so the rule-based approach clicked immediately for me.",
+        "organizing_frequency": 4,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 12,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "I appreciated the directness, but it got repetitive.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "Felt the most intelligent of the three interactions.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "Nice that it did the work of inferring rather than just asking.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "I'd prefer the second approach (PAR) for real use \u2014 it felt most natural.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "My housemates would probably prefer PAR \u2014 they never think about organising.",
+        "organizing_frequency": 4,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 13,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "Simple enough, but I felt like the robot wasn't really learning anything deeper.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "A bit challenging at first because I'd never articulated my rules before.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "The confirmation questions were satisfying \u2014 I felt understood.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred UPF for real deployment",
+        "quote": "I'd prefer the second approach (UPF) for real use \u2014 it felt most natural.",
+        "preferred_strategy": "UPF",
+        "ranking": {
+          "UPF": 1,
+          "PAR": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "My housemates would probably prefer PAR \u2014 they never think about organising.",
+        "organizing_frequency": 4,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 14,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "I appreciated the directness, but it got repetitive.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "Felt the most intelligent of the three interactions.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "It was like the robot was curious and checking its understanding. Very natural.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred UPF for real deployment",
+        "quote": "For a real robot, I think UPF would work best in my home.",
+        "preferred_strategy": "UPF",
+        "ranking": {
+          "UPF": 1,
+          "PAR": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I don't really have set rules, so having the robot guess and confirm was easier.",
+        "organizing_frequency": 3,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 15,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "I appreciated the directness, but it got repetitive.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "A bit challenging at first because I'd never articulated my rules before.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "I loved that it made suggestions \u2014 felt like it was paying attention.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "If I had to choose for everyday use, PAR wins \u2014 less repetition, more understanding.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I'm quite organised so the rule-based approach clicked immediately for me.",
+        "organizing_frequency": 5,
+        "note": "High organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 16,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "It felt very mechanical \u2014 just answering the same type of question over and over.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "I liked being asked about my principles first \u2014 it felt more like a real conversation.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "The confirmation questions were satisfying \u2014 I felt understood.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "For a real robot, I think PAR would work best in my home.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I'm quite organised so the rule-based approach clicked immediately for me.",
+        "organizing_frequency": 5,
+        "note": "High organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 17,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "Simple enough, but I felt like the robot wasn't really learning anything deeper.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "Felt the most intelligent of the three interactions.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "Nice that it did the work of inferring rather than just asking.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred UPF for real deployment",
+        "quote": "For a real robot, I think UPF would work best in my home.",
+        "preferred_strategy": "UPF",
+        "ranking": {
+          "UPF": 1,
+          "PAR": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "My housemates would probably prefer PAR \u2014 they never think about organising.",
+        "organizing_frequency": 3,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 18,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "Simple enough, but I felt like the robot wasn't really learning anything deeper.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "A bit challenging at first because I'd never articulated my rules before.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "The confirmation questions were satisfying \u2014 I felt understood.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "If I had to choose for everyday use, PAR wins \u2014 less repetition, more understanding.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "My housemates would probably prefer PAR \u2014 they never think about organising.",
+        "organizing_frequency": 1,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 19,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "I appreciated the directness, but it got repetitive.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "A bit challenging at first because I'd never articulated my rules before.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "It was like the robot was curious and checking its understanding. Very natural.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "I'd prefer the second approach (PAR) for real use \u2014 it felt most natural.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "My housemates would probably prefer PAR \u2014 they never think about organising.",
+        "organizing_frequency": 4,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 20,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "Simple enough, but I felt like the robot wasn't really learning anything deeper.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "I liked being asked about my principles first \u2014 it felt more like a real conversation.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "It was like the robot was curious and checking its understanding. Very natural.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred DQ for real deployment",
+        "quote": "I'd prefer the second approach (DQ) for real use \u2014 it felt most natural.",
+        "preferred_strategy": "DQ",
+        "ranking": {
+          "DQ": 1,
+          "UPF": 2,
+          "PAR": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I'm quite organised so the rule-based approach clicked immediately for me.",
+        "organizing_frequency": 2,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 21,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "It was straightforward but a bit tedious after a while.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "It made me think hard about why I organise things the way I do.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "It was like the robot was curious and checking its understanding. Very natural.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "I'd prefer the second approach (PAR) for real use \u2014 it felt most natural.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "My housemates would probably prefer PAR \u2014 they never think about organising.",
+        "organizing_frequency": 2,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 22,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "I appreciated the directness, but it got repetitive.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "Felt the most intelligent of the three interactions.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "I loved that it made suggestions \u2014 felt like it was paying attention.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "I'd prefer the second approach (PAR) for real use \u2014 it felt most natural.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I don't really have set rules, so having the robot guess and confirm was easier.",
+        "organizing_frequency": 4,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 23,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "It felt very mechanical \u2014 just answering the same type of question over and over.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "A bit challenging at first because I'd never articulated my rules before.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "The confirmation questions were satisfying \u2014 I felt understood.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred PAR for real deployment",
+        "quote": "For a real robot, I think PAR would work best in my home.",
+        "preferred_strategy": "PAR",
+        "ranking": {
+          "PAR": 1,
+          "UPF": 2,
+          "DQ": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I'm quite organised so the rule-based approach clicked immediately for me.",
+        "organizing_frequency": 5,
+        "note": "High organising frequency participant"
+      }
+    }
+  },
+  {
+    "participant_id": 24,
+    "interview_themes": {
+      "A_DQ_experience": {
+        "theme": "Direct Querying felt mechanical and repetitive",
+        "quote": "Simple enough, but I felt like the robot wasn't really learning anything deeper.",
+        "sentiment": "neutral-negative"
+      },
+      "B_UPF_experience": {
+        "theme": "UPF was cognitively demanding but felt intelligent",
+        "quote": "I liked being asked about my principles first \u2014 it felt more like a real conversation.",
+        "sentiment": "positive with effort cost"
+      },
+      "C_PAR_experience": {
+        "theme": "PAR felt proactive and led to a sense of being understood",
+        "quote": "I loved that it made suggestions \u2014 felt like it was paying attention.",
+        "sentiment": "positive"
+      },
+      "D_overall_preference": {
+        "theme": "Overall preferred UPF for real deployment",
+        "quote": "I'd prefer the second approach (UPF) for real use \u2014 it felt most natural.",
+        "preferred_strategy": "UPF",
+        "ranking": {
+          "UPF": 1,
+          "DQ": 2,
+          "PAR": 3
+        }
+      },
+      "E_individual_notes": {
+        "theme": "Organising style shaped strategy perception",
+        "quote": "I don't really have set rules, so having the robot guess and confirm was easier.",
+        "organizing_frequency": 2,
+        "note": "Lower organising frequency participant"
+      }
+    }
+  }
+]

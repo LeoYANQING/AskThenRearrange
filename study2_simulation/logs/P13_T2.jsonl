@@ -1,0 +1,11 @@
+{"event": "trial_start", "participant_id": 13, "trial_index": 2, "strategy": "UPF", "scene": "kitchen", "timestamp": "2026-03-23T10:30:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "PE", "question": "How do you generally organise items in your kitchen?", "answer": "I usually keep everyday things within easy reach and store rarely used items away.", "psr_at_k": {"seen": 0.1, "unseen": 0.178, "total": 0.139}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "PI", "question": "So you prefer items you use daily to be in easily accessible spots?", "answer": "Yes, exactly. Convenience is my top priority.", "psr_at_k": {"seen": 0.226, "unseen": 0.375, "total": 0.3}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Based on your preferences, where should oven gloves go?", "answer": "I think the countertop makes sense given what I said.", "psr_at_k": {"seen": 0.24, "unseen": 0.421, "total": 0.33}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Given what you told me, which container fits dish soap best?", "answer": "I'd say top drawer \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.323, "unseen": 0.459, "total": 0.391}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Based on your preferences, where should can opener go?", "answer": "I think the under-sink cabinet makes sense given what I said.", "psr_at_k": {"seen": 0.463, "unseen": 0.634, "total": 0.548}}
+{"event": "dialogue_turn", "turn_index": 6, "pattern": "AO", "question": "Given what you told me, which container fits measuring cup best?", "answer": "I'd say top drawer \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.511, "unseen": 0.611, "total": 0.561}}
+{"event": "trial_end", "n_turns": 6}
+{"event": "preference_form", "unseen_psr": 0.904, "seen_psr": 0.805, "total_psr": 0.855}
+{"event": "questionnaire", "CL1": 4.5, "CL2": 4.0, "CL3": 3.5, "PU1": 6.0, "PU2": 4.5, "PU3": 5.5, "IA1": 6.0, "IA2": 7.0, "IA3": 7.0, "CL_mean": 4.0, "PU_mean": 5.333, "IA_mean": 6.667}
+{"event": "evaluation_summary", "strategy": "UPF", "unseen_psr": 0.904, "seen_psr": 0.805}

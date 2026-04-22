@@ -1,0 +1,10 @@
+{"event": "trial_start", "participant_id": 1, "trial_index": 2, "strategy": "UPF", "scene": "kitchen", "timestamp": "2026-03-11T10:30:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "PE", "question": "How do you generally organise items in your kitchen?", "answer": "I usually keep everyday things within easy reach and store rarely used items away.", "psr_at_k": {"seen": 0.1, "unseen": 0.206, "total": 0.153}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "PI", "question": "So you prefer items you use daily to be in easily accessible spots?", "answer": "Yes, exactly. Convenience is my top priority.", "psr_at_k": {"seen": 0.248, "unseen": 0.334, "total": 0.291}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Based on your preferences, where should cutting board go?", "answer": "I think the pantry shelf makes sense given what I said.", "psr_at_k": {"seen": 0.325, "unseen": 0.513, "total": 0.419}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Given what you told me, which container fits can opener best?", "answer": "I'd say countertop \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.384, "unseen": 0.542, "total": 0.463}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Based on your preferences, where should oven gloves go?", "answer": "I think the under-sink cabinet makes sense given what I said.", "psr_at_k": {"seen": 0.507, "unseen": 0.59, "total": 0.549}}
+{"event": "trial_end", "n_turns": 5}
+{"event": "preference_form", "unseen_psr": 0.873, "seen_psr": 0.801, "total_psr": 0.837}
+{"event": "questionnaire", "CL1": 3.0, "CL2": 4.0, "CL3": 5.0, "PU1": 5.5, "PU2": 6.5, "PU3": 5.5, "IA1": 4.5, "IA2": 4.5, "IA3": 5.5, "CL_mean": 4.0, "PU_mean": 5.833, "IA_mean": 4.833}
+{"event": "evaluation_summary", "strategy": "UPF", "unseen_psr": 0.873, "seen_psr": 0.801}

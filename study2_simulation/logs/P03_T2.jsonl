@@ -1,0 +1,12 @@
+{"event": "trial_start", "participant_id": 3, "trial_index": 2, "strategy": "DQ", "scene": "living", "timestamp": "2026-03-13T10:30:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "AO", "question": "Where should I put the throw pillow?", "answer": "Put it in the TV unit shelf.", "psr_at_k": {"seen": 0.1, "unseen": 0.05, "total": 0.075}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "AO", "question": "Where would you like the TV remote to go?", "answer": "I'd put that in the side table.", "psr_at_k": {"seen": 0.182, "unseen": 0.066, "total": 0.124}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Which container should the blanket go into?", "answer": "The storage ottoman works for that.", "psr_at_k": {"seen": 0.282, "unseen": 0.11, "total": 0.196}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Where should I put the coaster?", "answer": "Put it in the storage ottoman.", "psr_at_k": {"seen": 0.366, "unseen": 0.118, "total": 0.242}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Where would you like the candle to go?", "answer": "I'd put that in the coffee table.", "psr_at_k": {"seen": 0.477, "unseen": 0.18, "total": 0.329}}
+{"event": "dialogue_turn", "turn_index": 6, "pattern": "AO", "question": "Which container should the charging cable go into?", "answer": "The TV unit shelf works for that.", "psr_at_k": {"seen": 0.457, "unseen": 0.211, "total": 0.334}}
+{"event": "dialogue_turn", "turn_index": 7, "pattern": "AO", "question": "Where should I put the plant spray?", "answer": "Put it in the TV unit shelf.", "psr_at_k": {"seen": 0.493, "unseen": 0.283, "total": 0.388}}
+{"event": "trial_end", "n_turns": 7}
+{"event": "preference_form", "unseen_psr": 0.476, "seen_psr": 0.8, "total_psr": 0.638}
+{"event": "questionnaire", "CL1": 2.5, "CL2": 3.5, "CL3": 2.0, "PU1": 2.0, "PU2": 2.0, "PU3": 2.0, "IA1": 3.5, "IA2": 3.0, "IA3": 3.5, "CL_mean": 2.667, "PU_mean": 2.0, "IA_mean": 3.333}
+{"event": "evaluation_summary", "strategy": "DQ", "unseen_psr": 0.476, "seen_psr": 0.8}

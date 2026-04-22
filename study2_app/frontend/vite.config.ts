@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-const BACKEND = 'http://localhost:8001'
+// Override with PREFQUEST_BACKEND_URL env var if backend is on a non-default port/host.
+const BACKEND = process.env.PREFQUEST_BACKEND_URL ?? 'http://localhost:8000'
 
 export default defineConfig({
   plugins: [react()],

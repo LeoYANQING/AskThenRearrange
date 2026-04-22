@@ -1,0 +1,8 @@
+{"event": "trial_start", "participant_id": 4, "trial_index": 2, "strategy": "PAR", "scene": "bedroom", "timestamp": "2026-03-14T10:30:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "AO", "question": "I'm going to place the lamp in the desk surface \u2014 does that work?", "answer": "Yes, that's fine / Actually, I'd prefer the under-bed storage.", "psr_at_k": {"seen": 0.218, "unseen": 0.156, "total": 0.187}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "AO", "question": "Let me try putting notebook in the bathroom cabinet. Does this match your preference?", "answer": "That works / I'd actually put it in the desk surface.", "psr_at_k": {"seen": 0.362, "unseen": 0.338, "total": 0.35}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "PI", "question": "I notice a pattern \u2014 you tend to keep frequently used items on open surfaces. Does that sound right?", "answer": "Yes, that's a good summary / It's a bit more nuanced than that.", "psr_at_k": {"seen": 0.55, "unseen": 0.521, "total": 0.535}}
+{"event": "trial_end", "n_turns": 3}
+{"event": "preference_form", "unseen_psr": 0.614, "seen_psr": 0.748, "total_psr": 0.681}
+{"event": "questionnaire", "CL1": 2.0, "CL2": 3.0, "CL3": 3.0, "PU1": 6.5, "PU2": 6.0, "PU3": 6.0, "IA1": 4.5, "IA2": 3.5, "IA3": 4.5, "CL_mean": 2.667, "PU_mean": 6.167, "IA_mean": 4.167}
+{"event": "evaluation_summary", "strategy": "PAR", "unseen_psr": 0.614, "seen_psr": 0.748}

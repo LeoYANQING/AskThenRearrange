@@ -1,0 +1,11 @@
+{"event": "trial_start", "participant_id": 17, "trial_index": 3, "strategy": "UPF", "scene": "living", "timestamp": "2026-03-27T10:45:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "PE", "question": "How do you generally organise items in your living?", "answer": "I usually keep everyday things within easy reach and store rarely used items away.", "psr_at_k": {"seen": 0.177, "unseen": 0.222, "total": 0.199}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "PI", "question": "So you prefer items you use daily to be in easily accessible spots?", "answer": "Yes, exactly. Convenience is my top priority.", "psr_at_k": {"seen": 0.149, "unseen": 0.313, "total": 0.231}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Based on your preferences, where should blanket go?", "answer": "I think the storage ottoman makes sense given what I said.", "psr_at_k": {"seen": 0.351, "unseen": 0.462, "total": 0.407}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Given what you told me, which container fits TV remote best?", "answer": "I'd say TV unit shelf \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.375, "unseen": 0.451, "total": 0.413}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Based on your preferences, where should candle go?", "answer": "I think the display cabinet makes sense given what I said.", "psr_at_k": {"seen": 0.425, "unseen": 0.558, "total": 0.491}}
+{"event": "dialogue_turn", "turn_index": 6, "pattern": "AO", "question": "Given what you told me, which container fits charging cable best?", "answer": "I'd say storage ottoman \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.515, "unseen": 0.606, "total": 0.561}}
+{"event": "trial_end", "n_turns": 6}
+{"event": "preference_form", "unseen_psr": 0.959, "seen_psr": 0.798, "total_psr": 0.879}
+{"event": "questionnaire", "CL1": 5.0, "CL2": 5.5, "CL3": 5.5, "PU1": 6.5, "PU2": 6.5, "PU3": 6.0, "IA1": 6.0, "IA2": 6.5, "IA3": 6.0, "CL_mean": 5.333, "PU_mean": 6.333, "IA_mean": 6.167}
+{"event": "evaluation_summary", "strategy": "UPF", "unseen_psr": 0.959, "seen_psr": 0.798}

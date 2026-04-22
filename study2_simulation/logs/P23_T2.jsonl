@@ -1,0 +1,11 @@
+{"event": "trial_start", "participant_id": 23, "trial_index": 2, "strategy": "DQ", "scene": "study", "timestamp": "2026-03-33T10:30:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "AO", "question": "Where should I put the notebook?", "answer": "Put it in the bookshelf.", "psr_at_k": {"seen": 0.176, "unseen": 0.05, "total": 0.113}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "AO", "question": "Where would you like the sticky notes to go?", "answer": "I'd put that in the bookshelf.", "psr_at_k": {"seen": 0.272, "unseen": 0.123, "total": 0.197}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Which container should the keyboard go into?", "answer": "The desktop organiser works for that.", "psr_at_k": {"seen": 0.345, "unseen": 0.203, "total": 0.274}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Where should I put the pen holder?", "answer": "Put it in the wall-mounted shelf.", "psr_at_k": {"seen": 0.463, "unseen": 0.27, "total": 0.366}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Where would you like the stapler to go?", "answer": "I'd put that in the filing cabinet.", "psr_at_k": {"seen": 0.49, "unseen": 0.273, "total": 0.381}}
+{"event": "dialogue_turn", "turn_index": 6, "pattern": "AO", "question": "Which container should the calculator go into?", "answer": "The desk drawer works for that.", "psr_at_k": {"seen": 0.556, "unseen": 0.315, "total": 0.435}}
+{"event": "trial_end", "n_turns": 6}
+{"event": "preference_form", "unseen_psr": 0.449, "seen_psr": 0.896, "total_psr": 0.672}
+{"event": "questionnaire", "CL1": 6.0, "CL2": 5.5, "CL3": 5.5, "PU1": 4.0, "PU2": 3.5, "PU3": 5.0, "IA1": 3.5, "IA2": 4.0, "IA3": 4.0, "CL_mean": 5.667, "PU_mean": 4.167, "IA_mean": 3.833}
+{"event": "evaluation_summary", "strategy": "DQ", "unseen_psr": 0.449, "seen_psr": 0.896}

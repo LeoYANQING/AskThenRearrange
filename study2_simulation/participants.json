@@ -1,0 +1,146 @@
+[
+  {
+    "participant_id": 1,
+    "age": 33,
+    "gender": "M",
+    "organizing_frequency": 5
+  },
+  {
+    "participant_id": 2,
+    "age": 24,
+    "gender": "F",
+    "organizing_frequency": 1
+  },
+  {
+    "participant_id": 3,
+    "age": 28,
+    "gender": "F",
+    "organizing_frequency": 4
+  },
+  {
+    "participant_id": 4,
+    "age": 35,
+    "gender": "M",
+    "organizing_frequency": 5
+  },
+  {
+    "participant_id": 5,
+    "age": 24,
+    "gender": "NB",
+    "organizing_frequency": 3
+  },
+  {
+    "participant_id": 6,
+    "age": 22,
+    "gender": "F",
+    "organizing_frequency": 4
+  },
+  {
+    "participant_id": 7,
+    "age": 20,
+    "gender": "M",
+    "organizing_frequency": 1
+  },
+  {
+    "participant_id": 8,
+    "age": 29,
+    "gender": "F",
+    "organizing_frequency": 3
+  },
+  {
+    "participant_id": 9,
+    "age": 29,
+    "gender": "M",
+    "organizing_frequency": 5
+  },
+  {
+    "participant_id": 10,
+    "age": 20,
+    "gender": "M",
+    "organizing_frequency": 5
+  },
+  {
+    "participant_id": 11,
+    "age": 25,
+    "gender": "F",
+    "organizing_frequency": 4
+  },
+  {
+    "participant_id": 12,
+    "age": 28,
+    "gender": "F",
+    "organizing_frequency": 4
+  },
+  {
+    "participant_id": 13,
+    "age": 29,
+    "gender": "M",
+    "organizing_frequency": 4
+  },
+  {
+    "participant_id": 14,
+    "age": 24,
+    "gender": "F",
+    "organizing_frequency": 3
+  },
+  {
+    "participant_id": 15,
+    "age": 34,
+    "gender": "F",
+    "organizing_frequency": 5
+  },
+  {
+    "participant_id": 16,
+    "age": 19,
+    "gender": "F",
+    "organizing_frequency": 5
+  },
+  {
+    "participant_id": 17,
+    "age": 33,
+    "gender": "M",
+    "organizing_frequency": 3
+  },
+  {
+    "participant_id": 18,
+    "age": 27,
+    "gender": "F",
+    "organizing_frequency": 1
+  },
+  {
+    "participant_id": 19,
+    "age": 24,
+    "gender": "F",
+    "organizing_frequency": 4
+  },
+  {
+    "participant_id": 20,
+    "age": 26,
+    "gender": "M",
+    "organizing_frequency": 2
+  },
+  {
+    "participant_id": 21,
+    "age": 33,
+    "gender": "F",
+    "organizing_frequency": 2
+  },
+  {
+    "participant_id": 22,
+    "age": 24,
+    "gender": "F",
+    "organizing_frequency": 4
+  },
+  {
+    "participant_id": 23,
+    "age": 22,
+    "gender": "F",
+    "organizing_frequency": 5
+  },
+  {
+    "participant_id": 24,
+    "age": 21,
+    "gender": "F",
+    "organizing_frequency": 2
+  }
+]

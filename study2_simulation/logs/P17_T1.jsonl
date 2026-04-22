@@ -1,0 +1,11 @@
+{"event": "trial_start", "participant_id": 17, "trial_index": 1, "strategy": "PAR", "scene": "bedroom", "timestamp": "2026-03-27T10:15:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "AO", "question": "I'm going to place the alarm clock in the under-bed storage \u2014 does that work?", "answer": "Yes, that's fine / Actually, I'd prefer the bedside table drawer.", "psr_at_k": {"seen": 0.165, "unseen": 0.147, "total": 0.156}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "AO", "question": "Let me try putting hairbrush in the bedside table drawer. Does this match your preference?", "answer": "That works / I'd actually put it in the bathroom cabinet.", "psr_at_k": {"seen": 0.204, "unseen": 0.186, "total": 0.195}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "PI", "question": "I notice a pattern \u2014 you tend to place daily-use items within arm's reach. Does that sound right?", "answer": "Yes, that's a good summary / It's a bit more nuanced than that.", "psr_at_k": {"seen": 0.289, "unseen": 0.273, "total": 0.281}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Let me try putting phone charger in the desk surface. Does this match your preference?", "answer": "That works / I'd actually put it in the wardrobe shelf.", "psr_at_k": {"seen": 0.394, "unseen": 0.413, "total": 0.403}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "I'm going to place the novel in the bathroom cabinet \u2014 does that work?", "answer": "Yes, that's fine / Actually, I'd prefer the desk surface.", "psr_at_k": {"seen": 0.395, "unseen": 0.376, "total": 0.385}}
+{"event": "dialogue_turn", "turn_index": 6, "pattern": "PI", "question": "I notice a pattern \u2014 you tend to place daily-use items within arm's reach. Does that sound right?", "answer": "Yes, that's a good summary / It's a bit more nuanced than that.", "psr_at_k": {"seen": 0.524, "unseen": 0.433, "total": 0.479}}
+{"event": "trial_end", "n_turns": 6}
+{"event": "preference_form", "unseen_psr": 0.724, "seen_psr": 0.886, "total_psr": 0.805}
+{"event": "questionnaire", "CL1": 4.0, "CL2": 4.0, "CL3": 4.0, "PU1": 3.5, "PU2": 5.0, "PU3": 4.5, "IA1": 2.5, "IA2": 3.0, "IA3": 3.0, "CL_mean": 4.0, "PU_mean": 4.333, "IA_mean": 2.833}
+{"event": "evaluation_summary", "strategy": "PAR", "unseen_psr": 0.724, "seen_psr": 0.886}

@@ -15,9 +15,9 @@ This document specifies the frontend system for **Study 2** of the PrefQuest pro
 ### 1.1 Study Context
 
 - **Design**: Within-subjects, 3 strategy conditions (DQ, UPF, PAR)
-- **Budget**: B = 6 questions per trial
-- **Participants**: N = 20–24
-- **Scenes**: 4 household scenes (study / bedroom / kitchen / living room), each with 12 items and 5 receptacles
+- **Budget**: open-ended; participant self-terminates by verbal signal (no fixed turn cap; system enforces a soft maximum of 20 turns as a safety backstop)
+- **Participants**: N = 24
+- **Scenes**: 4 household scenes (study / bedroom / kitchen / living room), each with 16 items (8 seen + 8 unseen) and 5 receptacles
 - **Counterbalancing**: Latin-square order over strategies; scene assignment counterbalanced separately
 - **Session length**: ~60–70 min
 - **Physical setup**: Real physical tabletop mock-scenes; experimenter manually enters scene content into the system before each session
@@ -25,13 +25,12 @@ This document specifies the frontend system for **Study 2** of the PrefQuest pro
 ### 1.2 Interaction Model
 
 1. Experimenter configures the scene for a trial (items + receptacles + scene label)
-2. Agent asks B=6 questions (text displayed + TTS audio played)
-3. Participant answers verbally (Whisper speech-to-text captures input; participant can also type)
-4. After dialogue, participant fills in a preference form (all 12 items → receptacle assignments)
-5. System displays its predicted placement plan
-6. Participant completes per-trial questionnaire (NASA-TLX, PSC, Perceived Control)
-7. After all 3 trials, participant completes a final preference ranking and optional comment box
-8. All data is written to a JSONL session log
+2. Agent asks questions (text displayed + TTS audio played); participant answers verbally (Whisper STT); participant self-terminates by verbal signal when satisfied
+3. Participant fills in a preference form (all 16 items → receptacle assignments) — **before any prediction is shown**
+4. Participant completes per-trial questionnaire (CL / PU / IA primary; QA process check) — **blind to placement accuracy**
+5. System displays its predicted placement plan alongside participant's preference form (matches/mismatches highlighted)
+6. After all 3 trials, participant completes a final strategy preference ranking and optional comment box
+7. All data is written to a JSONL session log
 
 ---
 
@@ -208,30 +207,35 @@ Displayed after the preference form is submitted.
 
 ### 4.5 Phase 5 — Per-Trial Questionnaire
 
-Three instruments on a single scrollable page:
+> **Authoritative questionnaire source**: [`docs/study2_session_sop.md`](study2_session_sop.md) §Phase 4. The SOP reflects the current v2.3 (2026-04-21) instrument design, which supersedes the earlier NASA-TLX / PSC / Perceived Control scheme outlined below. Frontend implementers MUST render the SOP items verbatim (CL1–3, PU1–3, IA1–3, QA1–2).
+>
+> **Measurement tiers** (v2.3):
+> - **Primary** (hypothesis-testing, Friedman + post-hoc): CL, PU, IA — map to RQ4 / H3.
+> - **Process check** (no hypothesis test; descriptive + Spearman(QA, PU)): QA.
+> - **Behavioral outcome**: Final Strategy Ranking in §4.6 (replaces a Likert Trust & Intention subscale).
 
-#### NASA-TLX (6 subscales, 21-point slider each)
+Four instruments on a single scrollable page (all 7-point Likert unless noted):
 
-- Mental Demand
-- Physical Demand
-- Temporal Demand
-- Performance
-- Effort
-- Frustration
+#### CL — Cognitive Load (3 items) — *primary*
 
-#### PSC — Preference Satisfaction with Communication (5 items, 7-point Likert)
+Anchors: 1 = very low / 7 = very high. See SOP for item wording.
 
-1. The agent asked questions that were relevant to my preferences.
-2. I felt the agent understood my organizing style.
-3. The agent's questions helped me articulate my preferences clearly.
-4. I was satisfied with how the agent learned about my preferences.
-5. I would trust this agent to organize items in my home.
+#### PU — Perceived Understanding (3 items) — *primary*
 
-#### Perceived Control (3 items, 7-point Likert)
+Anchors: 1 = strongly disagree / 7 = strongly agree. See SOP.
 
-1. I felt in control of what information I provided to the agent.
-2. I could guide the conversation in the direction I wanted.
-3. The agent gave me enough opportunity to express my preferences.
+#### IA — Interaction Agency (3 items) — *primary*
+
+Anchors: 1 = strongly disagree / 7 = strongly agree. See SOP.
+
+#### QA — Questioning Appropriateness (2 items) — *process check, not hypothesis-tested*
+
+Anchors: 1 = strongly disagree / 7 = strongly agree.
+
+1. The way the agent asked its questions felt natural for this task.
+2. I could easily understand why the agent was asking each question.
+
+> Rationale: QA probes whether HHI-derived questioning patterns, once operationalized as agent-side strategies, are perceived as appropriate by real users. Analysis plan reports descriptive statistics and Spearman(QA, PU) only; QA is excluded from H1–H3 family-wise corrections to keep the primary story focused on CL/PU/IA.
 
 A "Submit" button finalizes the trial. After submission the experimenter advances to the next trial or the final session.
 

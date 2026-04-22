@@ -1,0 +1,13 @@
+{"event": "trial_start", "participant_id": 5, "trial_index": 3, "strategy": "UPF", "scene": "living", "timestamp": "2026-03-15T10:45:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "PE", "question": "How do you generally organise items in your living?", "answer": "I usually keep everyday things within easy reach and store rarely used items away.", "psr_at_k": {"seen": 0.125, "unseen": 0.163, "total": 0.144}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "PI", "question": "So you prefer items you use daily to be in easily accessible spots?", "answer": "Yes, exactly. Convenience is my top priority.", "psr_at_k": {"seen": 0.125, "unseen": 0.269, "total": 0.197}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Based on your preferences, where should magazine go?", "answer": "I think the side table makes sense given what I said.", "psr_at_k": {"seen": 0.254, "unseen": 0.307, "total": 0.281}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Given what you told me, which container fits blanket best?", "answer": "I'd say storage ottoman \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.274, "unseen": 0.386, "total": 0.33}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Based on your preferences, where should charging cable go?", "answer": "I think the TV unit shelf makes sense given what I said.", "psr_at_k": {"seen": 0.274, "unseen": 0.449, "total": 0.361}}
+{"event": "dialogue_turn", "turn_index": 6, "pattern": "AO", "question": "Given what you told me, which container fits TV remote best?", "answer": "I'd say coffee table \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.368, "unseen": 0.504, "total": 0.436}}
+{"event": "dialogue_turn", "turn_index": 7, "pattern": "AO", "question": "Based on your preferences, where should throw pillow go?", "answer": "I think the display cabinet makes sense given what I said.", "psr_at_k": {"seen": 0.439, "unseen": 0.558, "total": 0.499}}
+{"event": "dialogue_turn", "turn_index": 8, "pattern": "AO", "question": "Given what you told me, which container fits coaster best?", "answer": "I'd say side table \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.454, "unseen": 0.631, "total": 0.543}}
+{"event": "trial_end", "n_turns": 8}
+{"event": "preference_form", "unseen_psr": 0.835, "seen_psr": 0.916, "total_psr": 0.875}
+{"event": "questionnaire", "CL1": 4.0, "CL2": 3.5, "CL3": 5.0, "PU1": 5.5, "PU2": 5.0, "PU3": 5.5, "IA1": 5.5, "IA2": 6.0, "IA3": 5.5, "CL_mean": 4.167, "PU_mean": 5.333, "IA_mean": 5.667}
+{"event": "evaluation_summary", "strategy": "UPF", "unseen_psr": 0.835, "seen_psr": 0.916}

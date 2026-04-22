@@ -1,0 +1,10 @@
+{"event": "trial_start", "participant_id": 8, "trial_index": 3, "strategy": "UPF", "scene": "living", "timestamp": "2026-03-18T10:45:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "PE", "question": "How do you generally organise items in your living?", "answer": "I usually keep everyday things within easy reach and store rarely used items away.", "psr_at_k": {"seen": 0.1, "unseen": 0.264, "total": 0.182}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "PI", "question": "So you prefer items you use daily to be in easily accessible spots?", "answer": "Yes, exactly. Convenience is my top priority.", "psr_at_k": {"seen": 0.26, "unseen": 0.37, "total": 0.315}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Based on your preferences, where should blanket go?", "answer": "I think the storage ottoman makes sense given what I said.", "psr_at_k": {"seen": 0.361, "unseen": 0.483, "total": 0.422}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Given what you told me, which container fits charging cable best?", "answer": "I'd say storage ottoman \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.408, "unseen": 0.594, "total": 0.501}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Based on your preferences, where should magazine go?", "answer": "I think the display cabinet makes sense given what I said.", "psr_at_k": {"seen": 0.47, "unseen": 0.662, "total": 0.566}}
+{"event": "trial_end", "n_turns": 5}
+{"event": "preference_form", "unseen_psr": 0.821, "seen_psr": 0.862, "total_psr": 0.842}
+{"event": "questionnaire", "CL1": 5.0, "CL2": 5.5, "CL3": 5.5, "PU1": 5.5, "PU2": 5.5, "PU3": 5.5, "IA1": 4.5, "IA2": 5.0, "IA3": 4.5, "CL_mean": 5.333, "PU_mean": 5.5, "IA_mean": 4.667}
+{"event": "evaluation_summary", "strategy": "UPF", "unseen_psr": 0.821, "seen_psr": 0.862}

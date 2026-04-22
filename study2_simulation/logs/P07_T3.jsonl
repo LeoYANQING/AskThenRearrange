@@ -1,0 +1,8 @@
+{"event": "trial_start", "participant_id": 7, "trial_index": 3, "strategy": "PAR", "scene": "study", "timestamp": "2026-03-17T10:45:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "AO", "question": "I'm going to place the stapler in the bookshelf \u2014 does that work?", "answer": "Yes, that's fine / Actually, I'd prefer the wall-mounted shelf.", "psr_at_k": {"seen": 0.128, "unseen": 0.229, "total": 0.179}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "AO", "question": "Let me try putting sticky notes in the wall-mounted shelf. Does this match your preference?", "answer": "That works / I'd actually put it in the filing cabinet.", "psr_at_k": {"seen": 0.378, "unseen": 0.305, "total": 0.342}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "PI", "question": "I notice a pattern \u2014 you tend to keep the main surface clear and store things in drawers. Does that sound right?", "answer": "Yes, that's a good summary / It's a bit more nuanced than that.", "psr_at_k": {"seen": 0.52, "unseen": 0.309, "total": 0.415}}
+{"event": "trial_end", "n_turns": 3}
+{"event": "preference_form", "unseen_psr": 0.599, "seen_psr": 0.729, "total_psr": 0.664}
+{"event": "questionnaire", "CL1": 5.0, "CL2": 5.0, "CL3": 4.5, "PU1": 5.0, "PU2": 5.5, "PU3": 5.5, "IA1": 2.0, "IA2": 2.5, "IA3": 3.5, "CL_mean": 4.833, "PU_mean": 5.333, "IA_mean": 2.667}
+{"event": "evaluation_summary", "strategy": "PAR", "unseen_psr": 0.599, "seen_psr": 0.729}

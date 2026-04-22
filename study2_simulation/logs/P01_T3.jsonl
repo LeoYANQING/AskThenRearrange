@@ -1,0 +1,10 @@
+{"event": "trial_start", "participant_id": 1, "trial_index": 3, "strategy": "PAR", "scene": "study", "timestamp": "2026-03-11T10:45:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "AO", "question": "I'm going to place the USB drive in the desktop organiser \u2014 does that work?", "answer": "Yes, that's fine / Actually, I'd prefer the bookshelf.", "psr_at_k": {"seen": 0.165, "unseen": 0.097, "total": 0.131}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "AO", "question": "Let me try putting notebook in the wall-mounted shelf. Does this match your preference?", "answer": "That works / I'd actually put it in the desktop organiser.", "psr_at_k": {"seen": 0.225, "unseen": 0.237, "total": 0.231}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "PI", "question": "I notice a pattern \u2014 you tend to keep frequently used items on open surfaces. Does that sound right?", "answer": "Yes, that's a good summary / It's a bit more nuanced than that.", "psr_at_k": {"seen": 0.314, "unseen": 0.352, "total": 0.333}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Let me try putting sticky notes in the desktop organiser. Does this match your preference?", "answer": "That works / I'd actually put it in the wall-mounted shelf.", "psr_at_k": {"seen": 0.431, "unseen": 0.463, "total": 0.447}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "I'm going to place the keyboard in the wall-mounted shelf \u2014 does that work?", "answer": "Yes, that's fine / Actually, I'd prefer the filing cabinet.", "psr_at_k": {"seen": 0.449, "unseen": 0.448, "total": 0.448}}
+{"event": "trial_end", "n_turns": 5}
+{"event": "preference_form", "unseen_psr": 0.741, "seen_psr": 0.961, "total_psr": 0.851}
+{"event": "questionnaire", "CL1": 3.5, "CL2": 3.5, "CL3": 3.0, "PU1": 7.0, "PU2": 6.0, "PU3": 5.5, "IA1": 5.0, "IA2": 4.0, "IA3": 5.5, "CL_mean": 3.333, "PU_mean": 6.167, "IA_mean": 4.833}
+{"event": "evaluation_summary", "strategy": "PAR", "unseen_psr": 0.741, "seen_psr": 0.961}

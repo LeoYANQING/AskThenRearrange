@@ -1,0 +1,12 @@
+{"event": "trial_start", "participant_id": 11, "trial_index": 2, "strategy": "DQ", "scene": "study", "timestamp": "2026-03-21T10:30:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "AO", "question": "Where should I put the keyboard?", "answer": "Put it in the bookshelf.", "psr_at_k": {"seen": 0.1, "unseen": 0.075, "total": 0.087}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "AO", "question": "Where would you like the desk lamp to go?", "answer": "I'd put that in the desktop organiser.", "psr_at_k": {"seen": 0.198, "unseen": 0.208, "total": 0.203}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Which container should the notebook go into?", "answer": "The wall-mounted shelf works for that.", "psr_at_k": {"seen": 0.299, "unseen": 0.129, "total": 0.214}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Where should I put the USB drive?", "answer": "Put it in the bookshelf.", "psr_at_k": {"seen": 0.346, "unseen": 0.216, "total": 0.281}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Where would you like the stapler to go?", "answer": "I'd put that in the bookshelf.", "psr_at_k": {"seen": 0.441, "unseen": 0.281, "total": 0.361}}
+{"event": "dialogue_turn", "turn_index": 6, "pattern": "AO", "question": "Which container should the sticky notes go into?", "answer": "The filing cabinet works for that.", "psr_at_k": {"seen": 0.507, "unseen": 0.266, "total": 0.386}}
+{"event": "dialogue_turn", "turn_index": 7, "pattern": "AO", "question": "Where should I put the calculator?", "answer": "Put it in the desktop organiser.", "psr_at_k": {"seen": 0.528, "unseen": 0.358, "total": 0.443}}
+{"event": "trial_end", "n_turns": 7}
+{"event": "preference_form", "unseen_psr": 0.664, "seen_psr": 0.987, "total_psr": 0.826}
+{"event": "questionnaire", "CL1": 5.0, "CL2": 4.5, "CL3": 4.0, "PU1": 4.5, "PU2": 5.0, "PU3": 4.0, "IA1": 3.0, "IA2": 3.0, "IA3": 3.5, "CL_mean": 4.5, "PU_mean": 4.5, "IA_mean": 3.167}
+{"event": "evaluation_summary", "strategy": "DQ", "unseen_psr": 0.664, "seen_psr": 0.987}

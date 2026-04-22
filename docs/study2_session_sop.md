@@ -1,9 +1,11 @@
-# PrefQuest Study 2 实验员操作指南
+# PrefQuest Study 2 — 实验员 Session SOP
 
-**版本**：2.0（2026-04-20）  
+**版本**：2.3（2026-04-21）  
 **适用对象**：主实验员（PI）及助手实验员  
 **实验设计**：被试内设计，3 种策略条件（DQ / UPF / PAR），每人 3 个 trial  
 **预计时长**：每次 session 约 65–75 分钟
+
+> **问卷测量分层**：CL / PU / IA 为 **primary**（对应 RQ4 体验维度与 H3 主观–客观分离，进入 Friedman + post-hoc 假设检验）；QA 为 **process check**（不进假设检验，仅用 Spearman(QA, PU) 支持机制解释）；Final Strategy Ranking 作为 **behavioral outcome**（替代 Trust & Intention 自评）。共 4 部分 11 题，每 trial 约 3 分钟。
 
 **角色分工**
 
@@ -65,7 +67,7 @@ npm run dev
 
 1. 引导参与者就座，简要介绍实验环境
 2. 请参与者阅读知情同意书并签字（含录音授权）
-3. 将平板递给参与者，填写**人口统计学问卷 + ATI + NARS**（约 8 分钟）
+3. 将平板递给参与者，填写**人口统计学问卷**（年龄、性别、整理频率、机器人使用经验单题）（约 5 分钟）
 4. 回收平板
 
 ### 1.5 口头介绍（逐字稿）
@@ -86,7 +88,7 @@ npm run dev
 
 1. 在控制面板选择 **Practice Trial**，策略选 UPF，点击 **Start Scene**
 2. 摆好练习场景道具，将平板递给参与者（显示物品网格）
-3. 按照正式 trial 的完整流程走一遍 Phase 1–5（步骤见第二节）
+3. 按照正式 trial 的完整流程走一遍 Phase 1–5（步骤见第二节）；**注意**：练习 Phase 4 仅填 2 题简化问卷（CL1 + PU1），无 IA 量表，平板会自动呈现简化版
 4. 练习结束后询问参与者：**"整个流程清楚了吗？有什么问题吗？"**
 
 **练习阶段常见问题回答**：
@@ -160,12 +162,57 @@ npm run dev
 **助手操作**：点击 **Advance to Questionnaire**
 
 **主实验员操作**：
-1. 将平板递给参与者（依次显示 NASA-TLX → 感知理解问卷 → 交互主导感问卷）
+1. 将平板递给参与者
 2. 对参与者说：
    > "请完成这份关于刚才对话体验的问卷，根据你的真实感受作答就好。"
 3. 参与者提交后收回平板
 
 > ⚠️ **此时绝对不展示系统预测结果。** 问卷的有效性依赖于参与者对准确率"完全不知情"。
+
+#### 问卷题目（供实验员核对；平板上自动呈现）
+
+**第一部分：认知负荷（CL）**  
+量表：1 = 非常低 / 7 = 非常高
+
+| 题号 | 英文原文 | 中文译文 |
+|---|---|---|
+| CL1 | How mentally demanding was the interaction? | 这段对话在脑力上对你的要求有多高？ |
+| CL2 | How hard did you have to work to accomplish your level of performance? | 为了完成这个任务，你需要付出多大的努力？ |
+| CL3 | How irritated, stressed, and annoyed were you? | 在整个过程中，你感到多沮丧、紧张或烦躁？ |
+
+---
+
+**第二部分：感知理解（PU）**  
+量表：1 = 强烈不同意 / 7 = 完全同意
+
+| 题号 | 英文原文 | 中文译文 |
+|---|---|---|
+| PU1 | In this session, the agent understood my organising preferences. | 在这次对话中，机器人理解了我的整理偏好。 |
+| PU2 | In this session, I believe the agent could predict where I would place items it did not ask about. | 在这次对话中，我相信机器人能预测出它没有直接问过我的物品应该放在哪里。 |
+| PU3 | In this session, the agent seemed to understand not just specific items, but the general logic behind how I organise. | 在这次对话中，机器人似乎不只理解了具体物品的放置，还理解了我整理东西背后的整体逻辑。 |
+
+---
+
+**第三部分：交互主导感（IA）**  
+量表：1 = 强烈不同意 / 7 = 完全同意
+
+| 题号 | 英文原文 | 中文译文 |
+|---|---|---|
+| IA1 | In this session, I felt that my answers actively shaped what the agent came to understand about my preferences. | 在这次对话中，我感觉我的回答积极地影响了机器人对我偏好的理解。 |
+| IA2 | In this session, I felt that I, rather than the agent, determined what preferences the agent should learn about. | 在这次对话中，我感觉是我而不是机器人决定了它应该学习哪些偏好。 |
+| IA3 | In this session, I felt I had control over what conclusions the agent drew about my preferences. | 在这次对话中，我感觉我能掌控机器人对我偏好得出的结论。 |
+
+---
+
+**第四部分：提问恰当性（QA）—— process check，不进假设检验**  
+量表：1 = 强烈不同意 / 7 = 完全同意
+
+> 用途：**过程诊断**，不纳入 H1–H3 假设检验。分析计划仅报告描述统计与 Spearman(QA, PU) 相关系数，用于 Discussion 支持"HHI-derived 提问模式迁移到 agent 侧后仍被感知为自然"的机制解释。
+
+| 题号 | 英文原文 | 中文译文 |
+|---|---|---|
+| QA1 | The way the agent asked its questions felt natural for this task. | 在这次对话中，机器人的提问方式让我觉得很自然、符合这个任务的场景。 |
+| QA2 | I could easily understand why the agent was asking each question. | 在这次对话中，我能清楚地理解机器人为什么会问每一个问题。 |
 
 ---
 
@@ -245,6 +292,14 @@ npm run dev
 **E. 真实场景**
 - "如果家里真的有这样一个机器人，你希望它用哪种方式向你提问？"
 - "你觉得提多少个问题比较合适？"
+
+**F. 个人差异探查**（替代量表，定性收集）
+- "平时你是个比较喜欢主导事情进展的人，还是更倾向于跟着对方走？"（替代 dominance 量表）
+- "你在日常生活中对整理收纳有没有比较固定的习惯或规则？"（整理规则程度）
+- "你平时用智能设备或 AI 助手多吗？有没有觉得它们'不够了解你'的经历？"（技术使用态度，替代 ATI）
+- "和机器人或 AI 交互时，你一般感觉自在吗？有没有觉得别扭的地方？"（机器人舒适度，替代 NARS）
+
+> 注：F 段探针用于获取 ATI / NARS 对应的定性信息，助手记录关键词即可，无需逐字转录。
 
 **结束语**：
 > "非常感谢你今天参与！你的反馈对我们的研究很有帮助。如有任何问题，可以通过邮件联系我们。"
@@ -328,4 +383,4 @@ print(len(events), "events recorded")
 
 ---
 
-*版本：2.0 | 2026-04-20*
+*版本：2.3 | 2026-04-21*

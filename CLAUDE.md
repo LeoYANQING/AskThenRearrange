@@ -80,7 +80,8 @@ AskThenRearrange/
 │   ├── writing_style_guide.md         ← IJHCS 格式/统计/术语规范
 │   ├── writing_logic_guide.md         ← 论证结构与叙事逻辑规范
 │   ├── system_overview.md             ← PrefQuest 技术架构说明
-│   └── study2_frontend_PRD.md         ← Study 2 前端系统需求文档
+│   ├── study2_frontend_PRD.md         ← Study 2 前端系统需求文档（给开发者）
+│   └── study2_session_sop.md          ← Study 2 实验员操作 SOP（给实验员，含问卷题目）
 ├── logs/
 │   └── ablation_full_qwen3.jsonl      ← Qwen3 全量实验日志
 └── plots/

@@ -1,0 +1,12 @@
+{"event": "trial_start", "participant_id": 22, "trial_index": 1, "strategy": "UPF", "scene": "living", "timestamp": "2026-03-32T10:15:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "PE", "question": "How do you generally organise items in your living?", "answer": "I usually keep everyday things within easy reach and store rarely used items away.", "psr_at_k": {"seen": 0.1, "unseen": 0.078, "total": 0.089}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "PI", "question": "So you prefer items you use daily to be in easily accessible spots?", "answer": "Yes, exactly. Convenience is my top priority.", "psr_at_k": {"seen": 0.18, "unseen": 0.242, "total": 0.211}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Based on your preferences, where should TV remote go?", "answer": "I think the display cabinet makes sense given what I said.", "psr_at_k": {"seen": 0.264, "unseen": 0.387, "total": 0.325}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Given what you told me, which container fits candle best?", "answer": "I'd say display cabinet \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.321, "unseen": 0.442, "total": 0.381}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Based on your preferences, where should charging cable go?", "answer": "I think the storage ottoman makes sense given what I said.", "psr_at_k": {"seen": 0.344, "unseen": 0.561, "total": 0.453}}
+{"event": "dialogue_turn", "turn_index": 6, "pattern": "AO", "question": "Given what you told me, which container fits blanket best?", "answer": "I'd say side table \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.414, "unseen": 0.614, "total": 0.514}}
+{"event": "dialogue_turn", "turn_index": 7, "pattern": "AO", "question": "Based on your preferences, where should plant spray go?", "answer": "I think the side table makes sense given what I said.", "psr_at_k": {"seen": 0.535, "unseen": 0.664, "total": 0.599}}
+{"event": "trial_end", "n_turns": 7}
+{"event": "preference_form", "unseen_psr": 0.924, "seen_psr": 0.914, "total_psr": 0.919}
+{"event": "questionnaire", "CL1": 4.0, "CL2": 4.5, "CL3": 4.5, "PU1": 3.0, "PU2": 4.0, "PU3": 3.5, "IA1": 5.0, "IA2": 5.0, "IA3": 5.0, "CL_mean": 4.333, "PU_mean": 3.5, "IA_mean": 5.0}
+{"event": "evaluation_summary", "strategy": "UPF", "unseen_psr": 0.924, "seen_psr": 0.914}

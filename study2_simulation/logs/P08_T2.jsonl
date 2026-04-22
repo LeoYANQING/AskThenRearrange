@@ -1,0 +1,9 @@
+{"event": "trial_start", "participant_id": 8, "trial_index": 2, "strategy": "PAR", "scene": "study", "timestamp": "2026-03-18T10:30:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "AO", "question": "I'm going to place the keyboard in the filing cabinet \u2014 does that work?", "answer": "Yes, that's fine / Actually, I'd prefer the desktop organiser.", "psr_at_k": {"seen": 0.136, "unseen": 0.13, "total": 0.133}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "AO", "question": "Let me try putting stapler in the desk drawer. Does this match your preference?", "answer": "That works / I'd actually put it in the filing cabinet.", "psr_at_k": {"seen": 0.279, "unseen": 0.221, "total": 0.25}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "PI", "question": "I notice a pattern \u2014 you tend to place daily-use items within arm's reach. Does that sound right?", "answer": "Yes, that's a good summary / It's a bit more nuanced than that.", "psr_at_k": {"seen": 0.348, "unseen": 0.396, "total": 0.372}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Let me try putting desk lamp in the desk drawer. Does this match your preference?", "answer": "That works / I'd actually put it in the bookshelf.", "psr_at_k": {"seen": 0.478, "unseen": 0.486, "total": 0.482}}
+{"event": "trial_end", "n_turns": 4}
+{"event": "preference_form", "unseen_psr": 0.694, "seen_psr": 0.748, "total_psr": 0.721}
+{"event": "questionnaire", "CL1": 4.0, "CL2": 2.5, "CL3": 4.0, "PU1": 5.0, "PU2": 4.5, "PU3": 5.0, "IA1": 4.0, "IA2": 3.0, "IA3": 3.5, "CL_mean": 3.5, "PU_mean": 4.833, "IA_mean": 3.5}
+{"event": "evaluation_summary", "strategy": "PAR", "unseen_psr": 0.694, "seen_psr": 0.748}

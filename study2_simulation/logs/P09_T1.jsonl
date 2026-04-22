@@ -1,0 +1,11 @@
+{"event": "trial_start", "participant_id": 9, "trial_index": 1, "strategy": "UPF", "scene": "study", "timestamp": "2026-03-19T10:15:00Z"}
+{"event": "dialogue_turn", "turn_index": 1, "pattern": "PE", "question": "How do you generally organise items in your study?", "answer": "I usually keep everyday things within easy reach and store rarely used items away.", "psr_at_k": {"seen": 0.113, "unseen": 0.215, "total": 0.164}}
+{"event": "dialogue_turn", "turn_index": 2, "pattern": "PI", "question": "So you prefer items you use daily to be in easily accessible spots?", "answer": "Yes, exactly. Convenience is my top priority.", "psr_at_k": {"seen": 0.153, "unseen": 0.302, "total": 0.228}}
+{"event": "dialogue_turn", "turn_index": 3, "pattern": "AO", "question": "Based on your preferences, where should stapler go?", "answer": "I think the filing cabinet makes sense given what I said.", "psr_at_k": {"seen": 0.294, "unseen": 0.363, "total": 0.328}}
+{"event": "dialogue_turn", "turn_index": 4, "pattern": "AO", "question": "Given what you told me, which container fits notebook best?", "answer": "I'd say desktop organiser \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.398, "unseen": 0.458, "total": 0.428}}
+{"event": "dialogue_turn", "turn_index": 5, "pattern": "AO", "question": "Based on your preferences, where should USB drive go?", "answer": "I think the filing cabinet makes sense given what I said.", "psr_at_k": {"seen": 0.394, "unseen": 0.535, "total": 0.464}}
+{"event": "dialogue_turn", "turn_index": 6, "pattern": "AO", "question": "Given what you told me, which container fits desk lamp best?", "answer": "I'd say wall-mounted shelf \u2014 it's where I access things like that regularly.", "psr_at_k": {"seen": 0.435, "unseen": 0.551, "total": 0.493}}
+{"event": "trial_end", "n_turns": 6}
+{"event": "preference_form", "unseen_psr": 0.679, "seen_psr": 0.724, "total_psr": 0.702}
+{"event": "questionnaire", "CL1": 4.5, "CL2": 4.0, "CL3": 4.0, "PU1": 3.5, "PU2": 5.0, "PU3": 4.0, "IA1": 5.5, "IA2": 6.0, "IA3": 5.5, "CL_mean": 4.167, "PU_mean": 4.167, "IA_mean": 5.667}
+{"event": "evaluation_summary", "strategy": "UPF", "unseen_psr": 0.679, "seen_psr": 0.724}

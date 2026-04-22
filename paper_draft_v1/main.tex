@@ -122,7 +122,7 @@
 %%
 %% The "title" command has an optional parameter,
 %% allowing the author to define a "short title" to be used in page headers.
-\title{Does How You Ask Matter? Questioning Strategies for Preference Learning in Household Robot Assistance}
+\title{From Human Dialogue to Agent Questioning: How Questioning Strategy Shapes Preference Learning in Household Rearrangement}
 
 %%
 %% The "author" command and its associated commands are used to define
@@ -211,7 +211,7 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-Household robots that assist with organizing tasks must acquire individualized user preferences through dialogue; however, the effect of different \textit{questioning strategy designs} on objective task performance remains largely uncharacterized. Prior work has examined atomic clarification queries in isolation, leaving open whether macro-level strategy organization---how a robot schedules question types across a multi-turn budget---produces measurably different outcomes, particularly for objects never discussed during the interaction. The present work addresses this gap through three contributions. First, we conducted a formative human--human study ($N = 28$ participants, 14 dyads) and identified three empirically grounded questioning patterns: \textit{Direct Querying} (item-by-item clarification), \textit{User-Preference-First} (eliciting abstract organizing rules before specific actions), and \textit{Parallel Exploration} (interleaving concrete actions with periodic rule induction). Second, we formalized these patterns as composable design elements within \textsc{PrefQuest}, a structured preference learning framework that maintains an explicit evidence hierarchy across turns. Third, we evaluated four questioning strategies derived from these patterns in a large-scale simulation study spanning 102 household episodes and question budgets from 1 to 10. Results indicate that the User-Preference-First strategy achieves 85.2\% unseen preference satisfaction rate at budget $B=5$, significantly outperforming Direct Querying (72.7\%; $+12.5$ percentage points, $p < .001$), because top-down preference elicitation produces category-level rules that generalize to novel objects. In contrast, bottom-up induction (Parallel Exploration) offers no significant advantage over item-by-item querying under tight budgets, and adaptive strategy switching does not outperform the simpler preference-first heuristic. These findings have implications for the design of preference-aware dialogue agents that must balance information breadth against interaction cost.
+When people are placed in the role of learning another person's household organization preferences through conversation, they rarely ask questions at random. They structure their inquiries around different levels of abstraction, sometimes resolving objects one at a time, sometimes first articulating the organizing rule that covers many items, and sometimes advancing tentative hypotheses to be confirmed or rejected. Whether interactive agents that must elicit preferences under a limited question budget can benefit from these human-derived questioning patterns, both in what the agent can learn and in how the interaction feels to the person answering, is an open question with direct implications for designing preference-aware conversational systems that neither overburden the teacher nor misread what they mean. Prior work in human--robot and human--agent preference learning has examined atomic clarification queries in isolation, leaving open how multi-turn questioning patterns, once carried from inter-human elicitation into agent-initiated elicitation, influence learning efficiency, generalization to objects never discussed, and subjective experience. In a formative human--human study ($N = 28$ participants, 14 dyads), we analyzed the dialogue contributed by the partner placed in the asker role and identified three recurring questioning patterns: \textit{Direct Querying} (DQ; item-by-item clarification), \textit{User-Preference-First} (UPF; eliciting abstract organizing rules before specific actions), and \textit{Parallel Exploration} (PAR; interleaving concrete actions with periodic rule induction). We then operationalized these human-derived patterns as composable design elements within \textsc{PrefQuest}, a structured preference learning framework in which an agent-initiated dialogue maintains an explicit separation between object-level actions, category-level rules, and rejected hypotheses. A simulation study across 102 household episodes with question budgets from 1 to 10 showed that the agent-side UPF strategy achieves 85.2\% unseen preference satisfaction rate (PSR) at budget $B = 5$, substantially outperforming DQ (72.7\%; $+12.5$ pp, $p < .001$), because top-down preference elicitation yields category-level rules that transfer to novel objects whereas bottom-up induction offers no reliable advantage under tight budgets. A within-subjects user study ($N = 24$) complements these findings by testing whether the simulation pattern replicates when real users answer the agent's questions and whether the strategies produce measurably different cognitive load, interaction satisfaction, and perceived control. Together, the studies trace a path from human questioning behavior to agent-initiated questioning design, and indicate that the level of abstraction at which an agent asks is a first-class design variable shaping both what the agent can generalize and how the teacher experiences the exchange.
 \end{abstract}
 
 %%
@@ -251,7 +251,7 @@ Household robots that assist with organizing tasks must acquire individualized u
 %% information and the body of the document, and typically spans the
 %% page.
 \begin{teaserfigure}
-  \includegraphics[width=\textwidth]{teaser}
+  \includegraphics[width=\textwidth]{img/teaser2.png}
   \caption{The present study examines how questioning strategies affect robot learning of household preferences. We (1) identify three distinct questioning patterns in human teaching through a formative study, (2) formalize them as composable design elements within a structured preference learning framework (\textsc{PrefQuest}), and (3) provide the first large-scale quantitative evidence that strategy choice measurably affects generalization to novel objects, with top-down preference elicitation significantly outperforming item-by-item querying.}
   % TODO: Update teaser figure to reflect new system architecture
   \Description{An overview diagram showing three questioning patterns and their effect on household object placement accuracy.}
@@ -271,31 +271,32 @@ Household robots that assist with organizing tasks must acquire individualized u
 \section{Introduction}
 % =============================================================================
 
-Household tasks are inherently open-ended and shaped by diverse, individualized user preferences, making it difficult for robots to reliably align with human expectations~\cite{wu2023tidybot,nasiriany2024robocasa}. Beyond perceiving the physical environment, effective assistance requires robots to proactively acquire preferences that are often tacit, abstract, and only partially articulable~\cite{zheng2019personalized,lawley2024val}. Learning by Asking (LBA) provides a natural and interaction-efficient mechanism for this: by posing targeted questions before acting, a robot can reduce uncertainty, build a shared understanding of user preferences, and apply what it has learned to objects it has never explicitly been asked about~\cite{biyik2019asking,6padmakumar2022teach,8leusmann2025investigating}.
+When an interactive agent must acquire a user's household organization preferences through a small number of conversational exchanges, it cannot rely on the user to volunteer complete instructions; to close the gap between what it needs to know and what the user has said so far, it must ask. Proactive questioning is therefore not an auxiliary mechanism but the central lever through which preference-aware agents make interactive personalization tractable. When people are placed in a comparable role, that of eliciting another person's organizing preferences through conversation under uncertainty, they rarely ask at random~\cite{stivers2010overview,robinson2023probing}. Instead, they structure their inquiries around different levels of abstraction, sometimes clarifying specific object placements and sometimes first establishing a general organizing principle that applies to many items. This structuring is a cognitive and communicative act: askers select what to ask, and at what level to ask it, as a function of what they have already inferred about the other party's habits and what remains uncertain~\cite{zheng2019personalized,lawley2024val}. For interactive agents that must acquire individualized preferences through agent-initiated dialogue, understanding how humans themselves organize such elicitation conversations is a prerequisite for designing questioning policies that align with how people naturally structure inquiry under uncertainty~\cite{wu2023tidybot,cakmak2012designing,biyik2019asking,6padmakumar2022teach,8leusmann2025investigating}.
 
-A fundamental but underexplored design dimension of LBA concerns \textit{how questions are organized across multiple turns}. Consider two contrasting approaches: a robot might ask about each object individually---``Where should this book go?''---or instead begin with a broader preference question such as ``Do you usually keep reading materials and study supplies together?''. These two approaches instantiate different \textit{questioning strategies}, and prior work in education and collaborative dialogue suggests that how questions are sequenced strongly influences information yield and perceived interaction quality~\cite{cakmak2012designing,mutlu2009footing}. However, existing robot LBA research has largely focused on optimizing individual questions---choosing which clarification to request, or how to phrase an ambiguity resolution~\cite{cakmak2012designing,biyik2019asking,habibian2022here}---while the macro-level organization of questioning sequences across a full interaction budget has received comparatively little attention~\cite{tyshka2023interactive,hu2024designing}. Critically, prior evaluations have relied almost exclusively on subjective user perceptions (e.g., perceived workload, curiosity, or trust), leaving open the question of whether different questioning strategies produce measurably different \textit{objective} task outcomes.
+A central but underexplored aspect of such agent-initiated preference learning concerns the macro-level organization of questions across multiple turns. Consider two contrasting approaches an agent might take: it could ask about each object individually, for example ``Where should this book go?'', or instead begin with a broader preference question such as ``Do you usually keep reading materials and study supplies together?''. These approaches instantiate different \textit{questioning strategies}, and prior work in education and collaborative dialogue suggests that how questions are sequenced strongly influences both information yield and perceived interaction quality~\cite{cakmak2012designing,mutlu2009footing}. Existing research in human--robot interaction has largely focused on optimizing individual questions, namely what single clarification to request, how to phrase an ambiguity resolution, or how to select the next most informative query~\cite{cakmak2012designing,biyik2019asking,habibian2022here}. How such atomic decisions are composed into multi-turn strategies across a full interaction budget, and how those compositions shape what a user experiences and what an agent can generalize to objects it never explicitly asked about, has received comparatively little attention~\cite{tyshka2023interactive,hu2024designing}. Moreover, prior evaluations have relied almost exclusively on subjective measures such as perceived workload, curiosity, or trust, leaving open whether different questioning strategies produce measurably different \textit{objective} task outcomes, and whether objective and subjective outcomes move together or diverge.
 
-The present work addresses this gap by combining human-derived questioning patterns with a structured preference learning framework and providing the first large-scale quantitative evaluation of questioning strategy effects on object placement accuracy. We focus specifically on \textit{unseen object accuracy}---the ability to correctly place objects that were never directly discussed during questioning---as this is the most direct test of whether learned preferences are genuinely generalizable rather than merely object-specific. To address this, we formulate three research questions:
+The present work takes a human-centered approach to this gap, organized around a transfer question: can the questioning patterns that recur in inter-human preference elicitation be carried over to agent-initiated elicitation, and if so, with what consequences for what the agent can learn and how the interaction feels? We first observe how people, when placed in the asker role of a preference-elicitation dyad, structure their questioning; we then operationalize the observed patterns as composable elements of an agent-initiated questioning policy; and finally we test the resulting strategies both in controlled simulation and with real users. Our primary objective measure is \textit{unseen Preference Satisfaction Rate (unseen PSR)}, defined as the proportion of objects never directly discussed during questioning that are nonetheless placed in accordance with the user's preferences. Unseen PSR foregrounds the central challenge of preference learning through proactive questioning, namely extracting generalizable rules from a small number of targeted exchanges rather than resolving each object one at a time. We formulate four research questions:
 
 \begin{itemize}[leftmargin=*]
-    \item \textbf{RQ1}: In household teaching scenarios, do people naturally exhibit distinguishable questioning strategies, and if so, what are their organizational characteristics?
-    \item \textbf{RQ2}: Can these empirically grounded strategies be formalized as composable dialogue policies within a structured preference learning framework?
-    \item \textbf{RQ3}: Does strategy choice produce measurably different outcomes in objective task performance---specifically, in the accuracy with which learned preferences generalize to objects never discussed during questioning?
+    \item \textbf{RQ1}: When people are placed in the asker role of a preference-elicitation dyad, do they exhibit distinguishable questioning patterns, and if so, what are their organizational characteristics?
+    \item \textbf{RQ2}: Can the asker-side patterns observed in human--human elicitation be formalized as composable question elements whose scheduling behavior is deterministic and interpretable within a shared structured preference state, so that an agent-initiated dialogue can be configured to follow any one of them?
+    \item \textbf{RQ3}: When transferred to an agent-initiated setting, does the choice among these human-derived strategies produce measurably different outcomes in objective task performance, specifically in the Preference Satisfaction Rate (PSR) with which learned preferences generalize to objects never discussed during questioning, and does this effect replicate when real users, rather than a simulated oracle, answer the agent's questions?
+    \item \textbf{RQ4}: Do the three human-derived strategies produce measurably different user-experience outcomes when deployed as agent-initiated questioning (cognitive load, satisfaction, perceived control), and do objective PSR rankings align with subjective experience rankings, or do the two dimensions dissociate?
 \end{itemize}
 
-To address RQ1, we conducted a formative human--human interaction study in which participants taught household organization tasks through dialogue. Analysis of 28 dialogue sequences revealed three distinct questioning patterns: \textit{Direct Querying} (item-by-item), \textit{User-Preference-First} (establishing general rules before addressing specific items), and \textit{Parallel Exploration} (interleaving concrete actions with periodic rule induction). For RQ2, we formalized these patterns as three questioning design elements---Action-Oriented (AO), Preference-Eliciting (PE), and Preference-Induction (PI)---and composed them into four controllable questioning strategies within \textsc{PrefQuest}, a structured preference learning framework that maintains an explicit evidence hierarchy across turns. For RQ3, we evaluated all four strategies in a simulation study across 102 household episodes with question budgets from 1 to 10, holding all factors constant except strategy composition.
+To address RQ1, we conducted a formative human--human interaction study in which dyads engaged in household-organization dialogue under explicit asker and answerer roles. Analysis of the asker-side contributions across 14 dialogue sequences revealed three distinct questioning patterns: \textit{Direct Querying} (DQ; item-by-item), \textit{User-Preference-First} (UPF; establishing general rules before addressing specific items), and \textit{Parallel Exploration} (PAR; interleaving concrete actions with periodic rule induction). For RQ2, we formalized these patterns as three questioning design elements, namely Action-Oriented (AO), Preference-Eliciting (PE), and Preference-Induction (PI), and composed them into four controllable agent-initiated questioning strategies within \textsc{PrefQuest}, a structured preference learning framework that maintains an explicit evidence hierarchy across turns. For RQ3, we first evaluated all four strategies in a simulation study across 102 household episodes with question budgets from 1 to 10, holding all factors constant except strategy composition, and then conducted a within-subjects user study ($N = 24$) to test whether the simulation finding replicates when real users, rather than a simulated oracle, answer the agent's questions. The user study additionally addresses RQ4 by measuring cognitive load, satisfaction, and perceived control for each strategy and comparing subjective with objective outcome rankings.
 
-Results indicate that strategy choice has a substantial and quantifiable impact on task performance. The User-Preference-First strategy achieves 85.2\% unseen preference satisfaction rate (PSR) at budget $B = 5$, outperforming Direct Querying (72.7\%) by $+$12.5 percentage points ($p < .001$). In contrast, Parallel Exploration performs at or below Direct Querying under tight budgets, and adaptive strategy combination (Hybrid-All) offers no significant improvement over the simpler preference-first heuristic.
+Results indicate that questioning patterns derived from inter-human elicitation transfer productively to agent-initiated questioning, and that the level of abstraction at which an agent asks has substantial consequences for what it can learn from a bounded exchange. The User-Preference-First (UPF) strategy substantially outperforms item-by-item Direct Querying (DQ) on unseen-object placement at moderate budgets ($B = 5$); Parallel Exploration (PAR) performs at or below DQ under tight budgets; and adaptive strategy combination (Hybrid-All, HYB) offers no additional gain over the simpler preference-first heuristic. Quantitative results are reported in §\ref{sec:study1}.
 
 The contributions of the present work are as follows:
 \begin{enumerate}
-  \item We identify and empirically validate three distinct questioning patterns in household teaching through a formative human--human study, providing grounded templates for robotic dialogue policy design.
-  \item We present \textsc{PrefQuest}, a structured preference learning framework that formalizes these patterns as composable design elements composed into four controllable strategies, supported by an explicit evidence hierarchy.
-  \item We provide the first large-scale quantitative evaluation showing that questioning strategy design is a critical and measurable factor in robot LBA, with top-down preference elicitation significantly outperforming item-by-item and bottom-up approaches on generalization to novel objects.
+  \item We characterize three recurring questioning patterns through which humans, when placed in the asker role of a preference-elicitation dyad, structure inquiry in household preference-teaching, providing empirically grounded templates for the design of agent-initiated preference-learning dialogue.
+  \item We present \textsc{PrefQuest}, a structured preference learning framework that operationalizes these human-derived patterns as composable design elements of an agent-initiated questioning policy, organized around an explicit evidence hierarchy that separates object-level actions, category-level rules, and rejected hypotheses.
+  \item We provide a systematic large-scale evaluation showing that the choice among human-derived questioning strategies is a measurable factor in preference-learning outcomes when the strategies are transferred to an agent-initiated setting, with top-down preference elicitation substantially outperforming item-by-item and bottom-up approaches on generalization to objects never discussed during the interaction.
   % TODO: Add contribution 4 (user study) when Study 2 is complete.
 \end{enumerate}
 
-The remainder of this paper is organized as follows. Section~\ref{sec:related} reviews prior work on robot learning in household tasks, active questioning in HRI, dialogue strategy design, and LLM-based robot learning. Section~\ref{sec:hhi} presents the human--human study and the three questioning patterns derived from it. Section~\ref{sec:system-design} describes the \textsc{PrefQuest} framework. Section~\ref{sec:study1} reports the simulation-based evaluation. Section~\ref{sec:study2} outlines the planned user study. Section~\ref{sec:discussion} discusses the findings, design implications, and limitations, and Section~\ref{sec:conclusion} concludes.
+The remainder of this paper is organized as follows. Section~\ref{sec:related} reviews prior work on household preference learning from interaction, active questioning in human--robot dialogue, questioning strategy research, and LLM-based interactive agents. Section~\ref{sec:hhi} presents the human--human study and the three asker-side questioning patterns derived from it. Section~\ref{sec:system-design} describes the \textsc{PrefQuest} framework. Section~\ref{sec:study1} reports the simulation-based evaluation. Section~\ref{sec:study2} presents the user study. Section~\ref{sec:discussion} discusses the findings, design implications, and limitations, and Section~\ref{sec:conclusion} concludes.
 
 % =============================================================================
 \section{Related Work}
@@ -318,7 +319,7 @@ Learning by Asking has emerged as an important paradigm for endowing robots with
 
 These strategies are effective in isolation but are typically designed for simple, single-query settings: resolving a single ambiguity~\cite{5ramrakhya2025grounding,7uehara2024learning} or acquiring knowledge about a single novel object~\cite{12biyik2019asking,shen2019learning}. Naively extending such atomic strategies to long-horizon tasks may result in unstructured, repetitive dialogue that degrades user experience and fails to capture transferable preferences~\cite{oviatt2006human,kosch2023survey}. Research on cognitive load further suggests that frequent attentional shifts can impair user performance~\cite{kosch2023survey}, and studies on dialogue systems indicate that macro-level planning of question sequences---rather than optimization of individual questions---is key to managing multi-turn interactions efficiently~\cite{stivers2010overview,kwan2023survey}.
 
-Critically, existing evaluations in the HRI community have relied almost exclusively on subjective measures (perceived workload, curiosity, trust), leaving unaddressed whether different questioning strategies produce \textit{measurably different task outcomes}. The present study addresses this gap by combining human-derived questioning patterns with a controlled quantitative evaluation of their effect on placement accuracy.
+Critically, existing evaluations in the HRI community have relied almost exclusively on subjective measures (perceived workload, curiosity, trust), leaving unaddressed whether different questioning strategies produce \textit{measurably different task outcomes}. The present study addresses this gap by combining human-derived questioning patterns with a controlled quantitative evaluation of their effect on preference satisfaction rate.
 
 \subsection{Dialogue and Questioning Strategies}
 \label{sec:related:dialogue}
@@ -334,26 +335,26 @@ In HRI research, some work has drawn directly on these theoretical foundations t
 
 The emergence of large language models (LLMs) and vision-language models (VLMs) has substantially expanded the perceptual and reasoning capabilities available to household robots. Works such as PaLM-E~\cite{driess2023palm} and RT-2~\cite{zitkovich2023rt} demonstrate that VLMs can couple multimodal perception with language reasoning, while surveys of LLM-based robot learning~\cite{ma2024survey,zeng2023large} identify these models as central to natural interaction and long-horizon planning in embodied agents.
 
-A key design question that has received comparatively little attention concerns whether to retain raw dialogue history or to extract structured intermediate representations. End-to-end LLM approaches that read full conversation histories are simple to implement but are susceptible to context limitations, information loss over long exchanges, and difficulty enforcing evidence hierarchies~\cite{tyshka2023interactive}. In applications such as TidyBot~\cite{wu2023tidybot}, which generalizes object placement from a small number of observed examples, a structured representation of confirmed placements and category rules enables more consistent and controllable reasoning than raw history alone. The present work adopts this structured approach and empirically validates its advantage over a matched end-to-end LLM baseline in the context of multi-turn preference learning.
+A key design question that has received comparatively little attention concerns whether to retain raw dialogue history or to extract structured intermediate representations. End-to-end LLM approaches that read full conversation histories are simple to implement but are susceptible to context limitations, information loss over long exchanges, and difficulty enforcing evidence hierarchies~\cite{tyshka2023interactive}. In applications such as TidyBot~\cite{wu2023tidybot}, which generalizes object placement from a small number of observed examples, a structured representation of confirmed placements and category rules enables more consistent and controllable reasoning than raw history alone. Yet no study has directly compared structured versus raw-history LLM pipelines under a matched multi-turn budget and oracle, leaving open whether structured state provides measurable gains beyond the underlying model's capacity. The present work adopts this structured approach and tests its advantage against a matched end-to-end LLM baseline in the context of multi-turn preference learning.
 
 % =============================================================================
 \section{Human--Human Study of Questioning Patterns}
 \label{sec:hhi}
 % =============================================================================
 
-Whether people organize their questions systematically when teaching household tasks---or simply ask whatever comes to mind---has direct implications for how robot questioning strategies should be designed. If human questioning is unsystematic, then any composition of question types is as principled as any other. If, instead, it exhibits recurring structure, those structures provide grounded templates for robotic dialogue policy design. To address this question, we conducted a \textit{Human--Human Interaction (HHI) study} in which one participant acted as the ``teacher,'' responding according to their personal habits and preferences, while the other played the role of the ``learner,'' who could only acquire task-relevant knowledge by asking questions.
+Every preference-elicitation dialogue involves two complementary roles: an \textit{asker} who drives inquiry under limited resources, and an \textit{answerer} whose preferences are the target of elicitation. An agent that must proactively query a user before acting occupies the asker role. Whether humans, placed in this role under ecologically matched conditions, organise their questions systematically or simply ask whatever comes to mind has direct implications for how agent questioning strategies should be designed. If asker-role behaviour is unsystematic, then any composition of question types is as principled as any other. If, instead, it exhibits recurring structure, those structures provide grounded templates for agent-initiated dialogue policy design. To isolate this behaviour empirically we conducted a \textit{Human--Human Interaction (HHI) study} in which one participant occupied the answerer role---the \textit{teacher}, responding according to their personal habits and preferences---while the other occupied the asker role---the \textit{learner}, who could acquire task-relevant knowledge only by asking questions. The asker-role behaviour isolated here is what we subsequently carry over to the agent in Section~\ref{sec:system-design}.
 
 \subsection{Participants}
 
-Participants were recruited through a screening questionnaire that asked them to report the number of times they had completed ``organizing a refrigerator'' and ``mixing cocktails'' in the past ten months, together with basic demographic information and self-rated task familiarity. An initial pool of 34 valid responses was collected; recruitment was subsequently expanded to yield a total of 40 volunteers from a university community. All participants received monetary compensation.
+Participants were recruited through a screening questionnaire that asked them to report the number of times they had completed ``organizing a refrigerator'' in the past ten months, together with basic demographic information and self-rated task familiarity. An initial pool of 34 valid responses was collected; recruitment was subsequently expanded to yield a total of 40 volunteers from a university community. All participants received monetary compensation.
 
 Participants who had performed a given task more than three times in the past ten months were classified as \textit{task-familiar} and assigned the role of \textit{teacher}, responsible for answering questions according to their own habits and preferences. Participants who had performed the task once or fewer times were classified as \textit{task-unfamiliar} and assigned the role of \textit{learner}, who could only acquire task-relevant information by asking questions. Each teacher was randomly paired with one learner, yielding 14 dyads (28 participants) who took part in the formal experiment.
 
-Participants had a mean age of 22 years and were either undergraduate or graduate students with normal or corrected-to-normal vision. All participants provided written informed consent prior to the study.
+Participants had a mean age of 22.0 years ($SD = $~\textbf{TODO}) and were either undergraduate or graduate students with normal or corrected-to-normal vision. All participants provided written informed consent prior to the study.
 
 \subsection{Procedure}
 
-The study task was organizing a refrigerator---a representative household placement task in which objects must be assigned to receptacles according to the owner's personal habits and preferences. This task type, which centers on achieving a desired \textit{final spatial state}, is directly analogous to the broader household rearrangement scenario targeted by \textsc{PrefQuest}, making it an appropriate context for formatively studying how people structure preference-eliciting dialogue.
+The study task was organizing a refrigerator---a representative household placement task in which objects must be assigned to receptacles according to the owner's personal habits and preferences. This task type, which centers on achieving a desired \textit{final spatial state}, is directly analogous to the broader household rearrangement scenario targeted by \textsc{PrefQuest}, making it an appropriate context for formatively studying how the asker role is enacted when no external policy constrains question selection.
 
 The learner could only obtain information by asking questions and executed physical operations accordingly; the teacher answered questions based on their own habits and preferences but performed no physical actions. Teachers were instructed not to use demonstration-based teaching or collaborative manipulation. Task completion was self-determined by the dyad. The entire process was recorded with a GoPro Hero 9 camera capturing both audio and video. Figure~\ref{fig:procedure} illustrates an example interaction from the experiment.
 
@@ -364,74 +365,96 @@ The learner could only obtain information by asking questions and executed physi
   \label{fig:procedure}
 \end{figure}
 
-\subsection{Hierarchical Coding Framework}
+\subsection{Coding Framework}
 
-To systematically analyze how humans ask questions in task-oriented dialogues, we developed a hierarchical coding framework with three levels, following an iterative thematic analysis approach~\cite{braun2006using}. At the first level, each question is annotated by its \textit{knowledge type}. At the second level, questions are coded according to their \textit{interactional intent}. At the third level, sequences of questions are analyzed to identify recurring \textit{patterns} across dialogues. Figure~\ref{fig:annotation-pipeline} illustrates this pipeline.
-
-Two researchers independently coded all 28 dialogue transcripts across both annotation levels. Inter-rater reliability was assessed using Cohen's $\kappa$: knowledge-level annotation achieved $\kappa = $~\textbf{TODO} and intent-level coding achieved $\kappa = $~\textbf{TODO}. Disagreements were resolved through discussion until consensus was reached; the final codebook was reviewed and validated by two additional researchers.
-% TODO: Fill in actual Cohen's kappa values from coding data.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{img/3.3.png}
-  \caption{The three-level annotation pipeline: raw dialogues are progressively annotated by knowledge type, interactional intent, and higher-level questioning pattern. This hierarchical process bridges low-level utterances and dialogue-level strategies.}
-  \label{fig:annotation-pipeline}
-\end{figure}
-
-\subsubsection{Knowledge-level Annotation}
-
-At the most fundamental level, each question was annotated with its corresponding knowledge type. We combined the K-type framework~\cite{shin2023uncertainty} with Wilson's model of information behavior~\cite{wilson1999models} to capture both the knowledge content of the question and whether it reflects user preferences. The K-type framework, originating from cognitive psychology and educational research~\cite{redfield1981meta,tofade2013best}, provides fine-grained categorization across 11 categories ranging from objective factual knowledge (e.g., object identity, spatial location) to complex subjective information (e.g., preferences, mental states). Representative examples include:
-\begin{itemize}
-    \item ``Is this a face mask?'' $\rightarrow$ Object Identity (K1);
-    \item ``Should all the unopened stuff go on this shelf?'' $\rightarrow$ Spatial Layout (K5);
-    \item ``Which part should we organize next?'' $\rightarrow$ Procedure (K8);
-    \item ``Do you usually keep all the drinks on the door?'' $\rightarrow$ Internal State (K11).
-\end{itemize}
-
-While K-type provides detailed knowledge classification, it does not explicitly account for whether a question seeks user preferences. For instance, ``Do you want the juice on the bottom or the top?'' is classified as Spatial Layout (K5) under K-type, yet its core function is to \textit{elicit the user's preference}. To address this, we incorporated Wilson's information behavior model as a complementary dimension, coding each question as either \textbf{User-related} (concerning user preferences, habits, or decisions) or \textbf{Non-user-related}. Each question was thus assigned two labels: a knowledge type (K1--K11) and a user-relatedness flag.
+To characterise how humans structure preference-elicitation dialogue, we developed a two-level coding framework through iterative analysis of the transcribed sessions. At the first level, each learner question is coded for its \textit{interactional intent}. At the second level, the full sequence of intent codes for each dialogue is analysed to identify recurring \textit{questioning patterns}. Following an observational coding approach validated in prior HRI studies of human question-asking~\cite{cakmak2012designing}, two researchers independently applied the framework to all 14 transcripts; disagreements were resolved through discussion. Inter-rater reliability was assessed via Cohen's $\kappa$ separately at each level.
 
 \subsubsection{Intent-level Coding}
 
-Annotating knowledge type alone is insufficient to reveal how a question functions in dialogue, as two questions sharing the same knowledge type may serve very different interactional purposes. We therefore conducted a higher-level coding of each question based on its \textit{interactional intent}---what the questioner aimed to achieve in a given context. Through iterative comparison and discussion, we identified three stable intent categories:
+Each learner question was coded into one of three mutually exclusive intent categories, capturing what informational goal the question pursues within the dialogue. Through iterative examination of the transcripts, we identified three stable categories:
 
-\textbf{Action-oriented queries} focus on the concrete execution of the task, aiming to clarify ``how to do'' something (e.g., \textit{``Should this notebook be placed in the drawer?''}). \textbf{Preference-summarizing queries} occur as dialogues progress, integrating and confirming previously gathered information; they typically take a summarizing or hypothetical tone and invite the user to confirm or correct (e.g., \textit{``So you prefer to keep drinks on the upper shelf, right?''}). \textbf{Preference-eliciting queries} seek the user's overall tendencies or preferences at a choice point, prompting selection among multiple possible options (e.g., \textit{``Do you want fruits placed above or below the drinks?''}).
+\textbf{Action-Oriented (AO)} queries target a single, concrete placement or handling decision for a specific item or zone. The answer resolves one action step and yields a confirmed placement $(o_i, c_j)$; it does not require the user to articulate any general organizing principle (e.g., \textit{``Should this yogurt go on the top shelf or bottom?''}).
+
+\textbf{Preference-Eliciting (PE)} queries invite the user to articulate a general organizing preference or principle for a category of objects. The \textit{user} is the originator of the preference content; the learner only provides the question frame. The answer yields a generalizable rule $(h_k, O_k, c_k)$ applicable across multiple objects (e.g., \textit{``How do you usually organize the drinks---by type or by height?''}).
+
+\textbf{Preference-Induction (PI)} queries present a hypothesis---a proposed layout plan or organizing rule---inferred by the learner from scene observations or accumulated confirmed actions, and ask the user to evaluate, refine, or reject it. Unlike PE, the \textit{learner} is the hypothesis generator; the user is the validator (e.g., \textit{``My plan would be: milk here, drinks here, fruit here---how does that sound?''}).
+
+The critical distinction between PE and PI is the direction of hypothesis generation: in PE the user generates the preference content in response to an open question; in PI the learner generates a testable preference hypothesis and seeks user confirmation. A proposal covering only a single item is coded as AO regardless of form; PI requires a hypothesis covering multiple items or a zone. To support coding consistency in borderline cases, each question was additionally annotated with its knowledge type (K1--K11)~\cite{shin2023uncertainty}: questions targeting internal states or preferences (K10--K11) were strong candidates for PE or PI, while questions targeting spatial layout or object identity (K1--K7) were strong candidates for AO. Intent-level coding achieved $\kappa = $~\textbf{TODO}.
+% TODO: Fill in actual Cohen's kappa for intent-level coding.
 
 \subsubsection{Pattern Identification}
-{\revstart
-After completing intent-level coding for individual questions, we treated the entire dialogue sequence as the unit of analysis to identify recurring questioning patterns. For each dialogue, we constructed an \textit{intent sequence}---the ordered list of intent codes (AO, PE, PS) across all questions---and analyzed the temporal distribution and transition structure of different intent types. Specifically, we examined: (1)~which intent types appeared in the opening, middle, and closing segments; (2)~whether preference-related intents clustered at the beginning or were distributed throughout; and (3)~dominant transition patterns between consecutive intent types.
 
-Two researchers independently classified each of the 28 dialogue sequences into candidate patterns using the criteria below, achieving an inter-rater agreement of $\kappa = $~\textbf{TODO} at the pattern level. Disagreements were resolved through discussion. This process yielded three stable and representative questioning patterns.
-\revend}
-% TODO: Fill in actual Cohen's kappa for pattern-level agreement.
+After completing intent-level coding, each dialogue was represented as an ordered intent sequence and examined for whether, and where, preference-seeking behaviour occurred. Two researchers independently classified all 14 sequences using the following decision rules, applied in priority order:
+
+\begin{enumerate}
+    \item If \textbf{any PI} query appears in the sequence $\rightarrow$ \textbf{PAR}
+    \item Else if \textbf{any PE} query appears before the first AO query $\rightarrow$ \textbf{UPF}
+    \item Otherwise (AO only throughout) $\rightarrow$ \textbf{DQ}
+\end{enumerate}
+
+PI takes priority because its presence marks a qualitatively different epistemic stance: the learner is actively constructing and testing preference hypotheses rather than passively eliciting or executing. PE is classified as UPF only when it precedes the first AO query, operationalising the top-down logic of establishing preference rules before acting on individual items. Pattern-level agreement was $\kappa = $~\textbf{TODO}.
+% TODO: Fill in actual Cohen's kappa for pattern-level classification.
+
+The three patterns represent distinct approaches to preference acquisition:
 
 \begin{itemize}
-    \item \textbf{User-Preference-First.} The learner begins by asking about the user's general organizing habits or preferences, which then serve as the basis for subsequent action-oriented queries. The criterion for this pattern is that the first question in the sequence is a preference-eliciting query, followed predominantly by action-oriented queries. This reflects a \textit{top-down} reasoning pathway: establishing global high-level rules first, then mapping them onto specific operations. For example, the learner may begin with \textit{``Do you prefer to keep drinks on the door or inside the fridge?''} before proceeding to \textit{``Should this milk be placed on the upper shelf?''}.
+    \item \textbf{Direct Querying (DQ).} The learner resolves the task entirely through AO queries, with no attempt to elicit or induce user preferences. The criterion is that the sequence contains no PE or PI queries. This reflects a reactive, execution-only stance in which no generalizable preference structure is sought.
 
-    \item \textbf{Parallel Exploration.} The learner interleaves action-oriented questions with preference-related ones throughout the task, progressively integrating user preferences while advancing operations. The criterion is that preference-eliciting or preference-summarizing questions appear not only at the beginning but also in the middle or later stages of the sequence. This reflects a \textit{bottom-up} reasoning pathway: accumulating evidence through action-oriented queries and gradually extracting or validating high-level preferences, resulting in a ``do-and-induce'' loop (e.g., \textit{``Does this arrangement match your usual habit?''} interleaved with item placements).
+    \item \textbf{User-Preference-First (UPF).} The learner opens by eliciting the user's general organizing preferences (PE) before proceeding to action-oriented queries. The criterion is that at least one PE query precedes the first AO query. This reflects a \textit{top-down} strategy: the user drives preference disclosure, and the learner applies the resulting rules to individual placement decisions.
 
-    \item \textbf{Direct Querying.} Unlike the other two patterns, this type of dialogue is entirely focused on action-oriented questions, with little or no attempt to elicit or summarize user preferences. The criterion is that the entire sequence consists solely of action-oriented queries. This reflects a single-layer, reactive logic in which the learner behaves more like an executor of instructions than an interpreter of user preferences.
+    \item \textbf{Parallel Exploration (PAR).} The learner generates and tests preference hypotheses (PI) at one or more points in the dialogue, alongside item-level AO queries. The criterion is the presence of at least one PI query anywhere in the sequence. Unlike UPF, where the user drives preference disclosure, in PAR the \textit{learner} takes the initiative to construct and validate a preference model.
 \end{itemize}
 
-In summary, these three patterns reveal different organizational logics of multi-turn questioning: User-Preference-First emphasizes top-down rule elicitation; Parallel Exploration emphasizes iterative alternation between concrete actions and rule induction; and Direct Querying remains at the level of immediate operations (Figure~\ref{fig:annotation-framework}).
+The three patterns differ not merely in the quantity of preference-seeking behaviour but in the fundamental epistemic role each assigns to the learner: executor (DQ), receiver (UPF), or active hypothesis generator (PAR). Figure~\ref{fig:pattern-examples} illustrates a representative dialogue sequence for each pattern.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{img/3.3.3.png}
-  \caption{Hierarchical coding framework for analyzing questioning strategies. The process begins with knowledge-level annotation, proceeds to intent-level coding, and culminates in the identification of higher-level conversational patterns.}
+  \caption{Two-level coding framework. The intent level codes each question as AO, PE, or PI; the sequence level classifies the resulting intent sequence into one of three questioning patterns.}
   \label{fig:annotation-framework}
 \end{figure}
 
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{img/fig_patterns.pdf}
+  \caption{Three questioning patterns identified in the HHI study ($N = 14$ dyads). Each block represents one question ordered top-to-bottom in dialogue sequence. \textbf{AO} = Action-Oriented; \textbf{PE} = Preference-Eliciting; \textbf{PI} = Preference-Induction. The criterion rule for each pattern is shown beneath the column header.}
+  \label{fig:pattern-examples}
+\end{figure*}
+
 \subsection{Pattern Distribution}
 
-Although some dialogues exhibited within-sequence shifts between patterns, we adopted a \textit{dominant-pattern} labeling for comparability: each of the 14 dialogue sequences was assigned to the single pattern that best captured its overall trajectory. Nine sequences (64.3\%) followed User-Preference-First, three (21.4\%) exhibited Parallel Exploration, and two (14.3\%) were Direct Querying.
+Applying the classification rules to all 14 sequences yielded the following distribution: ten sequences (71.4\%) followed User-Preference-First, three (21.4\%) were Direct Querying, and one (7.1\%) exhibited Parallel Exploration.
 
-The dominance of UPF in the refrigerator organization task is consistent with the state-goal character of placement tasks: participants seeking to learn an owner's organizing logic tend to front-load preference elicitation, establishing category-level rules before resolving individual objects. PAR appeared in roughly one-fifth of dialogues, reflecting a bottom-up strategy in which concrete placements accumulated until a generalizable pattern could be confirmed. DQ---present in a small but consistent minority---represents a baseline in which the learner remains at the level of individual object queries throughout, acquiring no explicit preference structure. The co-existence of all three patterns across 14 dyads confirms that they are empirically grounded and not artefacts of a single interactional style.
+The dominance of UPF is consistent with the state-goal character of refrigerator placement tasks: participants seeking to learn an owner's organizing logic tend to front-load preference elicitation, establishing category-level rules before resolving individual objects. DQ---present in roughly one-fifth of dialogues---represents a baseline in which the learner remains at the level of individual object queries throughout, acquiring no explicit preference structure. PAR, though rare, is the most epistemically active pattern: the learner takes the initiative to construct a preference hypothesis from scene observations and seeks user validation, rather than waiting for the user to volunteer preferences. The co-existence of all three patterns across 14 dyads suggests they reflect genuine strategic variation rather than artefacts of a single interactional style.
 
 \subsection{From Patterns to Strategies}
 
-The HHI study reveals that people do not ask questions randomly; rather, they organize their inquiries around three recurring dialogue-level patterns: Direct Querying, User-Preference-First, and Parallel Exploration. To operationalize these observations in a robotic system, we translate the HHI findings into two levels of design abstraction.
+The HHI study reveals that people do not ask questions randomly; rather, they organize their inquiries around three recurring dialogue-level patterns: Direct Querying, User-Preference-First, and Parallel Exploration. To operationalize these observations in a robotic system, we translate the HHI findings into two levels of design abstraction that jointly define the carry-over from human asker to agent.
 
-First, we derive three \textit{questioning design elements} from the intent-level analysis: Action-Oriented (AO), Preference-Eliciting (PE), and Preference-Induction (PI). AO and PE correspond directly to the action-oriented and preference-eliciting intents identified in the HHI study. For the third element, we refine HHI's \textit{Preference-Summarizing} (PS) into \textit{Preference-Induction} (PI): rather than restating previously disclosed preferences, the robot actively proposes a testable hypothesis inferred from accumulated evidence and asks the user to confirm, refine, or reject it. This refinement makes the element more actionable for robotic dialogue, where implicit preferences must be rendered explicit. Table~\ref{tab:patterns} summarizes the three design elements and their respective roles in the framework.
+The \textit{intent level} captures what a single question is asking \textit{for}, and separates three distinct granularities of preference information: object-level (one object, one receptacle), category-level (a rule over a set of objects), and hypothesis-level (a rule proposed by the asker, subject to answerer confirmation). The \textit{sequence level} captures how these granularities are scheduled across a dialogue, producing the three dominant patterns observed in HHI. Our agent design preserves both levels: the three HHI intents become three atomic questioning elements that target the same three granularities, and the three HHI patterns become three of the four scheduling strategies. Table~\ref{tab:hhi-carryover} summarises this mapping.
+
+\begin{table}[t]
+\centering
+\caption{Carry-over from HHI asker-role behaviour to the \textsc{PrefQuest} agent. The intent level provides atomic questioning elements; the sequence level provides scheduling strategies. HYB is an adaptive composition added as a reference condition; it has no direct HHI counterpart.}
+\label{tab:hhi-carryover}
+\small
+\begin{tabularx}{\linewidth}{@{} l l >{\raggedright\arraybackslash}X l @{}}
+\toprule
+\textbf{Level} & \textbf{HHI observation} & \textbf{Granularity / scheduling logic} & \textbf{Agent} \\
+\midrule
+Intent & Action-Oriented (AO) & Object-level: one confirmed $(o_i, c_j)$ & AO element \\
+Intent & Preference-Eliciting (PE) & Category-level: rule over a set of objects & PE element \\
+Intent & Preference-Summarising (PS) & Hypothesis-level: rule proposed, then validated & PI element \\
+\midrule
+Sequence & Direct Querying & Object-level only throughout the dialogue & DQ strategy \\
+Sequence & User-Preference-First & Category-level first, then object-level boundary probing & UPF strategy \\
+Sequence & Parallel Exploration & Object-level, consolidated into hypotheses as evidence accumulates & PAR strategy \\
+Sequence & (no HHI counterpart) & Adaptive composition of all three elements & HYB strategy \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+At the intent level, AO and PE correspond directly to the action-oriented and preference-eliciting intents identified in the HHI study. For the third element, we refine HHI's \textit{Preference-Summarizing} (PS) into \textit{Preference-Induction} (PI): rather than restating previously disclosed preferences, the agent actively proposes a testable hypothesis inferred from accumulated evidence and asks the user to confirm, refine, or reject it. This refinement makes the element more actionable for an agent-initiated dialogue, where implicit preferences must be rendered explicit before they can be acted on. Table~\ref{tab:patterns} summarizes the three design elements and their respective roles in the framework.
 
 \begin{table}[t]
 \centering
@@ -456,7 +479,7 @@ Proposes a rule \textit{inferred from confirmed actions} and asks the user to co
 \end{tabularx}
 \end{table}
 
-Second, we compose these design elements into four \textit{questioning strategies} that govern how elements are scheduled across a limited question budget. Three strategies correspond directly to the dominant HHI patterns: Direct Querying (DQ), User-Preference-First (UPF), and Parallel Exploration (PAR). A fourth strategy, Hybrid-All (HYB), combines all three elements adaptively and serves as a reference condition against which single-element strategies can be benchmarked. Table~\ref{tab:strategies} summarizes the strategy space and illustrates how each strategy unfolds over a short dialogue.
+Second, we compose these design elements into four \textit{questioning strategies} that govern how elements are scheduled across a limited question budget. Three strategies correspond directly to the dominant HHI patterns: Direct Querying (DQ), User-Preference-First (UPF), and Parallel Exploration (PAR). A fourth strategy, Hybrid-All (HYB), combines all three elements adaptively and serves as a reference condition: if the within-dialogue pattern shifts observed during HHI analysis are functionally beneficial, an adaptive composition should exceed any single-element strategy. Table~\ref{tab:strategies} summarizes the strategy space and illustrates how each strategy unfolds over a short dialogue.
 
 \begin{table*}[t]
 \centering
@@ -532,7 +555,7 @@ This framing makes the central constraint explicit: the agent has only a limited
   \label{fig:system-architecture}
 \end{figure*}
 
-Building on the three HHI-derived questioning elements summarized in Tables~\ref{tab:patterns} and~\ref{tab:strategies}, we present \textsc{PrefQuest}, a framework for proactive preference learning in household rearrangement. The central design claim of \textsc{PrefQuest} is that preference learning should be driven by proactive questioning organized around structured evidence accumulation, rather than by passive interpretation of raw dialogue alone. The framework operationalizes this through two components. First, it maintains a structured preference representation that explicitly separates object-level evidence, category-level rules, and negative feedback, enabling hierarchical reasoning over accumulated preference information. Second, it treats questioning strategy as a controllable layer that selects among AO, PE, and PI elements according to deterministic scheduling rules. Together, these components allow strategy composition to vary independently of the placement inference pipeline, making performance differences attributable to questioning design rather than unrelated implementation choices.
+Building on the three HHI-derived questioning elements summarized in Tables~\ref{tab:patterns} and~\ref{tab:strategies}, we present \textsc{PrefQuest}, a framework for proactive preference learning in household rearrangement. The central design claim of \textsc{PrefQuest} is that preference learning should be driven by proactive questioning organized around structured evidence accumulation, rather than by passive interpretation of raw dialogue alone. The framework operationalizes this through two components. First, it maintains a structured preference representation that explicitly separates object-level evidence, category-level rules, and negative feedback, enabling hierarchical reasoning over accumulated preference information. Second, it treats questioning strategy as a controllable layer that selects among AO, PE, and PI elements according to deterministic scheduling rules. Together, these components allow strategy composition to vary independently of the placement inference pipeline, supporting the interpretation that performance differences are attributable to questioning design rather than unrelated implementation choices. We hypothesize that without explicit separation of object-level evidence ($\mathcal{A}^+$) from category-level rules ($\mathcal{P}^+$), an LLM placer may struggle to reliably apply rules to unseen objects because rules and instances blur in raw dialogue---a prediction we test against the Raw LLM baseline in §\ref{sec:study1}.
 
 \subsubsection{Framework Overview}
 
@@ -648,13 +671,15 @@ Upon dialogue termination, the \textit{Final Placement Planner} is invoked to as
 
 \paragraph{Unseen object placement.} For each unseen object $o \in \mathcal{O}_u$, the planner follows the same priority but with emphasis on attribute-based matching: material, size, power source, and usage context determine which confirmed preference best fits the unseen object. When multiple preferences could match, the planner uses distinguishing attributes to select the most specific match.
 
-This two-stage design ensures that confirmed evidence always overrides general commonsense knowledge, which is critical in personalized household tasks where individual preferences may diverge from normative defaults.
+This two-stage design is intended to prioritize confirmed evidence over general commonsense knowledge, which is particularly important in personalized household tasks where individual preferences may diverge from normative defaults.
 
 \subsection{Implementation}
 
 \textsc{PrefQuest} is implemented as a modular Python pipeline in which each component corresponds directly to a framework module. The Structured Preference State is maintained as a typed JSON object, updated in place after every turn and passed as context to all downstream modules. The Strategy Controller is implemented as a deterministic rule-based scheduler that produces a one-sentence guidance string for the Pattern Proposer without making any LLM call itself, keeping the control logic transparent and reproducible.
 
-For all LLM-based modules---the Pattern Proposer, Preference Updater, and Final Placement Planner---we used GPT-5-Chat with temperature set to 0.0 throughout, ensuring deterministic outputs across all turns and conditions. All modules enforce structured outputs via JSON-mode generation with schema validation. The pipeline is orchestrated using the LangChain Python library~\cite{langchain2023}.
+For all LLM-based modules---the Pattern Proposer, Preference Updater, and Final Placement Planner---we used GPT-5-Chat with temperature set to 0.0 throughout, promoting consistent outputs across all turns and conditions. All modules enforce structured outputs via JSON-mode generation with schema validation. The pipeline is orchestrated using the LangChain Python library~\cite{langchain2023}.
+
+The following section empirically tests three predictions implicit in this design: (i) that strategy composition produces measurable differences in unseen-object PSR; (ii) that UPF's top-down rule elicitation transfers better to novel objects than DQ's object-by-object resolution; and (iii) that the structured preference state contributes beyond the LLM backbone, as tested against a matched Raw LLM baseline.
 
 \revend}
 
@@ -716,7 +741,7 @@ To assess oracle quality, we manually inspected a random sample of 50 oracle res
 
 We evaluated six conditions: four questioning strategies (DQ, UPF, PAR, HYB) and two baselines. The \textit{No Question} baseline ($B=0$) relies entirely on the LLM's commonsense knowledge without any user interaction, establishing a lower performance bound. The \textit{Raw LLM} baseline uses the same underlying model but replaces the entire \textsc{PrefQuest} pipeline with a minimal two-step procedure: a free-form LLM questioner generates one placement-related question per turn (given only room context, object lists, and prior Q\&A history, with no element constraints or structured state), and after budget exhaustion, a separate LLM placer reads the raw dialogue history to output placements without any structured evidence hierarchy. This baseline isolates the contribution of the full \textsc{PrefQuest} framework---strategy scheduling, structured state, and evidence-based planner---against a pure end-to-end LLM approach using the same oracle and the same question budget.
 
-Each strategy was evaluated at budget checkpoints $B \in \{1, 2, \dots, 10\}$. For efficiency, each episode was run once up to $B_{\max}=10$, with the structured state evaluated at each checkpoint. The primary model was Qwen3-8B served via Ollama (102 episodes, all conditions); GPT-5-Chat was used for cross-model validation.
+Each strategy was evaluated at budget checkpoints $B \in \{1, 2, \dots, 10\}$. For efficiency, each episode was run once up to $B_{\max}=10$, with the structured state evaluated at each checkpoint. The primary model was GPT-5-Chat (102 episodes, all conditions); Qwen3-8B served via Ollama was used for cross-model validation and is reported in Appendix~\ref{app:qwen3}.
 
 For each episode and budget, we computed a unified \textit{Preference Satisfaction Rate} (PSR) over a target object set~$\mathcal{O}$:
 \begin{equation}
@@ -761,19 +786,19 @@ HYB         & --- & --- & 62.2{\scriptsize$\pm$2.7} & 68.3{\scriptsize$\pm$2.2} 
 
 Consistent with RQ3, strategy choice produced measurably different outcomes on unseen PSR. All four strategies improved seen PSR monotonically with budget, as expected when additional turns resolve additional objects. DQ achieved the steepest seen-PSR gain (67.0\% at $B=1$ to 94.0\% at $B=10$), as each AO question resolves one seen object. Notably, at $B=1$, UPF had slightly lower seen PSR than DQ (64.5\% vs.~67.0\%), because a PE question asks about a category rather than confirming a specific object placement.
 
-The key finding concerns unseen PSR. UPF achieved 85.2\% unseen PSR at $B=5$ versus DQ's 72.7\%---a gap of $+$12.5 percentage points (Wilcoxon signed-rank: $W = 94$, $p < .001$). This advantage emerged as early as $B=3$ (71.1\% vs.~69.1\%) and remained significant at $B=10$ (87.1\% vs.~79.8\%, $+$7.4pp; $W = 105$, $p < .001$). The unseen PSR curve of UPF exhibited a characteristic elbow: rapid gain from $B=3$ to $B=5$ ($+$14.1pp), followed by sharply diminishing returns from $B=5$ to $B=10$ ($+$1.9pp). This pattern suggests that three to five well-chosen PE questions suffice to cover the major organizing rules for a typical episode, with additional questions contributing mainly to seen-object resolution.
+The key finding concerns unseen PSR. UPF achieved 85.2\% unseen PSR at $B=5$ versus DQ's 72.7\%---a gap of $+$12.5 percentage points (Wilcoxon signed-rank: $W = 94$, $p < .001$, $r = $~\textbf{TODO}). This advantage emerged as early as $B=3$ (71.1\% vs.~69.1\%) and remained significant at $B=10$ (87.1\% vs.~79.8\%, $+$7.4pp; $W = 105$, $p < .001$, $r = $~\textbf{TODO}). The unseen PSR curve of UPF exhibited a characteristic elbow: rapid gain from $B=3$ to $B=5$ ($+$14.1pp), followed by sharply diminishing returns from $B=5$ to $B=10$ ($+$1.9pp). This pattern suggests that three to five well-chosen PE questions suffice to cover the major organizing rules for a typical episode, with additional questions contributing mainly to seen-object resolution.
 
 Importantly, UPF's unseen advantage did not extend to seen PSR. At $B=5$, UPF and DQ achieved statistically equivalent seen PSR (79.8\% vs.~79.7\%, $p = .80$); at $B=10$, DQ had higher seen PSR (94.0\% vs.~89.0\%, $p = .013$), reflecting its object-by-object exhaustion of the seen set. This dissociation is consistent with the interpretation that UPF's advantage is specifically attributable to the category-level rules in $\mathcal{P}^+$, not to greater coverage of seen objects.
 
 PAR achieved 71.0\% unseen PSR at $B=5$, below both DQ (72.7\%) and UPF (85.2\%), and 77.4\% at $B=10$, below DQ (79.8\%). This finding is noteworthy: despite incorporating PI---an element designed to induce generalizable rules---PAR did not outperform purely action-based DQ on unseen PSR. The reason appears structural: within a budget of five questions, PAR must first spend at least two AO turns at the same receptacle before PI can be triggered, leaving fewer remaining turns for rule-driven generalization. In practice, the unseen-PSR profile of PAR closely resembled that of DQ, with PI contributing only marginally to preference generalization under tight budgets.
 
-HYB achieved 81.8\% unseen PSR at $B=5$ versus UPF's 85.2\% ($-$3.4pp; $W = 184$, $p = .085$), and 87.4\% versus 87.1\% at $B=10$ ($+$0.3pp; $W = 266$, $p = .796$). Neither difference was statistically significant, indicating that adaptive element selection provided no meaningful advantage over the simpler PE-first heuristic within the tested budget range.
+HYB achieved 81.8\% unseen PSR at $B=5$ versus UPF's 85.2\% ($-$3.4pp; $W = 184$, $p = .085$, $r = $~\textbf{TODO}), and 87.4\% versus 87.1\% at $B=10$ ($+$0.3pp; $W = 266$, $p = .796$, $r = $~\textbf{TODO}). Neither difference was statistically significant. This null result appears structural: because HYB's selector prefers PE whenever uncovered receptacles remain, and typical episodes contain four to six receptacles, HYB's element sequence coincides with UPF's across most of the tested budget; PI fires only after category rules are already in place, too late to alter unseen PSR within $B \leq 10$.
 
-All strategies at $B \geq 1$ exceeded the No Question baseline (67.5\% unseen PSR) once the budget was sufficient for preference rules to accumulate, confirming that user interaction consistently improved placement outcomes.
+Together, these three results indicate that category-level elicitation (PE) is the active ingredient driving generalization to unseen objects: pre-scheduling PE (UPF) captures most of the benefit within $B \leq 10$, while bottom-up (PAR) and adaptive (HYB) schedules either arrive at rules too late (PAR) or converge to the same PE-first sequence (HYB). All strategies exceeded the No Question baseline (67.5\% unseen PSR) once the budget permitted rule accumulation.
 
-\subsubsection{Value of Structured Preference State}
+\subsubsection{Does the Structured Preference State Contribute Beyond the LLM Backbone?}
 
-Table~\ref{tab:study1-results} also includes the Raw LLM baseline, which asks up to $B$ questions via an unconstrained LLM but produces placements by reading raw dialogue history directly, without a structured preference state or evidence-based planner. At $B=5$, Raw LLM achieved 69.2\% unseen PSR---16.0pp below UPF (85.2\%; $W = 64$, $p < .001$) and 12.6pp below HYB (81.8\%). At $B=10$, Raw LLM reached 78.2\%, still below UPF (87.1\%, $+$9.0pp; $W = 209$, $p < .001$) and all structured strategies. Notably, Raw LLM at $B=10$ performed comparably to DQ at $B=5$ (72.7\%), suggesting that doubling the question budget only partially compensates for the absence of structured state representation.
+Table~\ref{tab:study1-results} also includes the Raw LLM baseline, which asks up to $B$ questions via an unconstrained LLM but produces placements by reading raw dialogue history directly, without a structured preference state or evidence-based planner. At $B=5$, Raw LLM achieved 69.2\% unseen PSR---16.0pp below UPF (85.2\%; $W = 64$, $p < .001$, $r = $~\textbf{TODO}) and 12.6pp below HYB (81.8\%). At $B=10$, Raw LLM reached 78.2\%, still below UPF (87.1\%, $+$9.0pp; $W = 209$, $p < .001$, $r = $~\textbf{TODO}) and all structured strategies. Notably, Raw LLM at $B=10$ performed comparably to DQ at $B=5$ (72.7\%), suggesting that doubling the question budget only partially compensates for the absence of structured state representation.
 
 These results isolate the contribution of the \textsc{PrefQuest} framework beyond the underlying LLM: the structured preference state ($\mathcal{A}^+$, $\mathcal{P}^+$, $\mathcal{A}^-$) and evidence-based placement planner together produced a consistent and statistically significant PSR advantage, particularly for unseen objects where category-level rules must be retained and applied hierarchically. Results under Qwen3-8B (102 episodes) were consistent in direction and are reported in Appendix~\ref{app:qwen3}.
 
@@ -784,13 +809,14 @@ These results isolate the contribution of the \textsc{PrefQuest} framework beyon
 \label{sec:study2}
 % =============================================================================
 
-Study 1 established that questioning strategy design produces measurable differences in objective placement accuracy under controlled simulation conditions. Two open questions remain. First, the simulation relied on an LLM-based oracle to generate user responses; it is unclear whether the performance advantage of UPF over DQ persists when questions are answered by real users whose responses may be ambiguous, incomplete, or inconsistent with the structured preference model. Second, objective placement accuracy captures only one dimension of the interaction experience; real users may evaluate strategy conditions differently on dimensions such as cognitive load, perceived naturalness, and interaction satisfaction---dimensions that are inaccessible to simulation. Study 2 addresses both open questions through a controlled, within-subjects user study in which participants teach the autonomous \textsc{PrefQuest} agent their household organisation preferences across three strategy conditions. Three research questions guide the study:
+Study 1 established that questioning strategy design produces measurable differences in objective placement satisfaction under controlled simulation conditions. That offline evidence, however, leaves three questions open that are inaccessible to simulation alone. First, the simulation oracle is a noise-free LLM answerer that responds in complete preference-expressive sentences; real users answer partially, revise mid-turn, and routinely under-specify the rule the agent is trying to extract. Whether the UPF-over-DQ advantage survives this shift in answerer behaviour is an empirical question the oracle cannot settle. Second, objective unseen PSR indexes what the agent learns, not what the user experiences: a strategy that is more accurate on the page may be perceived as more effortful, less natural, or less under the user's control---and a strategy that \textit{feels} best need not be the one that generalises best. Third, the HHI-derived questioning elements (AO, PE, PI) were validated in a human--human dyad in which the asker was also human; it remains to be shown that the same elements, once operationalised as an agent policy and delivered by a synthetic voice, are still perceived as natural and interpretable by real answerers. Study 2 therefore operationalises RQ3 and RQ4 (Section~\ref{sec:introduction}) through a controlled, within-subjects user study in which participants teach the autonomous \textsc{PrefQuest} agent their household organisation preferences across three strategy conditions. Specifically, Study 2 asks four operational sub-questions:
 
-\begin{description}
-  \item[\textbf{RQ4}] Does the performance advantage of User-Preference-First over Direct Querying on unseen preference satisfaction rate replicate when questions are answered by real users rather than a simulated oracle?
-  \item[\textbf{RQ5}] Do the three questioning strategies produce measurably different effects on user experience---specifically, on cognitive load, interaction satisfaction, and perceived control over the dialogue?
-  \item[\textbf{RQ6}] Do differences in objective unseen PSR and subjective experience ratings follow the same ordering across strategy conditions, or do the two dimensions dissociate?
-\end{description}
+\begin{itemize}[leftmargin=*]
+  \item \textit{Replication (operationalises RQ3).} Does the unseen-PSR advantage of UPF over DQ observed in simulation replicate when questions are answered by real users rather than a simulated oracle?
+  \item \textit{User experience (operationalises RQ4).} Do the three strategies produce measurably different effects on cognitive load, perceived understanding, and interaction agency---the three primary experiential dimensions entered into hypothesis testing?
+  \item \textit{Objective--subjective alignment (operationalises RQ4).} Do objective unseen-PSR rankings and subjective strategy-preference rankings follow the same ordering across strategies, or do the two dimensions dissociate?
+  \item \textit{Questioning appropriateness (process check on transfer validity).} Do real users perceive the HHI-derived questioning elements, as composed by each strategy, as natural and interpretable? Analysed descriptively and via Spearman's $\rho$ between perceived appropriateness and perceived understanding; not entered into the H1--H3 hypothesis tests or family-wise correction.
+\end{itemize}
 
 \subsection{Study Design}
 \label{sec:study2:design}
@@ -799,29 +825,30 @@ A within-subjects design was adopted, with each participant experiencing all thr
 
 Three strategy conditions were tested: Direct Querying (DQ), User-Preference-First (UPF), and Parallel Exploration (PAR). Each corresponds directly to a questioning pattern observed in the human--human interaction study (Section~\ref{sec:hhi}), making Study 2 a targeted test of ecological validity for HHI-grounded dialogue policies. Hybrid-All (HYB) was not included as a study condition: it is not grounded in observed human questioning behaviour, and was statistically indistinguishable from UPF in simulation ($p = .085$ at $B = 5$; $p = .796$ at $B = 10$; Section~\ref{sec:study1}), providing no additional theoretical contrast. The dialogue was open-ended with no pre-specified turn limit. Participants signalled readiness to conclude verbally; the experimenter then ended the dialogue phase and advanced to the preference form. The number of dialogue turns was unconstrained and is treated as a secondary behavioural measure, allowing natural variation in dialogue length across strategy conditions to emerge as data rather than be suppressed by design.
 
-Strategy order and scene assignment were counterbalanced independently using a $6 \times 4$ Latin-square design. Six orderings of the three strategy conditions were constructed; four participants were assigned to each ordering, yielding $N = 24$ in total. Scene assignment was counterbalanced separately, such that each strategy appeared with each scene an equal number of times across participants and no participant encountered the same scene twice.
+Strategy order and scene assignment were counterbalanced jointly using a $12 \times 2$ design. Twelve orderings were constructed by crossing the six permutations of the three strategy conditions with two complementary scene assignment variants per permutation; two participants were assigned to each ordering, yielding $N = 24$ in total. This design achieves full counterbalancing: each of the twelve strategy--scene pairs (3 strategies $\times$ 4 scenes) appears with exactly three participants, and no participant encountered the same scene twice. The complete assignment table is provided in Appendix~\ref{app:latin-square}.
 
 A key methodological decision concerns the collection of ground-truth preference data. Eliciting a full preference annotation \textit{before} the interaction would make participants aware of the complete object set in advance, reducing ecological validity and confounding workload comparisons across strategies. Instead, a post-dialogue preference form was collected \textit{after} each trial's dialogue and \textit{before} the system revealed its predicted placements. This form served as the participant's reference preference annotation for that trial, reflecting preferences as articulated following the teaching interaction and independent of any system output. All placement accuracy metrics were computed relative to this post-dialogue annotation.
 
 The study was approved by the Institutional Review Board of Tongji University (approval reference: \textbf{[TODO: insert IRB reference number]}) and conducted in accordance with the Declaration of Helsinki. All participants provided written informed consent prior to enrolment.
 
-Based on Study 1 findings and established theory on cognitive demands in preference articulation, two directional hypotheses were specified prior to data collection. Subjective experience outcomes (RQ5, RQ6) are treated as exploratory, as no prior empirical evidence within this paper establishes a basis for directional predictions regarding satisfaction or preference rankings.
+Based on Study 1 findings and established theory on cognitive demands in preference articulation, two directional hypotheses were specified prior to data collection. Subjective experience and objective--subjective alignment outcomes (RQ4) are treated as exploratory, as no prior empirical evidence within this paper establishes a basis for directional predictions regarding satisfaction or preference rankings.
 
 \begin{description}
   \item[\textbf{H1}] UPF will produce higher unseen PSR than DQ across user-determined dialogue lengths, replicating the direction of the simulation finding (Section~\ref{sec:study1}), but with a smaller effect size owing to the attenuation expected when real-user response variability replaces oracle simulation.
-  \item[\textbf{H2}] DQ will produce lower cognitive load (NASA-TLX) than UPF, as action-oriented questions require participants to locate specific objects rather than to articulate abstract category-level preferences, placing fewer demands on reflective reasoning.
-  \item[\textbf{H3}] Objective unseen PSR rankings and subjective satisfaction rankings will not align across strategy conditions, indicating a dissociation between task performance and interaction experience.
+  \item[\textbf{H2a}] PAR will produce lower Cognitive Load (CL composite) than DQ: PAR externalises the inductive reasoning step to the agent, which proposes candidate preference rules for the user to confirm or reject, whereas DQ requires the user to process a larger number of concrete object-level queries across the interaction.
+  \item[\textbf{H2b}] PAR will produce lower Cognitive Load (CL composite) than UPF: UPF requires participants to spontaneously articulate abstract category-level organising principles---a reflectively demanding operation---whereas PAR presents ready-formed inductions for evaluation, distributing the inferential effort between agent and user.
+  \item[\textbf{H3}] Objective unseen PSR rankings and subjective strategy preference rankings (post-session drag-ranking) will not align across strategy conditions, indicating a dissociation between task performance and interaction experience.
 \end{description}
 
 \subsection{Participants}
 \label{sec:study2:participants}
 
-A target sample of $N = 24$ was determined by \textit{a priori} power analysis (G*Power 3.1) for a Friedman test with three repeated measures ($k = 3$, $\alpha = .05$, power $= .80$). The expected effect size was estimated conservatively as Cohen's $d = 0.60$ for pairwise comparisons, derived from 60\% of the standardised UPF--DQ unseen-PSR difference observed in Study 1 ($d_{\text{simulation}} \approx 1.02$; real-user attenuation assumed). This analysis indicated a minimum required $N$ of 23; the target was set to 24 to satisfy the Latin-square counterbalancing structure ($6~\text{orderings} \times 4~\text{participants}$).
+A target sample of $N = 24$ was determined by \textit{a priori} power analysis (G*Power 3.1) for the primary planned pairwise comparison (Wilcoxon signed-rank test, two-tailed, $\alpha = .05$, power $= .80$). The expected effect size was estimated conservatively as Cohen's $d = 0.60$, derived from 60\% of the standardised UPF--DQ unseen-PSR difference observed in Study 1 ($d_{\text{simulation}} \approx 1.02$; real-user attenuation assumed). This analysis indicated a minimum required $N$ of 23; the target was set to 24 to satisfy the Latin-square counterbalancing structure ($12~\text{orderings} \times 2~\text{participants}$).
 
-Participants were recruited from a university community. Inclusion criteria required participants to be aged 18 years or older, to report regular experience organising household items (at least once per week), and to have no prior participation in the human--human interaction study reported in Section~\ref{sec:hhi}. Prior to the experimental trials, participants completed a demographics questionnaire (age, gender, education level) and two baseline instruments. Technology attitudes were measured using the Affinity for Technology Interaction scale \citep[ATI;][]{franke2019personally}, a nine-item instrument scored on a six-point Likert scale. Attitudes toward social robots were assessed using the Negative Attitudes toward Robots Scale \citep[NARS;][]{nomura2006measurement}, specifically the S1 (interactions with robots) and S2 (social influence of robots) subscales. Self-reported organising frequency (five-point: rarely to daily) and organising confidence (five-point: not at all to very confident) were collected as exploratory covariates.
+Participants were recruited from a university community. Inclusion criteria required participants to be aged 18 years or older, to report regular experience organising household items (at least once per week), and to have no prior participation in the human--human interaction study reported in Section~\ref{sec:hhi}. Prior to the experimental trials, participants completed a demographics questionnaire covering age, gender, education level, self-reported organising frequency (five-point: rarely to daily), and prior experience with robotic or voice-based assistants (single item, five-point scale). Organising frequency was retained as a covariate in sensitivity analyses of the primary outcome measure; the remaining demographics served as descriptive variables.
 
 % TODO: Replace placeholder with actual participant demographics after data collection.
-% Report: N, age M ± SD, gender distribution, education levels, ATI M ± SD, NARS S1 M ± SD, S2 M ± SD.
+% Report: N, age M ± SD, gender distribution, education levels, organising frequency distribution, prior robot experience distribution.
 
 \subsection{Task Scenarios and Materials}
 \label{sec:study2:tasks}
@@ -830,7 +857,7 @@ Four matched household scenes were constructed as task materials: a bedroom, a k
 
 Each scene's 16 objects were pre-divided into a \textit{seen} set of eight and an \textit{unseen} set of eight. The seen set comprises objects known to the agent at the start of the interaction; the agent's questions were constrained to reference only seen objects. The unseen set comprises objects physically present in the scene and visible to the participant, but never mentioned or referenced by the agent during the dialogue. After the dialogue, the participant assigned preferences for all 16 objects; the agent was then required to predict placements for all 16, generalising from learned preferences to the eight unseen objects. The seen--unseen division was designed so that the seen set included at least one object associated with each of the five receptacles, ensuring that every strategy had an equal opportunity to discover the organising principle for each storage location. This design is directly analogous to the seen--unseen split used in Study 1, permitting quantitative comparison of PSR values across studies.
 
-Physical scenes were assembled by the experimenter using real household objects matching each scene's item list. Object positions within the scene followed a standardised layout documented in a preparation guide. Full item lists for all four scenes, including object descriptions, semantic category assignments, and the pre-defined seen--unseen split, are provided in Appendix~\ref{app:study2-items}.
+Physical scenes were assembled by the experimenter using real household objects matching each scene's item list. Object positions within the scene followed a standardised layout documented in a preparation guide. Full item lists for all four scenes, including object descriptions, semantic category assignments, and the pre-defined seen--unseen split, will be provided in a supplementary appendix after physical scene assembly is finalised. % TODO: Restore \ref{app:study2-items} once scene materials are photographed and tables confirmed.
 
 The post-dialogue preference form presented the participant with a grid displaying all 16 objects and five receptacle options. Each object was required to be assigned to exactly one receptacle before the form could be submitted. Objects were presented in a randomised order on each trial to reduce position-based anchoring.
 
@@ -865,7 +892,7 @@ The experimenter configured each trial by entering the object list and receptacl
 \subsection{Procedure}
 \label{sec:study2:procedure}
 
-Each session lasted approximately 65 minutes and followed a fixed protocol. Upon arrival, participants were briefed on the study, provided written informed consent, and completed the demographics questionnaire, ATI scale, and NARS subscales (approximately 8 minutes). During the briefing, participants were informed that the agent would predict a placement for every object in the scene---including objects it had not explicitly asked about during the dialogue---and that this full placement prediction would be revealed at the end of each trial. This task-level disclosure established a common evaluative frame across all participants without revealing the specific questioning mechanism used in any condition.
+Each session lasted approximately 60 minutes and followed a fixed protocol. Upon arrival, participants were briefed on the study, provided written informed consent, and completed the demographics questionnaire (approximately 5 minutes). During the briefing, participants were informed that the agent would predict a placement for every object in the scene---including objects it had not explicitly asked about during the dialogue---and that this full placement prediction would be revealed at the end of each trial. This task-level disclosure established a common evaluative frame across all participants without revealing the specific questioning mechanism used in any condition.
 
 Before the formal trials, participants completed one practice trial using a bathroom scene not included in the main materials (eight objects, three receptacles). The practice trial introduced the full per-trial protocol: hearing the agent's audio questions, responding verbally, reviewing and correcting the transcription if needed, completing a reduced preference form, viewing the system prediction, and completing a brief two-item questionnaire. The experimenter remained present throughout the practice trial to answer procedural questions; no data from the practice trial were retained for analysis.
 
@@ -873,7 +900,7 @@ Before the formal trials, participants completed one practice trial using a bath
   \centering
   % TODO: Replace rule-box with final two-level procedure diagram (procedure_flow.pdf or .png).
   % Upper level (session timeline): horizontal swim-lane or timeline bar showing the full session
-  %   structure left-to-right: [Consent + Demographics + ATI/NARS | ~8 min] →
+  %   structure left-to-right: [Consent + Demographics | ~5 min] →
   %   [Practice Trial | ~5 min] → [Trial 1 (Strategy A / Scene X) | ~15 min] →
   %   [Trial 2 (Strategy B / Scene Y) | ~15 min] → [Trial 3 (Strategy C / Scene Z) | ~15 min] →
   %   [Preference Ranking + Exit Interview | ~12 min]. Total ≈ 65 min.
@@ -882,7 +909,7 @@ Before the formal trials, participants completed one practice trial using a bath
   %   [Phase 2: Dialogue (open-ended; robot TTS → participant verbal → experimenter STT → submit;
   %     A+ → robot physical placement; participant signals readiness verbally)] →
   %   [Phase 3: Preference Form (16 objects, tablet)] →
-  %   [Phase 4: Questionnaire (NASA-TLX, PSC, Perceived Control, tablet — blind to accuracy)] →
+  %   [Phase 4: Questionnaire (CL: NASA-TLX Mental Demand/Effort/Frustration; PU 3 items; IA 3 items; tablet — blind to accuracy)] →
   %   [Phase 5: System Prediction (experimenter screen, confirmed vs inferred)].
   %   Annotate Phase 2 turn loop: robot question → TTS audio → participant verbal answer →
   %     experimenter press-and-hold STT → transcription reviewed → submit → robot physical placement.
@@ -891,37 +918,37 @@ Before the formal trials, participants completed one practice trial using a bath
   {\large\textbf{[TODO: Session + Trial procedure flow diagram — two levels]}}\\[0.8em]
   \textit{Upper: session-level timeline with approximate durations \quad Lower: per-trial five-phase breakdown}\\[2.5em]
   \rule{\linewidth}{0.5pt}
-  \caption{Study~2 session structure and per-trial protocol. \textbf{Upper}: The full session timeline ($\approx$65~min), comprising an initial consent and baseline questionnaire block, one practice trial, three formal trials in a Latin-square counterbalanced order, and a final ranking and exit interview. Each formal trial is assigned a distinct strategy condition (DQ, UPF, or PAR) and a distinct household scene. \textbf{Lower}: The five-phase structure of each formal trial. Phase~1 presents the scene layout on a tablet; Phase~2 runs an open-ended dialogue in which the robot delivers agent questions as synthesised speech, the participant responds verbally, and the experimenter captures and submits each response via a press-and-hold recording button---confirmed actions ($\mathcal{A}^+$) trigger immediate physical placement by the robot; the dialogue continues until the participant signals readiness to conclude; Phase~3 collects the post-dialogue preference form (tablet) before any system output is shown; Phase~4 administers the NASA-TLX, PSC, and Perceived Control questionnaires (tablet), ensuring subjective ratings are independent of accuracy knowledge; Phase~5 displays the complete placement result on the experimenter's screen---distinguishing \textit{confirmed} placements (resolved during dialogue) from \textit{inferred} placements (resolved by the Final Placement Planner)---alongside the participant's preference form assignments. The post-dialogue preference form (Phase~3) serves as the ground-truth reference for all placement accuracy metrics.}
+  \caption{Study~2 session structure and per-trial protocol. \textbf{Upper}: The full session timeline ($\approx$60~min), comprising an initial consent and baseline questionnaire block, one practice trial, three formal trials in a Latin-square counterbalanced order, and a final ranking and exit interview. Each formal trial is assigned a distinct strategy condition (DQ, UPF, or PAR) and a distinct household scene. \textbf{Lower}: The five-phase structure of each formal trial. Phase~1 presents the scene layout on a tablet; Phase~2 runs an open-ended dialogue in which the robot delivers agent questions as synthesised speech, the participant responds verbally, and the experimenter captures and submits each response via a press-and-hold recording button---confirmed actions ($\mathcal{A}^+$) trigger immediate physical placement by the robot; the dialogue continues until the participant signals readiness to conclude; Phase~3 collects the post-dialogue preference form (tablet) before any system output is shown; Phase~4 administers the Cognitive Load (CL), Perceived Understanding (PU), and Interaction Agency (IA) questionnaires (tablet), ensuring subjective ratings are independent of accuracy knowledge; Phase~5 displays the complete placement result on the experimenter's screen---distinguishing \textit{confirmed} placements (resolved during dialogue) from \textit{inferred} placements (resolved by the Final Placement Planner)---alongside the participant's preference form assignments. The post-dialogue preference form (Phase~3) serves as the ground-truth reference for all placement accuracy metrics.}
   % TODO: Update caption timing estimates if session duration changes during piloting.
   \label{fig:study2-procedure}
 \end{figure*}
 
-Each formal trial proceeded through five phases. In Phase~1 (\textit{scene presentation}), the participant viewed a visual grid of all 16 objects and five receptacle options on a tablet and examined the corresponding physical objects on the table, signalling readiness when prepared. In Phase~2 (\textit{dialogue}), the agent generated questions according to the assigned strategy and delivered them as synthesised speech through the robot; the participant answered each question verbally. The experimenter captured the participant's response via a press-and-hold audio recording button, reviewed the speech-to-text transcription on the control dashboard, and submitted it to the system. As each submitted answer produced a confirmed action ($\mathcal{A}^+$), the robot immediately placed the corresponding object in the predicted receptacle, providing real-time physical feedback of the agent's current understanding. When the participant judged that the agent had sufficiently learned their preferences, they indicated this verbally; the experimenter then ended the dialogue phase and advanced to Phase~3. In Phase~3 (\textit{preference form}), the participant assigned all 16 objects to receptacles using a drag-and-drop interface on the tablet; all objects were required to be assigned before submission was permitted. In Phase~4 (\textit{questionnaire}), the participant completed the NASA-TLX, PSC, and Perceived Control instruments for that trial on the tablet. Questionnaire administration preceded any display of system output, ensuring that subjective ratings reflected the interaction process rather than knowledge of placement accuracy. In Phase~5 (\textit{system prediction}), the experimenter displayed the complete placement result on the control screen, showing the system's predicted placements alongside the participant's preference form assignments, with matches and mismatches highlighted and a summary accuracy score. Placements were visually distinguished by type: objects confirmed during dialogue (via $\mathcal{A}^+$ real-time execution) were marked as \textit{confirmed}; objects inferred by the Final Placement Planner from accumulated preference rules and action analogies were marked as \textit{inferred}.
+Each formal trial proceeded through five phases. In Phase~1 (\textit{scene presentation}), the participant viewed a visual grid of all 16 objects and five receptacle options on a tablet and examined the corresponding physical objects on the table, signalling readiness when prepared. In Phase~2 (\textit{dialogue}), the agent generated questions according to the assigned strategy and delivered them as synthesised speech through the robot; the participant answered each question verbally. The experimenter captured the participant's response via a press-and-hold audio recording button, reviewed the speech-to-text transcription on the control dashboard, and submitted it to the system. As each submitted answer produced a confirmed action ($\mathcal{A}^+$), the robot immediately placed the corresponding object in the predicted receptacle, providing real-time physical feedback of the agent's current understanding. When the participant judged that the agent had sufficiently learned their preferences, they indicated this verbally; the experimenter then ended the dialogue phase and advanced to Phase~3. In Phase~3 (\textit{preference form}), the participant assigned all 16 objects to receptacles using a drag-and-drop interface on the tablet; all objects were required to be assigned before submission was permitted. In Phase~4 (\textit{questionnaire}), the participant completed the Cognitive Load (CL), Perceived Understanding (PU), and Interaction Agency (IA) instruments for that trial on the tablet. Questionnaire administration preceded any display of system output, ensuring that subjective ratings reflected the interaction process rather than knowledge of placement accuracy. In Phase~5 (\textit{system prediction}), the experimenter displayed the complete placement result on the control screen, showing the system's predicted placements alongside the participant's preference form assignments, with matches and mismatches highlighted and a summary accuracy score. Placements were visually distinguished by type: objects confirmed during dialogue (via $\mathcal{A}^+$ real-time execution) were marked as \textit{confirmed}; objects inferred by the Final Placement Planner from accumulated preference rules and action analogies were marked as \textit{inferred}.
 
 After all three formal trials, participants ranked the three interaction styles in order of preference using a drag-ranking interface and provided optional free-text comments. A semi-structured exit interview (approximately 12 minutes) then explored participants' perceptions of differences among the strategies, covering: which style felt most natural and why; which style best captured their preferences; which felt most effortful; whether any questions felt confusing, redundant, or presumptuous; and whether they would prefer a fixed or adaptive style in a real deployment. Full interview prompts are provided in Appendix~\ref{app:interview-guide}.
 
 \subsection{Measures and Analysis}
 \label{sec:study2:measures}
 
-The primary outcome measure was \textit{unseen preference satisfaction rate} (unseen PSR), defined as the proportion of unseen objects for which the agent's predicted receptacle matched the participant's post-dialogue preference form assignment (Equation~\ref{eq:psr}, $\mathcal{O} = \mathcal{O}_u$). Unseen PSR directly tests whether a strategy learns transferable preference rules rather than object-level facts, and mirrors the primary metric used in Study 1. Secondary objective measures included seen PSR ($\mathcal{O} = \mathcal{O}_s$), total PSR ($\mathcal{O} = \mathcal{O}_s \cup \mathcal{O}_u$), discussed-item accuracy (objects explicitly referenced during dialogue), and undiscussed-item accuracy (objects not referenced during dialogue). To enable comparison with Study~1 simulation benchmarks at matched turn counts, unseen PSR was additionally computed at each turn $k$ from the interaction logs (PSR@$k$), permitting learning-curve analysis independent of natural dialogue termination points.
+The primary outcome measure was \textit{unseen preference satisfaction rate} (unseen PSR), defined as the proportion of unseen objects for which the agent's predicted receptacle matched the participant's post-dialogue preference form assignment (Equation~\ref{eq:psr}, $\mathcal{O} = \mathcal{O}_u$). Unseen PSR directly tests whether a strategy learns transferable preference rules rather than object-level facts, and mirrors the primary metric used in Study 1. Secondary objective measures included seen PSR ($\mathcal{O} = \mathcal{O}_s$), total PSR ($\mathcal{O} = \mathcal{O}_s \cup \mathcal{O}_u$), discussed-item accuracy, and undiscussed-item accuracy. To enable comparison with Study~1 simulation benchmarks, unseen PSR was additionally computed at each turn $k$ (PSR@$k$), permitting learning-curve analysis independent of natural termination points.
 
-Three subjective constructs were assessed after each trial, selected to operationalise the cognitive labour distribution framing introduced in Section~\ref{sec:discussion:labour}.
+Three subjective constructs were assessed after each trial to operationalise the cognitive labour distribution framing (Section~\ref{sec:discussion:labour}); full item text, per-item rationale, and scale design notes are provided in Appendix~\ref{app:study2-questionnaire}.
 
-\textit{Cognitive Load} (CL) was measured using three subscales of the NASA Task Load Index \citep[NASA-TLX;][]{hart1988development}: Mental Demand, Effort, and Frustration (21-point scales). Physical Demand, Temporal Demand, and Performance were omitted as the framing predicts strategy differences primarily in cognitive rather than physical or time-pressure dimensions; the retained subscales formed a CL composite (mean of three items).
+\textit{Cognitive Load} (CL) was measured using three NASA-TLX subscales \citep{hart1988development}---Mental Demand, Effort, and Frustration---each rated on a 7-point scale (1 = Very Low, 7 = Very High), averaged into a CL composite. Physical Demand, Temporal Demand, and Performance were omitted as conversational questioning involves no physical exertion and is self-paced; only the three retained subscales showed significant strategy effects in our earlier study \citep{XXX}, consistent with established partial-subscale practice \citep{hart2006nasa,kosch2023survey}. % TODO: Insert CHI_old citation key.
 
-\textit{Perceived Understanding} (PU; 4 items, 7-point Likert, 1 = strongly disagree to 7 = strongly agree) captured participants' sense that the agent had learned their transferable preferences: (1) ``The agent understood my organising preferences''; (2) ``I felt the agent had correctly grasped how I like to organise things''; (3) ``I believe the agent could predict where I would place items it did not ask about''; (4) ``The agent's questions helped it build an accurate picture of my preferences.'' Items 1--2 assess perceived understanding of explicit preferences; items 3--4 directly target perceived generalisation ability. The scale is theoretically motivated but follows precedent for custom preference-learning evaluations in HRI \citep{wilde2024robot,rapp2025understood}. % TODO: Confirm bib keys wilde2024robot and rapp2025understood; add to bibliography.
+\textit{Perceived Understanding} (PU; 3 items, 7-pt Likert) captured whether participants felt the agent had learned their \textit{transferable} preferences---generalisable organising rules rather than surface object facts. Items operationalise the \textit{CUI Understanding} construct from conversational recommender research \citep{chen2024crsque} and the \textit{felt understood} construct in chatbot UX \citep{ashktorab2019resilient}. The cognitive labour framing predicts UPF highest on PU and DQ lowest, with PAR intermediate.
 
-\textit{Interaction Agency} (IA; 3 items, 7-point Likert) captured participants' sense of directing what the agent learned: (1) ``I felt in control of what the agent learned about me''; (2) ``I was able to guide the direction of the conversation''; (3) ``I set the terms of what the agent came to understand about my preferences.'' The Framing predicts UPF yields higher IA than DQ (user articulates abstract rules rather than answering object-by-object queries) and PAR (agent proposes inductions for user confirmation, shifting initiative toward the agent).
+\textit{Interaction Agency} (IA; 3 items, 7-pt Likert) captured participants' sense of directing what the agent learned, operationalising the \textit{user agency} pole of Sundar's (\citeyear{sundar2020agency}) human--AI agency spectrum \citep[cf.][]{bergstrom2022tochi,chen2024crsque}. The framing predicts UPF highest on IA (user articulates rules and determines the learning agenda) and PAR lowest (agent proposes inductions, shifting initiative toward the agent).
 
-All three instruments were administered after each trial on the tablet; participants completed them without knowledge of placement accuracy (Phase~4 precedes Phase~5). After all three trials, participants completed a strategy preference ranking (1st, 2nd, 3rd) as an overall comparative measure.
+To assess discriminant validity prior to hypothesis testing, an exploratory factor analysis (EFA; principal axis factoring, oblique rotation) will be conducted on the 6-item pool (PU~1--3, IA~1--3); a two-factor solution is expected, with items cross-loading above .30 flagged for sensitivity analysis. Cronbach's $\alpha$ will be reported per construct per strategy condition \citep{schrum2023likert}. Construct-specific items were used in place of generic satisfaction scales, as the latter have been shown to lack sensitivity to strategy-level differences in preference-elicitation studies even when objective metrics diverge \citep{XXX2024ijhcs}. % TODO: Insert bib key for IJHCS 2024 CRS PE paper.
 
-A potential demand-characteristics concern arises from informing participants that the agent would predict placements for objects not explicitly discussed. We argue this disclosure affects task-goal framing but not strategy-level behaviour, for two reasons. First, participants were told \textit{what} the agent would attempt (generalisation to all objects) but not \textit{how} any questioning strategy achieves this---the mechanism by which PE questions extract transferable rules, or by which PI questions confirm induced preferences, was never disclosed. Second, the same information was provided uniformly across all three strategy conditions, so any motivational effect on participant engagement is constant across conditions and cannot explain differential Perceived Understanding ratings. The disclosure therefore serves to align participants' evaluative frame with the study's construct of interest (preference generalisation) without introducing a confound.
+All three instruments were administered on the tablet after Phase~3 (preference form) and before Phase~5 (system prediction), ensuring subjective ratings were blind to placement accuracy. After all three trials, participants completed a strategy preference ranking (1st, 2nd, 3rd). The generalisation-task disclosure made prior to each trial is discussed in Appendix~\ref{app:study2-questionnaire}.
 
-Behavioural measures extracted from interaction logs included turn count, count and proportion of each question element type (AO, PE, PI), mean participant response duration in seconds, and transcription correction rate (proportion of turns in which the experimenter corrected the automatic speech-to-text transcription before submission).
+Behavioural measures from interaction logs included turn count, question element type distribution (AO, PE, PI), mean participant response duration, and transcription correction rate.
 
-Exit interview transcripts were analysed using reflexive thematic analysis \citep{braun2006using}. Two researchers independently generated initial codes across all transcripts; codes were then collaboratively reviewed and organised into themes. Inter-rater reliability was assessed on a randomly selected 25\% of transcripts using Cohen's $\kappa$, with a minimum threshold of $\kappa \geq .70$ set prior to final theme construction.
+Exit interview transcripts were analysed using reflexive thematic analysis \citep{braun2006using}; two researchers coded independently, then collaboratively consolidated themes. Inter-rater reliability was assessed on a 25\% random sample ($\kappa \geq .70$ threshold, set a priori).
 
-For quantitative analysis, normality of all continuous measures was assessed using the Shapiro--Wilk test. Where normality held, strategy effects were examined using one-way repeated-measures ANOVA with Greenhouse--Geisser correction for sphericity violations, followed by pairwise $t$-tests with Holm correction. Where normality was violated, a Friedman test was applied with Wilcoxon signed-rank post-hoc tests and Holm correction. Effect sizes are reported as partial $\eta^2$ for ANOVA and rank-biserial $r$ for Wilcoxon tests. The two primary planned comparisons were UPF versus DQ on unseen PSR and PAR versus DQ on unseen PSR; all remaining pairwise comparisons were treated as exploratory. Individual-difference covariates (ATI, NARS, organising frequency) were examined in exploratory mixed-effects models if a significant strategy main effect was observed.
+For quantitative analysis, normality was assessed via Shapiro--Wilk. Where normality held, strategy effects were examined with one-way repeated-measures ANOVA (Greenhouse--Geisser correction) followed by pairwise $t$-tests with Holm correction ($\eta^2_p$ reported). Where normality was violated, Friedman tests were used with Wilcoxon signed-rank post-hoc tests and Holm correction (rank-biserial $r$ reported). Primary planned comparisons were UPF vs. DQ and PAR vs. DQ on unseen PSR; all other pairwise comparisons were exploratory. Organising frequency was examined as a covariate in mixed-effects models if a significant strategy main effect was observed.
 
 \subsection{Results}
 
@@ -931,9 +958,11 @@ For quantitative analysis, normality of all continuous measures was assessed usi
 % ecological validity of simulation findings.
 
 \subsubsection{Questionnaire Results}
-% TODO: Summary statistics table (Shapiro--Wilk W, F/$\chi^2$, $p$,
-% partial $\eta^2$) for NASA-TLX, PSC, and GSE across strategy conditions.
-% Pairwise post-hoc comparisons for all significant main effects.
+% TODO: Summary statistics table (Shapiro--Wilk W, Friedman $\chi^2$ / ANOVA $F$, $p$,
+% effect size) for CL (Cognitive Load), PU (Perceived Understanding), and IA (Interaction Agency)
+% across strategy conditions (DQ, UPF, PAR).
+% Pairwise post-hoc comparisons (Wilcoxon + Holm or $t$-test + Holm) for all significant main effects.
+% Report Cronbach's $\alpha$ per construct per condition in a supplementary table.
 
 \subsubsection{Interview Results}
 % TODO: Thematic analysis results.
@@ -987,7 +1016,7 @@ This three-way contrast maps onto a broader design question that extends beyond 
 
 The distinction between strategies also has implications for \textit{perceived agency}: PAR's transparent reasoning---surfacing patterns the agent has inferred from the user's own prior responses---may produce a stronger sense of collaborative understanding than UPF's top-down elicitation or DQ's mechanical querying. If Study 2 data reveal that PAR achieves higher satisfaction ratings despite lower unseen PSR, this would provide direct empirical support for the claim that users' sense of being understood is shaped by the \textit{process} of interaction rather than its \textit{outcome} alone---a finding with broad implications for conversational AI design beyond the rearrangement domain.
 % TODO [Study 2]: Replace speculative framing with empirical findings when available.
-% Report ATI/NARS/organising-frequency moderation of strategy preference.
+% Report organising-frequency and robot-experience moderation of strategy preference.
 % Report task-property effects if multiple scene types show differential patterns.
 
 \subsection{Limitations and Future Work}
@@ -1164,211 +1193,99 @@ HYB              & --- & --- & .544{\scriptsize$\pm$.017} & .526{\scriptsize$\pm
 \end{table*}
 
 % =============================================================================
-\section{Study 2 Scene Materials}
-\label{app:study2-items}
+% Appendix: Study 2 Scene Materials
+% TODO: Fill in after physical scenes are assembled and photographed.
+% One sub-figure per scene (bedroom, kitchen, study, living room).
+% Each sub-figure: (a) photograph of physical tabletop arrangement +
+%   (b) digital grid with seen/unseen annotation (solid vs. dashed outline).
+% One table per scene: item name, description, category, seen/unseen assignment.
+% Label to restore when content is added: \label{app:study2-items}
 % =============================================================================
-
-% TODO: Insert final scene material figures and item tables after physical scenes are assembled
-% and photographed. One sub-figure per scene (bedroom, kitchen, study, living room).
-% Each sub-figure should pair: (a) a photograph of the physical tabletop arrangement, and
-% (b) the digital grid representation as shown to participants, with seen objects indicated
-% by solid outlines and unseen objects by dashed outlines.
-
-\begin{figure*}[h]
-  \centering
-  % TODO: Replace rule-box with final four-panel scene composite (study2_scenes.pdf or .png).
-  % Four-panel layout (2 × 2): bedroom (top-left), kitchen (top-right),
-  %   study (bottom-left), living room (bottom-right).
-  % Each panel: left column = tabletop photograph; right column = digital grid representation
-  %   with seen/unseen annotation (solid vs dashed outline or colour coding).
-  \noindent\rule{\linewidth}{0.5pt}\\[3em]
-  {\large\textbf{[TODO: Study 2 scene materials composite — 4 scenes × 2 views]}}\\[0.8em]
-  \textit{Bedroom \quad Kitchen \quad Study \quad Living room}\\[0.5em]
-  \textit{Each scene: physical photo (left) + digital grid with seen/unseen annotation (right)}\\[3em]
-  \rule{\linewidth}{0.5pt}
-  \caption{Full scene materials for Study~2. Each panel shows one of the four household scenes: bedroom (top left), kitchen (top right), study (bottom left), and living room (bottom right). For each scene, the left column shows the physical tabletop arrangement of objects used in the experiment; the right column shows the corresponding digital grid presented to participants, with seen objects (accessible to the agent during dialogue) shown with solid outlines and unseen objects (held out for generalization) shown with dashed outlines. Item names, receptacle labels, semantic category assignments, and the pre-defined seen--unseen split for each scene are listed in Tables~\ref{tab:scene-bedroom}--\ref{tab:scene-living}.}
-  % TODO: Update label references if table numbering changes.
-  \label{fig:study2-scenes}
-\end{figure*}
-
-Each scene contains 16 objects drawn from four semantic categories (four objects per category: two seen, two unseen). Seen objects ($\mathcal{O}_s$) are available to the agent during the dialogue and may be queried directly; unseen objects ($\mathcal{O}_u$) are withheld from questioning and must be placed by generalising from preferences learned during the dialogue. The seen--unseen split was designed so that each unseen object shares the same category as at least two seen objects, ensuring that a single category-level preference rule is sufficient to place it correctly. No target receptacle is pre-specified: ground truth is collected via the post-dialogue preference form completed by each participant, so placement correctness is evaluated against each individual's own stated preferences.
-
-% ---------- Scene 1: Bedroom ----------
-\paragraph{Bedroom.}
-Five receptacles: \textit{bedside table}, \textit{study desk}, \textit{wardrobe shelf}, \textit{bookshelf}, \textit{under-desk storage box}.
-
-\begin{table}[h]
-\centering
-\caption{Bedroom scene: 16 objects across four semantic categories, with seen/unseen assignment. Ground truth receptacle is participant-defined via post-dialogue preference form.}
-\label{tab:scene-bedroom}
-\small
-\begin{tabularx}{\linewidth}{@{} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}l l c @{}}
-\toprule
-\textbf{Item} & \textbf{Description} & \textbf{Category} & \textbf{Set} \\
-\midrule
-Novel           & paperback fiction book        & Reading \& study     & S \\
-Notebook        & spiral-bound study notebook   & Reading \& study     & S \\
-Magazine        & monthly lifestyle magazine    & Reading \& study     & U \\
-Sketchbook      & blank drawing pad             & Reading \& study     & U \\
-\midrule
-Earphones       & wired in-ear earbuds          & Electronics          & S \\
-Charging cable  & USB-C phone charger           & Electronics          & S \\
-Power bank      & portable battery pack         & Electronics          & U \\
-Phone stand     & adjustable desk phone holder  & Electronics          & U \\
-\midrule
-Eye mask        & contoured sleep eye mask      & Sleep \& personal care & S \\
-Hand cream      & moisturising lotion tube      & Sleep \& personal care & S \\
-Lip balm        & moisturising lip balm stick   & Sleep \& personal care & U \\
-Earplugs        & foam sleep earplugs (pair)    & Sleep \& personal care & U \\
-\midrule
-Belt            & leather belt                  & Clothing \& accessories & S \\
-Watch           & analogue wristwatch           & Clothing \& accessories & S \\
-Scarf           & lightweight cotton scarf      & Clothing \& accessories & U \\
-Sunglasses      & folding sunglasses            & Clothing \& accessories & U \\
-\bottomrule
-\multicolumn{4}{@{}l@{}}{\small S = seen ($\mathcal{O}_s$); U = unseen ($\mathcal{O}_u$).}
-\end{tabularx}
-\end{table}
-
-% ---------- Scene 2: Kitchen ----------
-\paragraph{Kitchen.}
-Five receptacles: \textit{upper cabinet}, \textit{lower cabinet}, \textit{countertop}, \textit{refrigerator}, \textit{utensil holder/dish rack}.
-
-\begin{table}[h]
-\centering
-\caption{Kitchen scene: 16 objects across four semantic categories, with seen/unseen assignment.}
-\label{tab:scene-kitchen}
-\small
-\begin{tabularx}{\linewidth}{@{} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}l l c @{}}
-\toprule
-\textbf{Item} & \textbf{Description} & \textbf{Category} & \textbf{Set} \\
-\midrule
-Wooden spatula  & flat cooking spatula          & Cooking utensils     & S \\
-Ladle           & long-handled soup spoon       & Cooking utensils     & S \\
-Tongs           & metal kitchen tongs           & Cooking utensils     & U \\
-Strainer        & mesh colander                 & Cooking utensils     & U \\
-\midrule
-Soy sauce       & glass bottle of soy sauce     & Condiments           & S \\
-Vinegar         & bottle of rice vinegar        & Condiments           & S \\
-Sesame oil      & small bottle of sesame oil    & Condiments           & U \\
-Oyster sauce    & bottle of oyster sauce        & Condiments           & U \\
-\midrule
-Rice            & 1\,kg bag of white rice       & Dry packaged food    & S \\
-Oats            & canister of instant oats      & Dry packaged food    & S \\
-Pasta           & packaged dry spaghetti        & Dry packaged food    & U \\
-Crackers        & boxed savoury crackers        & Dry packaged food    & U \\
-\midrule
-Cutting board   & plastic chopping board        & Kitchen gadgets      & S \\
-Kitchen timer   & mechanical dial timer         & Kitchen gadgets      & S \\
-Grater          & handheld vegetable grater     & Kitchen gadgets      & U \\
-Can opener      & manual can opener             & Kitchen gadgets      & U \\
-\bottomrule
-\multicolumn{4}{@{}l@{}}{\small S = seen ($\mathcal{O}_s$); U = unseen ($\mathcal{O}_u$).}
-\end{tabularx}
-\end{table}
-
-% ---------- Scene 3: Study ----------
-\paragraph{Study.}
-Five receptacles: \textit{desktop surface}, \textit{desk drawer}, \textit{bookshelf}, \textit{filing tray}, \textit{desktop organiser}.
-
-\begin{table}[h]
-\centering
-\caption{Study scene: 16 objects across four semantic categories, with seen/unseen assignment.}
-\label{tab:scene-study}
-\small
-\begin{tabularx}{\linewidth}{@{} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}l l c @{}}
-\toprule
-\textbf{Item} & \textbf{Description} & \textbf{Category} & \textbf{Set} \\
-\midrule
-Design reference book & hardcover design handbook   & Books \& references  & S \\
-Technical textbook    & university-level textbook   & Books \& references  & S \\
-Novel                 & paperback fiction novel     & Books \& references  & U \\
-Art magazine          & design/art monthly          & Books \& references  & U \\
-\midrule
-Fountain pen    & ink pen with cap              & Writing tools        & S \\
-Ruler           & 30\,cm plastic ruler          & Writing tools        & S \\
-Highlighter set & 4-colour highlighter pack     & Writing tools        & U \\
-Stapler         & desktop stapler               & Writing tools        & U \\
-\midrule
-Project report  & stapled A4 document folder    & Documents \& papers  & S \\
-Receipt bundle  & folded paper receipts         & Documents \& papers  & S \\
-Business cards  & stack of personal cards       & Documents \& papers  & U \\
-Sticky note pad & 3$\times$3\,in sticky notes   & Documents \& papers  & U \\
-\midrule
-USB hub         & 4-port USB-A hub              & Electronics          & S \\
-Wireless mouse  & compact wireless mouse        & Electronics          & S \\
-Webcam          & clip-on USB webcam            & Electronics          & U \\
-Portable hard drive & 1\,TB external hard drive & Electronics          & U \\
-\bottomrule
-\multicolumn{4}{@{}l@{}}{\small S = seen ($\mathcal{O}_s$); U = unseen ($\mathcal{O}_u$).}
-\end{tabularx}
-\end{table}
-
-% ---------- Scene 4: Living Room ----------
-\paragraph{Living room.}
-Five receptacles: \textit{TV cabinet}, \textit{coffee table}, \textit{side table}, \textit{bookcase}, \textit{storage ottoman}.
-
-\begin{table}[h]
-\centering
-\caption{Living room scene: 16 objects across four semantic categories, with seen/unseen assignment.}
-\label{tab:scene-living}
-\small
-\begin{tabularx}{\linewidth}{@{} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}l l c @{}}
-\toprule
-\textbf{Item} & \textbf{Description} & \textbf{Category} & \textbf{Set} \\
-\midrule
-TV remote           & television remote control     & Entertainment devices & S \\
-Game controller     & wireless game controller      & Entertainment devices & S \\
-AC remote           & air-conditioner remote        & Entertainment devices & U \\
-HDMI cable          & 2\,m HDMI cable               & Entertainment devices & U \\
-\midrule
-Newspaper           & daily broadsheet newspaper    & Reading materials    & S \\
-Coffee table book   & large-format art/photo book   & Reading materials    & S \\
-News magazine       & weekly news magazine          & Reading materials    & U \\
-Short story collection & paperback story anthology  & Reading materials    & U \\
-\midrule
-Tissues             & box of facial tissues         & Daily essentials     & S \\
-Hand lotion         & pump bottle of hand lotion    & Daily essentials     & S \\
-Lip balm            & lip balm stick                & Daily essentials     & U \\
-Nail clippers       & compact nail clipper          & Daily essentials     & U \\
-\midrule
-Playing cards       & standard deck of cards        & Leisure \& hobby     & S \\
-Puzzle box          & 500-piece jigsaw puzzle       & Leisure \& hobby     & S \\
-Dice set            & set of polyhedral dice        & Leisure \& hobby     & U \\
-Board game          & compact strategy board game   & Leisure \& hobby     & U \\
-\bottomrule
-\multicolumn{4}{@{}l@{}}{\small S = seen ($\mathcal{O}_s$); U = unseen ($\mathcal{O}_u$).}
-\end{tabularx}
-\end{table}
 
 % =============================================================================
 \section{Study 2 Counterbalancing Assignment}
 \label{app:latin-square}
 % =============================================================================
 
-Table~\ref{tab:latin-square} shows the full Latin-square counterbalancing scheme used in Study~2. Strategy order and scene assignment were counterbalanced independently: the six rows represent the six orderings of the three strategy conditions (DQ, UPF, PAR), and the scene column indicates the household scene paired with each trial position. Four participants were assigned to each row.
+Table~\ref{tab:latin-square} shows the full counterbalancing scheme used in Study~2. The twelve orderings are formed by crossing the six permutations of the three strategy conditions with two scene assignment variants per permutation. Two participants were assigned to each ordering ($N = 24$ total). Each of the twelve strategy--scene pairs (3 $\times$ 4) appears in exactly three orderings, ensuring that no strategy--scene pairing is systematically over- or under-represented. Each strategy appears exactly four times in each trial position (T1, T2, T3), and each scene appears exactly nine times across the 36 trial slots (12 orderings $\times$ 3 trials).
 
 \begin{table}[h]
 \centering
-\caption{Latin-square counterbalancing scheme for Study~2. Each row represents one ordering assigned to four participants. Strategy conditions (DQ, UPF, PAR) and scene assignments (Be = bedroom, Ki = kitchen, St = study, Li = living room) are counterbalanced independently. Each strategy appears with each scene an equal number of times across the full participant group.}
+\caption{Counterbalancing scheme for Study~2. Each row represents one ordering assigned to 2 participants. Scene abbreviations: Be = bedroom, Ki = kitchen, St = study, Li = living room. Each strategy--scene pair (3 strategies $\times$ 4 scenes = 12 pairs) appears in exactly 3 orderings, achieving full counterbalancing with $N = 24$.}
 \label{tab:latin-square}
 \begin{tabularx}{\linewidth}{@{} c >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X @{}}
 \toprule
 \textbf{Ordering} & \textbf{Trial 1} & \textbf{Trial 2} & \textbf{Trial 3} \\
 \midrule
-1 & DQ / Be & UPF / Ki & PAR / St \\
-2 & DQ / Ki & PAR / Be & UPF / Li \\
-3 & UPF / St & DQ / Li  & PAR / Be \\
-4 & UPF / Li & PAR / Ki & DQ / St  \\
-5 & PAR / Be & DQ / St  & UPF / Ki \\
-6 & PAR / St & UPF / Be & DQ / Li  \\
+1  & DQ / Be  & UPF / Ki & PAR / St \\
+2  & DQ / Li  & UPF / St & PAR / Ki \\
+3  & DQ / Ki  & PAR / Be & UPF / Li \\
+4  & DQ / St  & PAR / Li & UPF / Be \\
+5  & UPF / Be & DQ / Ki  & PAR / St \\
+6  & UPF / Li & DQ / St  & PAR / Ki \\
+7  & UPF / Ki & PAR / Be & DQ / Li  \\
+8  & UPF / St & PAR / Li & DQ / Be  \\
+9  & PAR / St & DQ / Li  & UPF / Be \\
+10 & PAR / Li & DQ / St  & UPF / Ki \\
+11 & PAR / Be & UPF / St & DQ / Ki  \\
+12 & PAR / Ki & UPF / Li & DQ / Be  \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-% TODO: Verify that the above Latin square achieves full counterbalancing of strategy × scene
-% pairings before finalising participant assignments. Check that each strategy appears with
-% each scene exactly twice across six orderings × 4 participants = 24 participants.
+% Verification: each strategy × scene pair appears exactly 3 times across 12 orderings.
+% DQ:  Be(1,8,12), Ki(3,5,11), St(4,6,10), Li(2,7,9)   — 3 each ✓
+% UPF: Be(4,5,9),  Ki(1,7,10), St(2,8,11), Li(3,6,12)  — 3 each ✓
+% PAR: Be(3,7,11), Ki(2,6,12), St(1,5,9),  Li(4,8,10)  — 3 each ✓
+
+% =============================================================================
+\section{Study 2 Questionnaire: Full Items and Design Notes}
+\label{app:study2-questionnaire}
+% =============================================================================
+
+\subsection*{Full Item Text}
+
+Table~\ref{tab:questionnaire-items} lists all nine per-trial questionnaire items across the three constructs. All items were administered in the fixed order CL $\to$ PU $\to$ IA; the session anchor ``In this session'' was prepended to PU and IA items to encourage condition-specific attribution and reduce rating drift across the three trials.
+
+\begin{table}[h]
+\centering
+\caption{Study~2 per-trial questionnaire items. CL items use a 7-point scale (1 = Very Low, 7 = Very High); PU and IA items use a 7-point Likert scale (1 = Strongly Disagree, 7 = Strongly Agree). All items are positively worded.}
+\label{tab:questionnaire-items}
+\small
+\begin{tabularx}{\linewidth}{@{} l l X @{}}
+\toprule
+\textbf{ID} & \textbf{Construct} & \textbf{Item text} \\
+\midrule
+CL1 & Cognitive Load & How mentally demanding was the interaction? \\
+CL2 & Cognitive Load & How hard did you have to work to accomplish your level of performance? \\
+CL3 & Cognitive Load & How irritated, stressed, and annoyed were you? \\
+\midrule
+PU1 & Perceived Understanding & In this session, the agent understood my organising preferences. \\
+PU2 & Perceived Understanding & In this session, I believe the agent could predict where I would place items it did not ask about. \\
+PU3 & Perceived Understanding & In this session, the agent seemed to understand not just specific items, but the general logic behind how I organise. \\
+\midrule
+IA1 & Interaction Agency & In this session, I felt that my answers actively shaped what the agent came to understand about my preferences. \\
+IA2 & Interaction Agency & In this session, I felt that I, rather than the agent, determined what preferences the agent should learn about. \\
+IA3 & Interaction Agency & In this session, I felt I had control over what conclusions the agent drew about my preferences. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection*{Per-Item Rationale}
+
+For PU, the three items target distinct levels of the transferability hierarchy: PU1 assesses global perceived understanding (surface-level comprehension); PU2 assesses object-level generalisation (whether the agent's knowledge extends to unseen items); and PU3 assesses rule-level generalisation (whether the agent appeared to grasp the underlying organising logic rather than isolated object facts). The progression from PU1 to PU3 mirrors the core claim of PrefQuest---that effective questioning should build transferable representations, not object-specific memories.
+
+For IA, the three items target distinct dimensions of the user agency construct: IA1 assesses perceived influence on what the agent understood (input dimension); IA2 assesses perceived control over the content of the learning agenda (direction dimension); and IA3 assesses perceived control over the agent's final conclusions (output dimension). Together they operationalise agency as spanning from the user's contribution to the agent's resulting representation, without conflating agency with termination timing, which was procedurally constant across conditions.
+
+\subsection*{Scale Design Notes}
+
+No reverse-scored items were included. In within-subjects designs with three repeated questionnaire administrations, reverse-scored items introduce a confound: participants may fail to invert their response frame consistently across conditions, producing spuriously low inter-item correlations in particular conditions that suppress Cronbach's $\alpha$ for reasons unrelated to construct reliability. All three scales are therefore entirely positively worded.
+
+\subsection*{Demand Characteristics and Disclosure Justification}
+
+Participants were informed prior to the first trial that the agent would predict placements for \textit{all} objects in the scene---including those it had not asked about directly---and that they would see the full prediction result at the end of each trial. This disclosure could in principle inflate PU ratings if participants over-attribute understanding to the agent merely because they know generalisation is the intended goal.
+
+We argue the disclosure does not introduce a confound for two reasons. First, participants were told \textit{what} the agent would attempt (predict all objects) but not \textit{how} any questioning strategy achieves this: the mechanisms by which PE questions extract category-level rules, or by which PI questions confirm induced preferences, were never described. PU ratings therefore still reflect participants' inferences from the dialogue itself, not from mechanism knowledge. Second, the disclosure was delivered identically across all three strategy conditions and all three trials, so any inflation it produces is a constant offset that cannot explain differential PU ratings across DQ, UPF, and PAR. The disclosure thus serves to align participants' evaluative frame with the study's primary construct of interest---preference generalisation---without introducing a between-condition confound.
 
 % =============================================================================
 \section{Study 2 Exit Interview Guide}

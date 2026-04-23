@@ -8,7 +8,13 @@ from __future__ import annotations
 import os
 from typing import Any
 
+import dashscope
 from dashscope.audio.asr import Recognition, RecognitionCallback
+
+DASHSCOPE_API_KEY = os.environ.get(
+    "DASHSCOPE_API_KEY", "sk-515fc7843e934051bc2d59978fc9e030"
+)
+dashscope.api_key = DASHSCOPE_API_KEY
 
 
 class _NoopCallback(RecognitionCallback):
@@ -20,10 +26,8 @@ class _NoopCallback(RecognitionCallback):
 
 
 def _ensure_api_key() -> None:
-    if not os.environ.get("DASHSCOPE_API_KEY"):
-        raise RuntimeError(
-            "DASHSCOPE_API_KEY not set — export it (or add to start.sh) before starting the backend."
-        )
+    if not DASHSCOPE_API_KEY:
+        raise RuntimeError("DASHSCOPE_API_KEY not set.")
 
 
 def transcribe_file(

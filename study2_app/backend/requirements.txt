@@ -1,6 +1,17 @@
+# Minimal deps to run the Study 2 app backend standalone.
+# For the full repo (plots, ablation scripts), use ../requirements.txt.
+
+# Core data models
+pydantic>=2.0
+
+# FastAPI service
 fastapi>=0.115
 uvicorn[standard]>=0.30
 python-multipart>=0.0.9
 
-# STT (Dashscope paraformer-realtime-v2); requires DASHSCOPE_API_KEY env var
+# LLM backends (one is enough at runtime; both installed for flexibility)
+langchain-ollama>=0.2
+langchain-openai>=0.2
+
+# STT (Dashscope paraformer-realtime-v2)
 dashscope>=1.23

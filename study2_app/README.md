@@ -18,17 +18,31 @@ Vite + React + TypeScript 单页应用。双面板布局：左侧实验员控制
 
 ## 运行
 
+### 首次安装
+
+仅本 app（推荐，只装 backend + frontend 所需的依赖）：
+
 ```bash
-# 首次安装（从仓库根目录）
-bash bootstrap.sh
+bash study2_app/bootstrap.sh
+```
 
-# 开发模式
-cd study2_app/frontend
-npm run dev            # http://localhost:5173
+脚本做三件事：
+1. 创建（或复用）conda env `behavior`（Python 3.10）；没 conda 时回退到 `./.venv`。
+2. `pip install -r study2_app/backend/requirements.txt`（含 `fastapi / uvicorn / pydantic / langchain-ollama / langchain-openai / dashscope`）。
+3. `cd study2_app/frontend && npm install`。
 
-# 或者从仓库根同时启动前后端
+> 注：仅运行 `pip install -r study2_app/backend/requirements.txt` 是**不够**的 —— 脚本还会跑 npm install 并处理 conda env。
+
+如果还需要画图 / 复现 Study 1 消融（`matplotlib / numpy / pandas`），用仓库根的 `bootstrap.sh`。
+
+### 启动
+
+```bash
+conda activate behavior         # 或 source .venv/bin/activate
 bash study2_app/start.sh
 ```
+
+默认：backend `127.0.0.1:8000`、frontend `localhost:5173`、ollama `110.42.252.68:8080` (model=qwen3)、Dashscope STT key 已内建在 `start.sh` / `voice/stt.py`，无需额外 export。
 
 Vite dev server 默认代理到 `http://localhost:8000`（见 `frontend/vite.config.ts`）。后端端口不同时通过 `PREFQUEST_BACKEND_URL` 覆盖：
 
@@ -154,7 +168,7 @@ Vite 代理（见 `frontend/vite.config.ts`）转发的前缀：`/sessions`、`/
 2. `Recorder.stop()` 把 Float32Array 编码成 16-bit PCM WAV（`encodeWAV`）。
 3. `transcribe(blob)` POST 到 `/voice/stt`，后端调 Dashscope `paraformer-realtime-v2` 返回文本。
 
-后端要求 `DASHSCOPE_API_KEY` 环境变量。未设置时 `/voice/stt` 返回 500，前端在 `DialogueView` 显示错误。
+Dashscope API key 已硬编码在 `start.sh` 和 `backend/voice/stt.py` 作为默认值；如需替换，`export DASHSCOPE_API_KEY=sk-...` 覆盖。前端 `DialogueView` 在 `/voice/stt` 返回 500 时会显示错误提示。
 
 DialogueView 里的使用模式：按住说话 → 松开自动 stop + transcribe → 填入答题框（参与者可以再编辑后提交）。
 

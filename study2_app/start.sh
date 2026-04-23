@@ -25,8 +25,8 @@ export LLM_BACKEND="${LLM_BACKEND:-ollama}"
 export LLM_MODEL="${LLM_MODEL:-qwen3}"
 export LLM_BASE_URL="${LLM_BASE_URL:-http://110.42.252.68:8080}"
 
-# STT via Aliyun Dashscope (paraformer-realtime-v2). Export in your shell.
-export DASHSCOPE_API_KEY="${DASHSCOPE_API_KEY:-}"
+# STT via Aliyun Dashscope (paraformer-realtime-v2).
+export DASHSCOPE_API_KEY="${DASHSCOPE_API_KEY:-sk-515fc7843e934051bc2d59978fc9e030}"
 
 BACKEND_PORT="${BACKEND_PORT:-8000}"
 

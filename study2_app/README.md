@@ -30,10 +30,10 @@ npm run dev            # http://localhost:5173
 bash study2_app/start.sh
 ```
 
-Vite dev server 默认代理到 `http://localhost:8001`（见 `frontend/vite.config.ts`）。后端端口不同时通过 `PREFQUEST_BACKEND_URL` 覆盖：
+Vite dev server 默认代理到 `http://localhost:8000`（见 `frontend/vite.config.ts`）。后端端口不同时通过 `PREFQUEST_BACKEND_URL` 覆盖：
 
 ```bash
-PREFQUEST_BACKEND_URL=http://localhost:8000 npm run dev
+PREFQUEST_BACKEND_URL=http://localhost:8001 npm run dev
 ```
 
 生产构建：
@@ -193,4 +193,4 @@ DialogueView 在每轮问答下方会用 `newActionsForTurn` 对比前后 `state
 
 **代理后端到非本机**：在启动前 `export PREFQUEST_BACKEND_URL=http://remote:8000`。
 
-**排查"创建中…"卡住**：通常是后端挂了或端口不对。打开浏览器 DevTools Network，看 `/sessions` POST 是否 200。也可以直接访问 `http://localhost:8001/docs` 验证后端。
+**排查"创建中…"卡住**：通常是后端挂了或端口不对。打开浏览器 DevTools Network，看 `/sessions` POST 是否 200。也可以直接访问 `http://localhost:8000/docs` 验证后端。
